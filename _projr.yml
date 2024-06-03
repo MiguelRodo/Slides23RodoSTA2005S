@@ -1,0 +1,17 @@
+# default directory settings:
+directories:
+  data-raw:
+    path: _data_raw
+  cache: 
+    path: _tmp
+  output: 
+    path: _output
+  docs:
+    path: docs
+build:
+  git: true
+  github:
+    input:
+      content: [data-raw]
+    output:
+      content: [output, docs]
