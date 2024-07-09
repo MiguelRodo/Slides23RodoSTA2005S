@@ -1,0 +1,11 @@
+citHeader("To cite `Slides23RodoSTA2005S` in publications use:")
+
+bibentry(bibtype = "Misc",
+         key = "rodo",
+         title = "Slides23RodoSTA2005S: Slides for STA2005S",
+         author = person(given = "Miguel",
+                         family = "Rodo",
+                         email = "miguel.rodo@uct.ac.za"),
+         url = "https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme",
+         abstract = "Slides for STA2005S",
+         version = "0.0.0-1")

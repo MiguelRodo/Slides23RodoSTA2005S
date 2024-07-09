@@ -1,0 +1,53 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "Slides23RodoSTA2005S",
+  "description": "Slides for STA2005S",
+  "name": "Slides23RodoSTA2005S: Slides for STA2005S",
+  "relatedLink": "https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme",
+  "codeRepository": "https://github.com/MiguelRodo/Slides23RodoSTA2005S",
+  "issueTracker": "https://github.com/MiguelRodo/Slides23RodoSTA2005S/issues",
+  "license": "{{ License }}",
+  "version": "0.0.0.1",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Miguel",
+      "familyName": "Rodo",
+      "email": "miguel.rodo@uct.ac.za"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Miguel",
+      "familyName": "Rodo",
+      "email": "miguel.rodo@uct.ac.za"
+    }
+  ],
+  "softwareRequirements": {
+    "SystemRequirements": null
+  },
+  "fileSize": "1.623KB",
+  "citation": [
+    {
+      "@type": "CreativeWork",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Miguel",
+          "familyName": "Rodo",
+          "email": "miguel.rodo@uct.ac.za"
+        }
+      ],
+      "name": "Slides23RodoSTA2005S: Slides for STA2005S",
+      "url": "https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme"
+    }
+  ]
+}

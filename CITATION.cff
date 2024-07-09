@@ -1,0 +1,32 @@
+# --------------------------------------------
+# CITATION file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# --------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "Slides23RodoSTA2005S" in publications use:'
+type: software
+title: 'Slides23RodoSTA2005S: Slides for STA2005S'
+version: 0.0.0-1
+abstract: Slides for STA2005S
+authors:
+- family-names: Rodo
+  given-names: Miguel
+  email: miguel.rodo@uct.ac.za
+preferred-citation:
+  type: generic
+  title: 'Slides23RodoSTA2005S: Slides for STA2005S'
+  authors:
+  - family-names: Rodo
+    given-names: Miguel
+    email: miguel.rodo@uct.ac.za
+  url: https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme
+  abstract: Slides for STA2005S
+  version: 0.0.0-1
+repository-code: https://github.com/MiguelRodo/Slides23RodoSTA2005S
+url: https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme
+contact:
+- family-names: Rodo
+  given-names: Miguel
+  email: miguel.rodo@uct.ac.za
+
