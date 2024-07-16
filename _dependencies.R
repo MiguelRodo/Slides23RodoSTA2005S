@@ -4,3 +4,5 @@ library(cffr)
 
 library(codemeta)
 
+library(quarto)
+
