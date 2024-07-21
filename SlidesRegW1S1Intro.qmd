@@ -481,17 +481,27 @@ knitr::include_graphics(path_p_grid)
 
 # Mathematical foundations to linear regression
 
+::::{.columns}
+
+:::{.column width=50%}
+
 \begin{figure}
 \centering
-\includegraphics[width=0.75\textwidth]{_data_raw/img/iceberg.png}
+\includegraphics[width=\textwidth]{_data_raw/img/iceberg.png}
 \end{figure}
 
-# Developing inferential theory
+:::
+
+:::{.column width=50%}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.95\textwidth]{_data_raw/img/lm_output.png}
 \end{figure}
+
+:::
+
+::::
 
 # Linear algebra and statistical theory prerequisites
 
