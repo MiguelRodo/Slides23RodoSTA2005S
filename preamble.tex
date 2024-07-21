@@ -1,0 +1,32 @@
+\usepackage{xcolor}
+\usepackage{amssymb} % For additional symbols
+\usepackage{caption}
+
+% Definitions for all colors used in the presentation
+\definecolor{balancedOrange}{RGB}{255,216,180}
+\definecolor{secondaryOrange}{RGB}{251,188,5}
+\definecolor{softBlue}{RGB}{100,124,156}
+\definecolor{titleColor}{RGB}{0,51,102}
+\definecolor{accentColor}{RGB}{112,173,71}
+
+    % Applying colors to Beamer elements
+    \setbeamercolor{palette primary}{bg=balancedOrange,fg=titleColor}
+    \setbeamercolor{palette secondary}{bg=secondaryOrange,fg=white}
+    \setbeamercolor{palette tertiary}{bg=softBlue,fg=white}
+    \setbeamercolor{titlelike}{parent=palette primary, fg=titleColor}
+    \setbeamercolor{structure}{fg=softBlue}
+    \setbeamercolor{block title}{bg=balancedOrange,fg=titleColor}
+    \setbeamercolor{block body}{bg=balancedOrange!10,fg=black}
+
+% Customizing bullet points to a smaller sideways triangle and adjusting vertical position
+\setbeamertemplate{itemize item}{\raisebox{1.5pt}{\scalebox{0.6}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{\raisebox{1.3pt}{\scalebox{0.5}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subsubitem}{\raisebox{1.1pt}{\scalebox{0.4}{$\blacktriangleright$}}}
+
+% Suppressing the footline on the title slide
+\setbeamertemplate{footline}{
+    \ifnum\insertpagenumber=1
+    \else
+        \hfill\insertframenumber/\inserttotalframenumber\hspace*{1em}\vspace*{1em}
+    \fi
+}

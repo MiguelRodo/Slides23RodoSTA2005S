@@ -1,0 +1,343 @@
+---
+title: "Regression Prequisites"
+subtitle: "Slide deck 1: Linear algebra and statistical prerequisites"
+author: "Miguel Rodo (with credit to Prof Francesca Little and Yovna Junglee)"
+institute: University of Cape Town
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+# Prerequisites
+
+- This course will rely heavily on two areas you would have covered at some point:
+  - Statistical distributions
+  - Linear algebra
+
+# Univariate distributions related to the normal distribution
+
+- Since the response is normally distributed (and univariate), related univarite distributions arise frequently.
+
+- For example, squaring a standard normal random variable creates a $\chi^2_1$ random variable.
+
+<!-- \pause !-->
+
+- The image below summarises these relationships:
+
+\centering
+
+![](_data_raw/img/distributions.pdf){width=90%}
+
+
+# Relevance to later sections
+
+- The one-page document `NotesRegW1L3StatDbn` under `0. Prerequisites` contains more detail, and knowing its contents well is essential. We won't cover it here, though, as they're just facts you need to learn and have (at least partially) covered already.
+
+<!-- \pause !-->
+
+- Knowing immediately the distribution of a random variable that is a function of other random variable(s) will make the proofs and theory later much easier (if not easy).
+
+<!-- \pause !-->
+
+- The notes do describe how to derive the PDF of the multivariate normal distribution, but I won't ask that. Just know the PDF.
+
+# Linear algebra recap
+
+- Pages 1-20 of the notes cover a lot of mathematical ground.
+
+- I know everyone will have done linear algebra in MAM2000W, but we'll briefly recap some of the key concepts and facts, and point you to what is most important in the notes.
+
+# Overview of what's important
+
+- Key concepts
+  - Properties of vectors/matrices
+    - Idempotence
+    - Orthogonality
+    - Rank
+    - Invertability
+  - Function of matrices
+    - Trace
+  - Eigenvectors and eigenvalues
+    - The concept, rather than calculating them
+  - Special matrices
+    - Symmetric matrix
+    - Positive definite matrix
+
+# Less relevant sections of the notes
+
+- You won't typically have to calculate things by hand (e.g. the trace, eigenvalues or inverse), so focus simply on understanding the concepts and being able to make use of the properties.
+
+<!-- \pause !-->
+
+- Unless I'm much mistaken, determinants do not particularly come up. 
+
+<!-- \pause !-->
+
+- We also won't go through every single fact in the notes, but the ones that are most important. We'll mention any others as need be.
+
+# Employing linear algebra in \texttt{R}
+
+- The document `DemRegW1L3LinearAlgebra.html` (in `0. Prerequisites` on Vula) covers some of the key concepts above and shows you to perform the linear algebra in \texttt{R}.
+- You can kill two birds with one stone and improve both your coding and your linear algebra at the same time.
+
+# Notation for row and column vectors
+
+- Firstly, a brief point re notation: $\symbf{a}_{[i]}$ refers to the $i$-th **row** of $\symbf{A}$, whereas $\symbf{a}_{i}$ refers to the $i$-th ***column** of $\symbf{A}$.
+- For example, if $\symbf{A}=\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$, then $\symbf{a}_{[1]}=\begin{bmatrix} 1 \\ 2\end{bmatrix}$ and $\symbf{a}_1=\begin{bmatrix} 1 \\ 3 \end{bmatrix}$.
+- Note that, despite that $\symbf{a}_{[1]}$ is from a row, it's still written as a column vector. This is just a convention that whether we talk about a row/column of a matrix from a matrix (i.e. it's now considered on its own, outside the matrix structure), then we think of it as a column vector.
+- There are likely deviations from the above conventions in the notes and slides, but we'll point those out when we come across them (if they're not fixed beforehand).
+
+# Matrix multiplication
+
+- In $\symbf{AB}$, the $ij$-th element is the dot product of $i$-th row of $\symbf{A}$ and the the $j$-th column of $\symbf{B}$, i.e. $(\symbf{AB})_{ij} = \symbf{a}_{[i]}'\cdot\symbf{b}_{j}$.
+
+- For example, if both $\symbf{A}$ and $\symbf{B}$ are $3\times 3$, then 
+
+
+
+
+$$
+\symbf{AB}=
+\begin{bmatrix}
+\symbf{a}_{[1]}'\cdot\symbf{b}_{1} & \symbf{a}_{[1]}'\cdot\symbf{b}_{2} & \symbf{a}_{[1]}'\cdot\symbf{b}_{3} \\
+\symbf{a}_{[2]}'\cdot\symbf{b}_{1} & \symbf{a}_{[2]}'\cdot\symbf{b}_{2} & \symbf{a}_{[2]}'\cdot\symbf{b}_{3} \\
+\symbf{a}_{[3]}'\cdot\symbf{b}_{1} & \symbf{a}_{[3]}'\cdot\symbf{b}_{2} & \symbf{a}_{[3]}'\cdot\symbf{b}_{3}
+\end{bmatrix}
+$$
+
+
+# Block matrix multiplication I
+
+- Sometimes certain sub-matrices within the matrices we're multipling ($\symbf{A}$ or $\symbf{B}$) have particular structures.
+- For example, suppose
+
+$$
+\symbf{A}_{3\times 3} =
+\begin{bmatrix}
+\symbf{I}_2 & \symbf{0}_{2\times1} \\
+\symbf{0}_{1\times2} & 4
+\end{bmatrix}
+$$
+
+# Block matrix multiplication II
+
+- Then, if we calculate $\symbf{B}$, we might want to partition $\symbf{B}$ in a way to allow use to simply use the sub-matrices of $\symbf{A}$ rather than working out all the dot products. So, let's then then set
+
+$$
+\symbf{B}_{3\times2} =
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+$$
+
+- Then we essentially treat each sub-matrix as elements in a dot product - the same thing we do in standard matrix multiplication. The matrices must then just be conformable (i.e. line up so that the multiplication works out).
+
+# Block matrix multiplication III
+
+- Continuing the previous example, we calculate $\symbf{AB}$ as follows:
+
+$$
+\symbf{AB} =
+\begin{bmatrix}
+\symbf{I}_2 & \symbf{0}_{2\times1} \\
+\symbf{0}_{1\times2} & 4
+\end{bmatrix}
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+=
+\begin{bmatrix}
+\symbf{I}_2\symbf{B}^1_{2\times 2}  & \symbf{0}_{2\times1} \symbf{B}^2_{1\times 2}\\
+\symbf{0}_{1\times2}\symbf{B}^1_{2\times 2}  & 4\symbf{B}^2_{1\times 2}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+4\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+$$
+
+- This was significantly easier to write out by hand than all those dot products as we made use of the identity matrix and zero matrices returning the multipled matrix or a zero matrix.
+- This comes up later on, for example, when we consider idempotent matrices, as the factorisation of an idempotent matrix involves a block matrix.
+
+# Orthogonality
+
+- Two vectors, $\symbf{x}, \symbf{y}$ are orthogonal if:
+  - Their dot product is equal to zero, i.e. $\symbf{x}^T \symbf{y} = \sum x_iy_i = 0$
+  - Or equivalently, the angle between the vectors is 90 degrees.
+  - For example, $\begin{bmatrix} 1 \\ 2 \end{bmatrix}$ and $\begin{bmatrix} -2 \\ 1 \end{bmatrix}$ are orthogonal.
+
+<!-- \pause !-->
+
+- A matrix is orthogonal if it is:
+  - Square and every column is orthogonal to every other column
+  - For example:
+    - All diagonal matrices are orthogonal.
+    - The matrix $\begin{bmatrix} 1 & -2 & 0 \\ -2 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ is orthogonal.
+
+<!-- \pause !-->
+
+- A matrix is orthonormal if it is:
+  - Orthogonal and every column has unit length. 
+  - For example, the identify matrix is orthonormal.
+  - Any orthogonal matrix is orthonormal if you divide each column by its length.
+  <!-- \pause !-->
+
+  - For orthonormal matrices, the inverse is the transpose, i.e. $\symbf{A}^{-1}=\symbf{A}'$.
+
+# Where does orthonormality factor in?
+
+- Well, later on we have that any square symmetric matrix can be written as
+
+$$
+\symbf{P}\symbf{\Lambda}\symbf{P}'
+$$
+
+- where $\symbf{P}$ is an orthonormal matrix and $\symbf{\Lambda}$ is a diagonal matrix.
+
+<!-- \pause !-->
+
+- Similar result holds for idempotent matrices, i.e. a matrix which when squared equals itself ($\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$). 
+
+<!-- \pause !-->
+
+- A final example is that the residual vector ($\symbf{e}=\symbf{y}-\hat{\symbf{y}}$) is orthogonal to the vector of fitted values ($\hat{\symbf{y}}$) as well as the columns of the model matrix ($\symbf{X}$).
+
+# Trace
+
+- The trace is the sum of diagonal elements of a matrix, i.e. $\mathrm{tr}(\begin{bmatrix}a & b \\ c & d \end{bmatrix}) = a + d$.
+
+<!-- \pause !-->
+
+- It's a simple calculation, but the following properties are useful. For any two matrices $\symbf{A}:p\times q$ and $\symbf{B}:q\times p$:
+  - $\mathrm{tr}(\symbf{A}\symbf{B})= \mathrm{tr}(\symbf{B}\symbf{A})$
+
+  <!-- \pause !-->
+
+  - Since matrix multiplication is associative ($\symbf{A}(\symbf{B}\symbf{C})=(\symbf{A}\symbf{B})\symbf{C}$), the above implies that (when the dimensions match between the matrices, i.e. that they're conformable again) $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$. This is known as the cyclic property of traces.
+
+# Cyclic trace property I
+
+- To repeat, the cyclic trace property is that for conformable matrices $\symbf{A}$, $\symbf{B}$ and $\symbf{C}$ we have that $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$.
+- Note that it is the *cyclic* trace property, not the *any-order* trace property. So, we don't have (in general) that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BAC})$.
+
+# Cyclic trace property II
+
+- The reason we have that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{CAB})=\mathrm{tr}(\symbf{BCA})$ is because $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ (just to change the lettering). We can just group two matrices in $\symbf{ABC}$ as we like, e.g. $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}((\symbf{AB})\symbf{C})$, to which we then apply $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ to get $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{CAB})$. We then can re-apply this to get $\mathrm{tr}(\symbf{CAB})=\mathrm{tr}(\symbf{BCA})$.
+
+# Cyclic trace property III
+
+- Now, we could group the second two matrices rather than the first, i.e. use $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{A}(\symbf{BC}))$. Doing so and applying the same steps as above, we get $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BCA})=\mathrm{tr}(\symbf{CAB})$. So we get nothing new, and re-applying  $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ in either case gets us back to  $\mathrm{tr}(\symbf{ABC})$, meaning we're out of options.
+- So, it's less that we prove that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BAC})$ is generally false (it's sometimes true, e.g. if the matrices are all diagonal) than that it doesn't follow from the line of reasoning we used to get the cyclic trace property. 
+
+# Rank I
+
+- Rank can be thought of in various ways:
+<!-- \pause !-->
+
+  - The size of a basis of the columns (or rows). 
+    - A basis is the minimal set of vectors that span the column (or row) space.
+    - For example, a basis of the column space of $\symbf{A}=\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix}$ is $\left\{\begin{bmatrix} 1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \end{bmatrix}\right\}$. So the rank is 2.
+    <!-- \pause !-->
+
+  - The number of linearly independent columns (or rows).
+    - For example, in $\symbf{A}$ above clearly the first two columns are independent, i.e. one is not a multiple of the other. However, the third column is equal to the sum of the first two columns. So the rank is 2. 
+
+<!-- \pause !-->
+
+- A matrix is full rank when it is square and its rank is equal to the number of columns/rows. 
+  - The key part here is then that the inverse exists, i.e. if $\symbf{A}$ is full rank then $\symbf{A}^{-1}$ exists where $\symbf{A}\symbf{A}^{-1} = \symbf{I}$.
+  
+# Rank II
+
+- The rank cannot be any higher than the smaller of the number of columns or rows (i.e. maximum possible rank of a rectangular matrix is its "shorter" dimension).
+  - Where the rank of a matrix is equal to the number of columns, we say that it is full column rank. Similarly for rows. 
+  - For example, $\symbf{A}=\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix}$ is full row rank but not full column rank.
+  <!-- \pause !-->
+
+- We have that $\mathrm{rank}(A)=\mathrm{rank}(A')$. In addition, it can be shown that $\mathrm{rank}(A)=\mathrm{rank}(AA')=\mathrm{rank}(A'A)$.
+  - This comes into the course, as for a centred matrix $\symbf{Xc}$ the covariance matrix is (up until a factor) $\symbf{X}'\symbf{X}$.
+
+# Eigenvectors and eigenvalues
+
+- For a given matrix $\symbf{A}$, an eigenvector $\symbf{x}$ is a unit-length (by convention) vector such that $\symbf{A}\symbf{x}=\lambda\symbf{x}$.
+<!-- \pause !-->
+
+- Eigenvectors and eigenvalues are central to linear algebra, but the main way they come into the course is in appearing in useful properties of covariance matrices.
+
+<!-- \pause !-->
+
+- You won't need to calculate them by hand (apart from the very first question in the first tutorial).
+
+# Symmetric and positive-definite matrices
+
+- A matrix $\symbf{A}$ is symmetric if $\symbf{A}=\symbf{A}'$.
+- Clearly, it can only apply to square matrices.
+
+<!-- \pause !-->
+
+- A very useful factorisation of a square matrix is as follows. Any symmetric matrix can be written as 
+
+$$
+\symbf{A}=\symbf{P}\symbf{\Lambda}\symbf{P}',
+$$
+
+- where the columns of $\symbf{P}$ are an orthonormal set of eigenvectors and $\symbf{\Lambda}$ is a diagonal matrix of the ordered eigenvalues. 
+
+- For example, the matrix $\symbf{A}=\begin{bmatrix} 1 & 2 \\ 2 & 3 \end{bmatrix}= \begin{bmatrix} 0.53 & -0.85 \\ 0.85 & 0.53 \end{bmatrix} \begin{bmatrix} 4.32 & 0 \\ 0 & -0.24 \end{bmatrix}  \begin{bmatrix} 0.53 & 0.85 \\ -0.85 & 0.53 \end{bmatrix}$ (up to rounding). 
+
+# Positive definite matrices
+
+- A positive definite matrix is a symmetric matrix where all the eigenvalues are positive.
+<!-- \pause !-->
+
+- This is equivalent to the statement that there for any vector $\symbf{x}$, we have that $\symbf{x}'\symbf{A}\symbf{x}>0$. 
+
+<!-- \pause !-->
+
+- The way this ties into the course is that the covariance matrix is positive definite. 
+
+<!-- \pause !-->
+
+- You can see this intuitively by considering the variance of a linear combination of some random vector, $\symbf{X}$ with variance covariance matrix $\symbf{\Sigma}$. The variance of the linear combination $\symbf{a}'\symbf{X}$ is $\symbf{a}'\symbf{\Sigma}\symbf{a}$. Clearly this cannot be 0 or less, since it is the sum of squared numbers, and so this always exceeds 0. Thus $\symbf{\Sigma}$ is positive definite.
+
+# Idempotency 
+
+- As stated earlier, a matrix is idempotent if it is equal to itself when squared ($\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$). 
+
+<!-- \pause !-->
+
+- The eigenvalues of an idempotent matrix are always 0 and 1 (why?).
+
+<!-- \pause !-->
+
+- It can be shown that (similarly to symmetric matrices) idempotent matrices can be factored in the form
+
+$$
+\symbf{P}\symbf{\Lambda}\symbf{P}'
+$$
+
+- where $\symbf{P}$ is an orthonormal matrix and $\symbf{\Lambda}$ is a diagonal matrix. In this case, 
+
+$$
+\mathbf{\Lambda}=\begin{bmatrix} \symbf{I}_r & 0 \\ 0 & 0 \end{bmatrix}.
+$$
+
+- where $r$ is the rank and $\symbf{I}_r$ is an identity matrix of rank $r$, as we already know the eigenvalues.
+
+<!-- \pause !-->
+
+- In addition, if a matrix $\mathbf{A}$ is idempotent, then $\symbf{I} - \symbf{A}$ is also idempotent.
+
+# Idempotent matrices in the course
+
+- Idempotent matrices arise as the matrix $\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ is idempotent, and $\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ is the matrix we use to calculate fitted values ($\hat{\symbf{y}}_i$). 
+- This will imply that residuals are calculated using $\symbf{I}-\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$, which leads to the result that residuals are orthogonal to fitted values. 

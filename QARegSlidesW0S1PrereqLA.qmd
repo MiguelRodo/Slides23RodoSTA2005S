@@ -1,0 +1,69 @@
+---
+title: Q&A
+subtitle: "Slide deck 1: Linear algebra and statistical prerequisites"
+format:
+  html:
+    embed-resources: true
+---
+
+- What is the notation for the i-th row of a matrix $\symbf{A}$?
+  - $\symbf{a}_{[i]}$
+  - Is $\symbf{a}_{[i]}$ a row or column vector?
+    - Column vector
+- What is the notation for the i-th column of a matrix $\symbf{A}$?
+  - $\symbf{a}_{i}$
+  - Is $\symbf{a}_{i}$ a row or column vector?
+    - Column vector
+- How do you calculate the $ij$-th element in matrix multiplication $\symbf{AB}$?
+  - Dot product of i-th row of $\symbf{A}$ and j-th column of $\symbf{B}$
+- What are the conditions for orthogonality between two vectors $\symbf{x}$ and $\symbf{y}$:
+  - Algebraic condition?
+    - Their dot product is zero
+  - Geometric condition?
+    - The angle between the vectors is 90 degrees
+- Condition for a matrix being column-wise orthogonal?
+  - Every column is orthogonal to every other column
+- Conditions for a matrix being orthogonal:
+  - First?
+    - Square
+  - Second?
+    - Every column is orthogonal to every other column
+- Conditions for a matrix being orthonormal:
+  - First?
+    - Orthogonal
+  - Second?
+    - Every column has unit length
+- How is the trace of a matrix calculated?
+  - Sum of diagonal elements
+- What is the cyclic property of traces?
+  - $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$
+- What is the maximum possible rank of a rectangular matrix?
+  - Its shorter dimension
+- What is an eigenvector $\symbf{x}$ of a matrix $\symbf{A}$?
+  - A unit-length vector such that $\symbf{A}\symbf{x}=\lambda\symbf{x}$
+- What can any symmetric matrix $\symbf{S}$ be factorisation as?
+  - $\symbf{P}\symbf{\Lambda}\symbf{P}'$
+  - What is:
+    - $\symbf{P}$?
+      - Matrix of eigenvectors of $\symbf{S}$
+      - Are the eigenvectors the rows or columns of $\symbf{P}$?
+        - Columns
+    - $\symbf{\Lambda}$?
+      - Diagonal matrix of eigenvalues of $\symbf{S}$
+    - What is a name commonly given to the factorisation $\symbf{S}= \symbf{P}\symbf{\Lambda}\symbf{P}'$?
+      - Spectral decomposition
+- What characterizes a positive definite matrix?
+  - All eigenvalues are positive
+- What is the condition for a matrix $\symbf{A}$ to be idempotent?
+  - $\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$
+- What are the eigenvalues of an idempotent matrix?
+  - 0 and 1
+- What is the factorization of an idempotent matrix?
+  - $\symbf{P}\symbf{\Lambda}\symbf{P}'$
+  - What is:
+    - $\symbf{\Lambda}$?
+      - $\begin{bmatrix} \symbf{I}_r & 0 \\ 0 & 0 \end{bmatrix}$
+    - $\symbf{P}$?
+      - Matrix of eigenvectors of $\symbf{A}$
+      - Are the eigenvectors the rows or columns of $\symbf{P}$?
+        - Columns

@@ -1,0 +1,115 @@
+---
+title: "Regression Week I: Introduction and foundations to GLMs"
+subtitle: "Lecture IV: The normal distribution and related theorems"
+author: "Yovna Junglee (edited by Miguel Rodo)"
+institute: University of Cape Town
+aspectratio: 169
+theme: Boadilla
+format:
+  beamer:
+    embed-resources: true
+    colorlinks: true
+    include-in-header:
+      file: preamble.tex
+    classoption: "aspectratio=169"
+---
+
+# The centrality of the normal distribution
+
+- As mentioned in the demonstration linear regression analysis, we typically assume that the errors are normally distributed.
+
+<!-- \pause !-->
+
+- This assumption leads to our parameters of interest (i.e. $\beta_0$, $\beta_1$, $\beta_2$, $\ldots$) having a normal distribution (which we'll show next week). 
+- Therefore both our criterion for estimating the parameters as well as our inference regarding the parameters strongly depend on the normal distribution:
+
+```{r, include = FALSE}
+library(tibble)
+library(dplyr)
+
+data_raw_ad <- read.csv("_data_raw/Advertising.csv", header = TRUE)
+
+# Convert the raw data to a tibble for easier manipulation
+data_raw_ad <- as_tibble(data_raw_ad)
+
+data_tidy_ad <- data_raw_ad |>
+  dplyr::select(-X)
+data_tidy_ad[1, ]
+
+fit_tv <- lm(sales ~ TV, data = data_tidy_ad)
+```
+
+```{r , eval = FALSE, echo = FALSE}
+summary(fit_tv)
+```
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{_data_raw/img/lm_output.png}
+\end{figure}
+
+
+# Lecture outline
+
+- Describe the PDFs and MGFs of the univariate and multivariate normal distributions
+- Prove several results regarding the multivariate normal (MVN) distributions:
+  - Linear combination of a MVN random variable is MVN
+  - MVN composed of MVNs
+  - Relationship between MVN and a $\chi^2$ random variable
+
+# Exclusions compared to to previous years' courses
+
+- The following appear in previous years' slides and tests (and in some cases, the notes), but won't be examined here:
+  - Deriving MVN distribution
+  - Deriving MVN MGF
+  - Determining mean and variance of an MVN distribution given the exponent
+
+<!-- \pause !-->
+
+- The reasons are as follows:
+  - Later results complete without them
+  - Learning them well does not particularly help with other course content
+  - Overlap with STA2004F
+  - Adds significantly heavier calculus component
+
+<!-- \pause !-->
+
+- Note that being apply to make use of the MGF is still important.
+- In general, however, the foundational mathematical facts and ideas of the coure are in linear algebra and the statistical distributions connected to the normal.
+
+
+# The univariate normal distribution
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+\vspace{1.15cm}
+
+::: {.def-univ_normal_dbn}
+
+## Definition
+
+If $X \sim \mathcal{N}(\mu,\sigma^2)$, then the probability density function is given as:
+
+$$f(x)= \frac{1}{\sqrt{2 \pi \sigma^2}}\exp\left( -\frac{(x-\mu)^2}{2 \sigma^2} \right)$$
+where $E(X)= \mu$ and $\textrm{Var}(X)=\sigma^2$ for $x\in\mathbb{R}$.
+:::
+
+:::
+
+:::{.column width="50%"}
+
+\vspace{0cm}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{_data_raw/img/rnorm_0_1.pdf}
+    \caption{$X \sim \mathcal{N}(0,1)$}
+    \label{fig:sims_rnorm}
+\end{figure}
+
+
+:::
+
+::::

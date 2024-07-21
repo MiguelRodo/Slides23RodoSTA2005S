@@ -1,0 +1,512 @@
+---
+title: "Regression Week I: Introduction and foundations to GLMs"
+subtitle: "Slide deck I: Course introduction and motivation"
+author: Miguel Rodo
+institute: University of Cape Town
+date: 22 July 2024
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+```
+
+# What is the purpose of the regression section?
+
+<!-- \pause !-->
+
+- To make you a useful statistician!
+
+<!-- \pause !-->
+
+- Well, to really get you on your way
+  - First year (STA1006S) is useful, but easily replicable by non-statisticans
+  - STA2004F is (despite all the effort you put in) not immediately of great practical use
+  - The practical skills and mathematical understanding you'll gain here are not easily replicable and can actually be used to assist decision-making
+
+<!-- \pause !-->
+
+## Key outcomes
+
+- Mathematical understanding of simplest regression model
+- Ability to code up an end-to-end modelling analysis
+  - Reading in data
+  - Analysing data
+  - Displaying and interpreting results
+
+# Lecture schedule
+
+```{r }
+#| echo: false
+#| results: asis
+#| label: tab-schedule
+schedule_tbl <- tibble::tibble(
+  Weeks = c("1", "2-6", "Vac", "7-11", "12"),
+  `Start date` = c("22 Jul", "29 Jul", "30 Jul", "9 Sep", "14 Oct"),
+  `End date` = c("26 Jul", "30 Aug", "8 Sep", "11 Oct", "18 Oct"),
+  Section = c("Regression", "Experimental design", "")[
+    c(1, 2, 3, 1, 2)
+  ]
+)
+```
+
+```{r}
+#| echo: false
+#| results: asis
+#| label: tab-schedule-latex
+#| eval: true
+# Create and display the table
+knitr::kable(schedule_tbl, format = "latex", booktabs = TRUE) |>
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+# Contributions to regression section mark
+
+```{r}
+#| include: false
+# Create the data frame
+plot_tbl <- data.frame(
+  pos = 1:3 |> rev(),
+  percentage = c(70, 15, 15) |> rev(),
+  category = 1:3 |> rev() |> as.character()
+)
+
+plot_tbl_txt <- tibble::tibble(
+  x = 1:3,
+  y = c(7.5, 7.5, 35) |> rev(),
+  txt = c("70%", "15%", "15%")
+)
+
+plot_tbl_date <- tibble::tibble(
+  x = 2:3,
+  y = c(17, 17),
+  txt = c("10 October", "30 September")
+)
+
+cat_lab_vec <- c("Assignment", "Test", "Exam") |> rev()
+
+# Create the plot
+p <- ggplot(plot_tbl, aes(x = pos, y = percentage, fill = category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_x_continuous(
+    labels = cat_lab_vec,
+    breaks = 1:3
+  ) +
+  # geom_hline(yintercept = c(15, 70), linetype = "dashed") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1) # ,
+    # breaks = seq(0, 100, 10)
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+     axis.title.y = element_blank(),
+     axis.title.x = element_blank(),
+    # axis.ticks.y = element_blank(),
+    # axis.text.y = element_blank(),
+    legend.position = "none"
+  ) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) + #+
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) +
+  geom_text(
+    data = plot_tbl_txt, aes(x = x, y = y, label = txt),
+    size = 5, inherit.aes = FALSE
+    ) +
+  geom_text(
+    data = plot_tbl_date, aes(x = x, y = y, label = txt),
+    size = 5, inherit.aes = FALSE, hjust = 0
+    )
+
+path_p <- projr::projr_path_get(
+  "cache", "fig", "w1s1", "p-assessment.png"
+)
+cowplot::ggsave2(
+  path_p, p,
+  width = 15, height = 8, units = "cm"
+)
+```
+
+```{r}
+#| results: asis
+#| label: p-assessment
+knitr::include_graphics(path_p)
+```
+
+
+# Learning resources: content
+
+- Regression notes:
+  - Location: `Module 1: Regression/More regression resources/Notes/NotesReg.pdf`
+  - Printed copies available at stats reception later this week
+- Slides:
+  - Location: in `Slides` folder under each week's tab
+- Lecture recordings:
+  - Automatically uploaded to `Lecture Videos/Lecture Videos 2024` tab
+
+# Learning resources: testing I
+
+::::{.columns}
+
+:::{.column width=50%}
+
+- Q&A docs:
+  - Comprehensive set of short questions on each slide deck's content
+  - A review of all the facts, essentially
+  - Will be in the `Slides` folder for each week's content
+    - For example, `QARegSlidesW0S1PrereqLA.pdf` is in `Introduction/Slides` folder alongside `SlidesRegW0S1PrereqLA.pdf`
+  - *Note*: these are not exam-style questions, but rather a way to a) remember the content, and b) check your understanding
+
+
+:::
+
+
+\pause
+
+:::{.column width=50%}
+
+
+- Tutorials
+  - On Amathuba (`Module 1: Regression/More regression resources/Tutorials`)
+
+\pause
+
+- Question bank:
+  - Appropriate questions over and above the tutorials
+  - Aim to progress from simpler to harder questions within each section
+  - On Amathuba (`Module 1: Regression/More regression resources/Question bank`)
+  - Will be updated throughout the term
+
+:::
+
+::::
+
+# Advised learning/revision route for exam and test
+
+- Attend lectures
+- After each lecture, do relevant Q&A content
+- Do tutorials (and attend them)
+- Do question bank questions
+
+# Introduction to `R`
+
+- Online lecture:
+  - Day: Wednesday 24 July
+  - Time: 2pm
+  - Link: [MS Teams](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NjhjYTBlYjgtNDk3Ni00MGUxLWEyYmQtZGM4YTM5NjljNjUy%40thread.v2/0?context=%7b%22Tid%22%3a%2292454335-564e-4ccf-b0b0-24445b8c03f7%22%2c%22Oid%22%3a%22f479858a-bdb3-4e57-9ee4-f624b487e11f%22%7d)
+
+\pause
+
+- Practicals:
+  - Days: Thursday and Friday, 25 and 26 July
+  - Times: 2-3pm and 3-4pm
+  - Category: `Week 1 Computer Lab Session - Intro to R`
+
+# Practicals
+
+- In a computer lab, with a tutor, who will walk through coding up part of a regression analysis
+- For example:
+  - Fitting a regression model
+  - Validating a regression model
+
+# Sign up for tutorials and practicals
+
+- Frequency: weekly
+- Start: week 2
+- Signup:
+  - `Amathuba` >> `Course info` >> `Groups`
+  - Categories;
+    - Practical: `Computer Lab Session` and `STA2005SLabSession 5`
+    - Tutorial: `STA2005S Tutorials`
+
+# Office hours
+
+- Room: 5.52 PD Hahn (fifth floor, down the corridor from stats reception)
+- Time: 10-12
+- Day: Thursday
+- Purpose: any content-related questions
+- May also email for other times, if need be
+
+\pause
+
+- Email:
+  - Address: `miguel.rodo@uct.ac.za`
+  - Purpose: any admin-related issues
+
+
+# What is regression? {.smaller}
+
+::::{.columns}
+
+:::{.column width=50%}
+
+- $Y\sim f(X,\epsilon)$:
+  - $Y$ is the response variable (dependent variable)
+  - $X$ contains the explanatory variable(s) (or independent variables) 
+  - $\epsilon$ is the random variable
+  - The function `f` describes how they relate
+  - $Y$ cannot be categorical
+
+:::
+
+:::{.column width=50%}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{_data_raw/img/reg_img.png}
+\end{figure}
+:::
+
+::::
+
+# Regression versus the $t$-test
+
+- Suppose you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
+- Also suppose that more males took the drug than females.
+- Suppose we perform a $t$-test. How might someone object?
+
+<!--
+- Confounders
+!-->
+
+\pause
+
+- Regression allows us to control for confounders
+
+# Regression versus the correlation coefficient
+
+- Now, suppose a doctor wants to decide whether a six-month old baby has a healthy weight.
+- Why would the correlation coefficient not be useful?
+
+\pause
+
+- Regression allows us to predict
+
+# Toolbox
+
+\centering
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{_data_raw/img/toolbox-wide-edit-removebg.png}
+\end{figure}
+
+# Assumptions
+
+::::{.columns}
+:::{.column width=70%}
+```{r}
+# ==========================
+# distribution
+# ==========================
+# density
+set.seed(3)
+# generate data from a normal distrbution from a range of x values
+p_normal <- ggplot(
+  tibble::tibble(x = rnorm(1000, 200, 5)),
+  aes(x = x)
+) +
+  geom_density(fill = "#a6cee3", adjust = 3, col = "gray65") +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_normal_non <- ggplot(
+  tibble::tibble(x = rpois(1000, 200)^6),
+  aes(x = x)
+) +
+  geom_density(fill = "#b2df8a", adjust = 3, col = "gray65") +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+# ==========================
+# relationship
+# ==========================
+
+set.seed(5)
+n_elem <- 1e2
+plot_tbl <- tibble::tibble(
+  x = c(1, runif(n_elem, 1, 10), 10)
+) |>
+  dplyr::mutate(
+    y = 2 + 3 * x + rnorm(n_elem + 2, 0, 2),
+    y2 = 2 + 3 * x^3 + rnorm(n_elem + 2, 0, 300),
+    fit = 2 + 3 * x,
+    fit2 = 2 + 3 * x^3
+  )
+
+p_rel_linear <- ggplot(plot_tbl, aes(x = x, y = y)) +
+  geom_point(col = "#a6cee3") +
+  geom_line(aes(y = fit), color = "gray15", size = 1) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_rel_quad <- ggplot(plot_tbl, aes(x = x, y = y2)) +
+  geom_point(col = "#b2df8a") +
+  geom_line(aes(y = fit2), color = "gray15", size = 1) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+# ==========================
+# variance
+# ==========================
+
+set.seed(6)
+n_elem <- 3e2
+plot_tbl <- tibble::tibble(
+  x = c(1, runif(n_elem, 1, 10), 10)
+) |>
+  dplyr::mutate(
+    y = 1 * x + rnorm(n_elem + 2, 0, 2),
+    y2 = (1 * x + rpois(n_elem + 2, x)^2)^0.9,
+    y2 = y2 + rnorm(n_elem + 2, 0, 2)
+  )
+
+p_var_constant <- ggplot(plot_tbl, aes(x = x, y = y)) +
+  geom_point(col = "#a6cee3") +
+  geom_smooth(
+    method = "lm", se = FALSE, col = "gray15", size = 1,
+    formula = y ~ x
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_var_increasing <- ggplot(plot_tbl, aes(x = x, y = y2)) +
+  geom_point(col = "#b2df8a") +
+ geom_smooth(
+    method = "lm", se = FALSE, col = "gray15", size = 1,
+    formula = y ~ x
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+
+p_grid <- cowplot::plot_grid(
+  p_normal, p_rel_linear, p_var_constant,
+p_normal_non, p_rel_quad, p_var_increasing,
+  ncol = 3,
+  labels = c("Distribution", "Relationship", "Variance"),
+  label_size = 18
+)
+path_p_grid <- projr::projr_path_get(
+  "cache", "fig", "w1s1", "p-assumptions.png"
+)
+cowplot::ggsave2(
+  path_p_grid, p_grid,
+  width = 19, height = 14, units = "cm"
+)
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_grid)
+```
+:::
+
+:::{.column width=30%}
+
+\vskip 1cm
+
+- In our course, we consider **linear regression** only:
+  - Normally distributed response
+  - Linear relationship with response variables
+  - Constant variance
+
+:::
+
+::::
+
+# Regression becomes highly flexible
+
+- Non-constant variance: mean-variance relationship, dependent on predictor variables, etc.
+- Correlated errors:
+  - within subsets of observations, e.g. measurements from the same individual, or
+  - between "nearby" observations, e.g. time-series or spatial data
+- Non-normally distributed data, e.g. count data
+- Categorial dependent vairables, e.g. disease status
+
+# Mathematical foundations to linear regression
+
+\begin{figure}
+\centering
+\includegraphics[width=0.75\textwidth]{_data_raw/img/iceberg.png}
+\end{figure}
+
+# Developing inferential theory
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth]{_data_raw/img/lm_output.png}
+\end{figure}
+
+# Linear algebra and statistical theory prerequisites
+
+- Under `Module 1: Regression/Introduction/Prerequisites`:
+  - `NotesRegW0StatDbn.pdf`
+    - Facts about normal, $t$ and $F$ distributions
+  - `SlidesRegW0S1PrereqLA.pdf`
+    - Essential linear algebra 
+  - `QARegSlidesW0S1PrereqLA.pdf`
+    - Questions and answers on the linear algebra content
+  - Pre-recorded lecture video
+    - Will upload one in the next day or two
+  - `DemRegW0LinearAlgebra.html`
+    - Implementing linear algebra in `R`
+  - `TutReg1IntroMVNQuestions.pdf`
+    - The first few questions in this tutorial are about linear algebra
+  
+
