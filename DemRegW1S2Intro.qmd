@@ -252,7 +252,14 @@ The `summary` function gives the following output:
 
 The plot below displays some of the key quantities associated with the data and the model:
 
-![](_data_raw/img/reg_img_exp.png)
+```{r}
+#| results: asis
+#| echo: false
+path_img <- "_data_raw/img/reg_img_exp.png"
+if (file.exists(path_img)) {
+  knitr::include_graphics(path_img)
+}
+```
 
 - $\hat{\beta}_0$: estimated mean sales when TV spending is zero
 - $\hat{\beta}_1$: The estime per-unit increase in mean sales for each unit increase in TV spending
