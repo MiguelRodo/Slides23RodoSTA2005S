@@ -1,0 +1,97 @@
+---
+title: "Q&A: Week One - Slide deck one - Introduction and prerequisites"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+*Note: the headings map to slide headings in the slide deck `SlidesRegW1S1Intro.pdf`.*
+
+#### What is regression?
+
+- In terms of notation, what is the symbol for the:
+  - Response variable?
+    - $Y$
+    - What is another name for the response variable?
+      - Dependent variable
+    - Is $Y$ categorical?
+      - No
+    - Is $Y$ random?
+      - Yes
+  - Explanatory variable(s)?
+    - $X$
+    - What is another name for the explanatory variable(s):
+      - First?
+        - Independent variable
+      - Second?
+        - Predictor variable
+    - Is $X$ random?
+      - No
+  - Error term?
+    - $\epsilon$
+    - Is $\epsilon$ random?
+      - Yes
+  - Intercept?
+    - $\beta_0$
+      - What does the intercept represent?
+        - The expected value of $Y$ when $X=0$
+  - Slope?
+    - $\beta_1$
+      - What does the slope represent?
+        - The change in $Y$ for a one-unit change in $X$
+- Consider the model formula $Y = \beta_0 + \beta_1X + \epsilon$.
+  - What is this model called?
+    - Simple linear regression
+  - What is an extension of this?
+    - Multiple linear regression
+    - What is the difference between simple and multiple linear regression?
+      - The number of explanatory variables
+    - What is the model formula for multiple linear regression with two explanatory variables?
+      - $Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \epsilon$
+
+#### Assumptions
+
+- What type of regression do we consider?
+  - Linear regression
+- What are the restrictions:
+  - First?
+    - Distribution of response
+    - What must it be?
+      - Normal
+  - Second?
+    - Relationship with response variables
+    - What must it be?
+      - Linear
+  - Third?
+    - Variance
+    - What must it be?
+      - Must be constant
+      - With respect to?
+        - Predictor variables
+  - Fourth?
+    - Errors
+    - What must they be?
+      - Independent
+      - Of:
+        - First?
+          - Each other
+        - Second?
+          - Predictor variables
+
+#### Linear algebra and statistical theory prerequisites
+
+- What is under Module 1: Regression/Introduction/Prerequisites?
+  - NotesRegW0StatDbn.pdf
+- What does NotesRegW0StatDbn.pdf cover?
+  - Facts about normal, $t$, and $F$ distributions
+- What does SlidesRegW0S1PrereqLA.pdf cover?
+  - Essential linear algebra
+- What is QARegSlidesW0S1PrereqLA.pdf?
+  - Questions and answers on the linear algebra content
+- What will be uploaded in the next day or two?
+  - Pre-recorded lecture video
+- What is DemRegW0LinearAlgebra.html about?
+  - Implementing linear algebra in $R$
+- What is the first few questions in TutReg1IntroMVNQuestions.pdf about?
+  - Linear algebra

@@ -6,6 +6,65 @@ format:
     embed-resources: true
 ---
 
+## Statistical distributions
+
+- Why do related univariate distributions arise frequently in the context of linear regression?
+  - Since the response is normally distributed (and univariate)
+- How is a standard normal random variable denoted?
+  - $X$
+  - How do we write its distribution?
+    - $N(0, 1)$
+  - Suppose a normal random variable has meann $\mu$ and variance $\sigma^2$. How do we denote its distribution?
+    - $N(\mu, \sigma^2)$
+  - How to create a $N(\mu, \sigma^2)$ random variable from a $N(0, 1)$ random variable?
+    - Multiply by $\sigma$ and add $\mu$
+    - Formula?
+      - $\mu + \sigma X$
+  - How do we create a $N(0, 1)$ random variable from a $N(\mu, \sigma^2)$ random variable?
+    - Subtract $\mu$ and divide by $\sigma$
+    - Formula?
+      - $\frac{(X - \mu)}{\sigma}$
+    - What is usually the notation for such a variable?
+      - $Z$
+- What is the sum of squares of $n$ standard normal random variables distributed as?
+  - $\chi^2_n$
+  - What is the notation for a $\chi^2_n$ random variable?
+    - $\chi^2_n$
+- $\chi^2_n$ random variable:
+  - What variables do we need to create it?
+    - $n$ normal random variables
+  - What are the conditions on the random variables:
+    - First?
+      - Standard normal
+      - Meaning?
+        - Mean 0 and variance 1
+    - Second?
+      - Independent
+    - Formula?
+      - $\sum_{i=1}^n Z_i^2$
+- $t_n$ random variable:
+  - What variables do we need to create it:
+    - First?
+      - Normal random variable
+    - Second?
+      - $\chi^2_n$ random variable
+  - How must these two variables relate?
+    - Independent
+  - What is the formula?
+    - $\frac{X}{\sqrt{\chi^2_n/n}}$
+- $F_{m,n}$ random variable:
+  - What variables do we need to create it:
+    - First?
+      - $\chi^2_m$ random variable
+    - Second?
+      - $\chi^2_n$ random variable
+  - How must these two variables relate?
+    - Independent
+  - What is the formula?
+    - $\frac{\chi^2_m / m}{\chi^2_n / n}$
+
+## Linear algebra
+
 - What is the notation for the i-th row of a matrix $\symbf{A}$?
   - $\symbf{a}_{[i]}$
   - Is $\symbf{a}_{[i]}$ a row or column vector?

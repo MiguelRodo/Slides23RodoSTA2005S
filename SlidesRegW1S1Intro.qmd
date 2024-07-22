@@ -269,28 +269,26 @@ knitr::include_graphics(path_p)
 
 ::::
 
-# Regression versus the $t$-test
+# Regression versus the correlation coefficient: round one
 
-- Suppose you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
-- Also suppose that more males took the drug than females.
-- Suppose we perform a $t$-test. How might someone object?
+- Image we work out what the correlation is between advertising spending and revenue.
+- In what way might the correlation coefficient be deficient?
 
-<!--
-- Confounders
-!-->
-
-\pause
-
-- Regression allows us to control for confounders
-
-# Regression versus the correlation coefficient
+# Regression versus the correlation coefficient round two
 
 - Now, suppose a doctor wants to decide whether a six-month old baby has a healthy weight.
 - Why would the correlation coefficient not be useful?
 
-\pause
+# Regression versus the $t$-test: round one
 
-- Regression allows us to predict
+- Let's say you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
+- Also assert that more males took the drug than females.
+- Suppose we perform a $t$-test. How might someone object?
+
+# Regression versus the $t$-test: round two
+
+- Suppose that we want to model blood pressure against BMI.
+- What's the problem with the $t$-test in this case?
 
 # Toolbox
 
@@ -300,6 +298,11 @@ knitr::include_graphics(path_p)
 \centering
 \includegraphics[width=0.6\textwidth]{_data_raw/img/toolbox-wide-edit-removebg.png}
 \end{figure}
+
+<!--
+- Points: simply adding to your statistical toolbox
+- Have to deal with real life, so need multiple approaches with their own pros and cons
+!-->
 
 # Assumptions
 
