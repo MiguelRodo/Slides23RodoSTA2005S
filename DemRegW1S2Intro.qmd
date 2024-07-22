@@ -1,0 +1,713 @@
+---
+title: "Introductory example of linear regression"
+author: "Miguel Rodo (with thanks to Prof. Little and Yovna Junglee)"
+format:
+  html:
+    toc: true
+    theme: lumen
+    number-sections: true
+    embed-resources: true
+    code-fold: true
+---
+
+## Introduction
+
+This is an example analysis of a simple dataset to illustrate the use of linear regression.
+
+Extra details, particularly those related to programming, are kept inside expandable "folds" (click on the triangle to the left of the fold to expand it) if you're viewing the HTML or inside HTML tags if you're viewing the qmd file.
+
+## Problem statement
+
+Suppose that you're a business analyst tasked with helping the executives decide how to advertise.
+
+You've gathered annual data across 200 markets in terms of sales revenue and advertising spend on TV, radio and newspaper. Your boss has heard about "regression", and wants to see if it can be more informative than simply understanding that more advertising leads to more sales.
+
+## Set-up
+
+First we attach R packages we need, which make useful functions available: 
+
+```{r}
+#| warning: false
+#| message: false
+#| results: "hide"
+#| echo: true
+# install packages if missing
+pkg_vec <- c("tibble", "dplyr", "ggplot2", "cowplot")
+for (x in pkg_vec) {
+  if (!requireNamespace(x, character.only = TRUE)) {
+    install.packages(x)
+  }
+}
+# attach packages
+library(tibble)
+library(dplyr)
+library(ggplot2)
+library(cowplot)
+```
+
+<details>
+  <summary>Indicating code in an qmd</summary>
+- How do I indicate code in an `qmd`?
+  - By "fencing" it
+  - What does that mean?
+    - Putting ```{r} before the code and ``` after the code
+  - What is another name for the tick things?
+    - Back ticks
+    - Where is it on the keyboard?
+      - Top left (next to one)
+  - What do I put in between the fences?
+    - Code!
+</details>
+
+<details>
+  <summary>Attaching packages</summary>
+  
+  In `R`, a package is a collection of functions that extend the functionality of `R`.
+  In `R`, a library is a actually a folder where packages are installed (e.g. the output from `.libPaths()`).
+
+  Somewhat confusingly, the `library` function is used to attach a package into the current `R` session. 
+  For example, the package `tibble` provides the `as_tibble` function.
+  If I run `as_tibble` without attaching the `tibble` package, I get the error that `as_tibble` function is not found.
+  But if I first run `library(tibble)` and then run `as_tibble`, it works.
+  Another option would be to not run `library(tibble)`, but instead directly reference the `tibble` package when using the `as_tibble` function, like so: `tibble::as_tibble` (note the double semi-colons). 
+
+  Some languages do not allow you to attach libraries in the way `R` does.
+  I prefer not attaching packages, but typical practice in the R community is to attach them.
+  Since this is an introductory course, I'll attach them.
+
+  If you are attaching them, then it's good practice to attach them at the top of the script.  
+
+</details>
+
+
+<details>
+  <summary>Naming datasets</summary>
+  
+  - I like reading in naming data sets I've just read in `data_raw_<name>`
+  - Converting it to a `tibble` prevents too much information being printed to the console each time you print it 
+
+</details>
+
+First we read our data in:
+
+```{r}
+# Read in the raw data from the Advertising.csv file
+data_raw_ad <- read.csv("_data_raw/Advertising.csv", header = TRUE)
+
+# Convert the raw data to a tibble for easier manipulation
+data_raw_ad <- as_tibble(data_raw_ad)
+```
+
+## Data exploration
+
+In the real world, it's important to examine the data first as the analytical techniques chosen will depend on the data itself.
+
+- Since we're interested in performing linear regression, we would like to assess upfront the following:
+  - Distribution of the response variable (hopefully normal)
+  - Relationship between repsonse and dependent variables (hopefully linear)
+  - Correlation between explanatory variables (hopefully minor)
+
+- Once we've fitted the model, we can also be more sure that we haven't made a mistake somewhere by the results matching what we see in preliminary data exploration.
+
+```{r}
+# Print the first 10 rows of the data
+data_raw_ad
+```
+
+We'll consider a linear regression analysis.
+
+We see that one column, `X`, is just the row number. So we delete it, yielding our analysis-ready dataset:
+
+```{r}
+data_tidy_ad <- data_raw_ad |>
+  select(-X)
+data_tidy_ad[1, ]
+```
+
+<details>
+  <summary>Pipe operator</summary>
+  
+  - The pipe operator, `|>`,  simplifies writing long chains of functions.
+    - For example, `f(g(h(x))` is equivalent to `f() |> g() |> h()x`.
+    - This might seem particularly advantageous here, but when `f`, `g` and `h` all have multiple arguments, having them on different lines is very helpful.
+</details>
+
+<details>
+  <summary>The tidyverse</summary>
+  
+  - The two packages I've used so far, `tibble` and `dplyr`, are part of the `tidyverse`.
+  - The `tidyverse` is a collection of packages that share a common philosophy of data manipulation.
+  - The `tidyverse` is very popular in the `R` community, and is a good place to start.
+  - The book `R for Data Science` is a good introduction to the `tidyverse`.
+</details>
+
+### Distribution of response variable
+
+
+First we'll examine the distribution of the sales response variable, which will be our dependent variable, to assess whether a normal distribution might be appropriate:
+
+```{r}
+hist(data_tidy_ad$sales, freq = FALSE)
+```
+
+We can also overlay a normal distribution on the histogram to see how well it fits:
+
+```{r}
+hist(data_tidy_ad$sales, freq = FALSE)
+x_vec <- seq(
+  min(data_tidy_ad$sales), max(data_tidy_ad$sales),
+  length.out = 1e3
+  )
+y_vec <- dnorm(
+  x_vec, mean = mean(data_tidy_ad$sales), sd = sd(data_tidy_ad$sales)
+)
+lines(x_vec, y_vec, col = "red", size = 2)
+```
+
+It seems approximately normally distributed, if positively skewed.
+
+It's important to note that the model only requires that the response variable be *conditionally* normally distributed, which we can't assess until we've fit the model. 
+But what we see thus far seems encouraging.
+
+### Correlation between explanatory variables
+
+The effects of explanatory variables are hard to isolate when they are highly correlated with one another. So we'll examine their correlation:
+
+```{r}
+cor(data_tidy_ad |> select(radio:sales)) |> signif(2)
+```
+
+They are all very low.
+
+Graphs could highlight non-linear relationships not captured by the correlation statistics, as well as indicate outlying observations:
+
+```{r}
+pairs(data_tidy_ad)
+```
+
+The explanatory variables also look uncorrelated. A few possible outliers, but nothing dramatic.
+
+Sales definitely seems to depend on TV and radio spending, but less so on newspaper spending.
+
+So, overall, we're happy that we'll be able fit a linear model. 
+
+## Modelling sales against TV
+
+So, let's just model sales against TV spending first.
+
+In this case, we assume that $Y_i=\beta_0 + \beta_{\mathrm{TV}}X_{i,\mathrm{TV}}+\epsilon_i$, where $\epsilon_i\sim N(0,\sigma^2)$. 
+
+### Fitting the model
+
+We fit the model using the `lm` function, which finds values for $\beta_0$, $\beta_{\mathrm{TV}}$ and $\sigma^2$ that best fit the data:
+
+```{r}
+fit_tv <- lm(sales ~ TV, data = data_tidy_ad)
+```
+
+Simply printing the model output displays the model structure and the estimated regression coefficients ($\beta_0$ and $\beta_{\mathrm{TV}}$):
+
+```{r}
+fit_tv
+```
+
+### Examining the model output
+
+However, if we want to find out what the effect of TV on sales is (the estimate), how accurate that estimate is (the estimate's standard error) and how compatible the data are with no effect (the p-value), we'll need to use the `summary` function on the fitted model object to generate extra statistics and estimates:
+
+#### Estimates and inference
+
+```{r}
+summary(fit_tv)
+```
+
+The `summary` function gives the following output:
+
+- `Call`:
+  - This is the command that fit the model.
+- `Residuals`:
+  - This is a five-number summary of the residuals (the difference between the actual and fitted response values).
+  - Since the residuals are not scaled (i.e. not divided by standard deviation), their magnitude is less important than symmetry around zero. That said, typically one would use the residuals in a plot rather than examine this line.
+- `Coefficients`:
+  - These are the estimated values of the parameters (`Estimate`), along with the accuracy thereof (`Std. Error`) as well as the test-statistic (`t value`) and p-value (`Pr(>|t|)`) for testing the null hypothesis that the parameter is zero.
+  - `(Intercept)` means $\beta_0$.
+  - As we can see, each one unit increase in TV spending increases sales by 0.047.
+  - The 95% confidence interval for this effect is roughly (0.042, 0.052), which is probably precise enough, given the purpose.
+ - The p-value is minute ($<2*10^{-16}$).
+  - The `Signif. codes` maps the number of stars next to the p-values to the range the star indicates.
+- `Residual standard error`:
+  - This is the estimate of $\sigma$, i.e. the standard deviation of the response.
+    - It is also the square root of the average squared distance of fitted values from the actual values.
+  - The degrees of freedom is the sample size (200) less the number of parameters estimated (2).
+  - The actual value is not particularly meaningful as it is scaled by the response variable.
+- `Multiple R-squared` and `Adjusted R-squared`: 
+  - These are measures of the proportion of variation in the response variable (`y_i`) captured by the model.
+  - The `Adjusted R-squared` is the `Multiple R-squared` penalised for the number of parameters estimated. 
+  - Both of these measures lie between 0 and 1, with higher values indicating more variation captured.
+- `F-statistic`:
+  - This is a "global" test for the nullity (i.e. zero-ness) of all the parameters except the intercept.
+  - The first number (312.1) is the test statistic, the second two are the $F$ distribution's degrees of freedom under the null and the third is the p-value. 
+ 
+#### Displaying results graphically
+
+The plot below displays some of the key quantities associated with the data and the model:
+
+![](_data_raw/img/reg_img_exp.png)
+
+- $\hat{\beta}_0$: estimated mean sales when TV spending is zero
+- $\hat{\beta}_1$: The estime per-unit increase in mean sales for each unit increase in TV spending
+- $y_i$: The response value for the $i$-th observation
+- $\hat{y}_i$: The fitted value for the $i$-th observation
+- $\hat{\epsilon}_i$: The estimated residual for the $i$-th observation (different between actual and fitted response value, i.e. $y_i-\hat{y}_i$)
+  - Note that it is more correct to use $\hat{\epsilon}_i$ than $\epsilon_i$, as the residuals are estimated (since the true value of the mean response is not known), but in practice this is not strictly adhered to. Use of the caret (i.e. the hat, $\textasciicircum$) for the estimated coefficients is important, however.
+
+#### Fitted values and residuals
+
+By virtue of fitting the model, we've described a way for relating any value of TV spending to average sales.
+
+For example, if someone spends 100 on TV advertising, we can predict that their average sales will be:
+
+```{r}
+coef_vec <- coefficients(fit_tv) |> setNames(NULL)
+beta_0 <- coef_vec[1]
+beta_1 <- coef_vec[2]
+round(beta_0 + beta_1 * 100, 1)
+```
+
+## Modelling sales against TV, radio and newspaperk
+
+Now that we've examined sales against TV, let's examine sales against all three explanatory variables.
+
+In this case, we assume that $Y_i=\beta_0 + \beta_{\mathrm{TV}}X_{i,\mathrm{TV}} + \beta_{\mathrm{R}}X_{i,\mathrm{R}} + \beta_{\mathrm{N}}X_{i,\mathrm{N}}  +\epsilon_i$, where $\epsilon_i\sim N(0,\sigma^2)$. 
+
+### Fitting the model
+
+We fit the model using the `lm` function as before, which finds optimal values for the unknowne parameters:
+
+```{r}
+fit_all <- lm(sales ~ TV + radio + newspaper, data = data_tidy_ad)
+```
+
+### Examining the model output
+
+Let's examine the detailed inferential output from the `summary` function:
+
+```{r}
+summary(fit_all)
+```
+
+The model output reveals that radio spending is clearly associated with sales, while newspaper spending does not show a significant effect. The inference regarding the effect of TV advertising spending on sales remains largely unchanged from the previous model.
+
+The only (subtle) change is that we now can confirm (in addition to the data exploration) that the effect of TV is not driven by an association between TV and radio.
+
+## Connection to future lessons
+
+- Over the next few weeks, we will develop the mathematical and statistical theory to estimate the parameters and conduct inference regarding them.
+- Once we've done that, we'll actually have a flexible inferential tool we can make use of.
+
+## Illustrating W1S1's scenarios
+
+First, we define some useful things:
+
+Here we define a directory to save the figures to:
+
+```{r}
+path_dir_fig_dem <- "_tmp/fig/w1s2dem"
+if (!dir.exists(path_dir_fig_dem)) {
+  dir.create(path_dir_fig_dem, recursive = TRUE)
+}
+```
+
+Now we define a custom theme for our plots:
+
+```{r}
+theme_cowplot_bg <- function() {
+  theme_cowplot() +
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white")
+    )
+}
+```
+
+Now we define some colours for our plots (from `colorbrewer2.org`)
+
+```{r}
+col_vec_3 <- c(
+  "#1b9e77", "#d95f02", "#7570b3"
+)
+```
+
+### Scenario I
+
+- Image we work out what the correlation is between advertising spending and revenue.
+- In what way might the correlation coefficient be deficient?
+  - It does not tell us what the precise nature of the relationship between the two variables is.
+
+#### Example
+
+We simulate an illustrative dataset, with a correlation of roughly 0.8 between the two variables:
+
+```{r}
+set.seed(3)
+x_vec <- runif(1e2, 0, 100)
+y_vec <- 200 + 2 * x_vec + rnorm(1e2, 0, 50)
+data_tbl_s1 <- tibble(
+  Advertising = x_vec, Revenue = y_vec
+)
+cor(x_vec, y_vec) |> signif(2)
+```
+
+```{r}
+
+# create table for plotting correlation label
+plot_tbl_cor <- tibble(
+  x = 12, y = 430, label = cor(x_vec, y_vec) |> round(2)
+)
+# plot:
+# specify points dataset, and that
+# `x` and `y` are the columns to use
+# for the x and y axes, respectively
+p_s1_init <- ggplot(
+  data_tbl_s1,
+  aes(x = Advertising, y = Revenue)
+) +
+  # add points to the plot (blue, semi-transparent)
+  geom_point(col = col_vec_3[1], alpha = 0.8) +
+  # add a label to the plot
+  geom_text(
+    # specify the dataset for the label
+    data = plot_tbl_cor,
+    # specify what columns
+    # have the label, x and y values
+    aes(label = label, x = x, y = y),
+    # specify the size of the label
+    size = 5,
+    # specify that we don't want the
+    # label to inherit the aesthetics
+    # from the initial `ggplot` call
+    # (this note is more complicated)
+    inherit.aes = FALSE
+  ) +
+  # use our custom theme (cowplot theme, white background)
+  theme_cowplot_bg() +
+  # add gridlines
+  background_grid(major = "xy") +
+  # add labels to the axes
+  labs(x = "Advertising spending", y = "Revenue")
+
+# save the plot:
+# specify the path to save the plot to
+path_p <- file.path(path_dir_fig_dem, "p-scenario1-init.png")
+# save the plot to the path.
+# specify the width and height of the plot (10cm each)
+ggsave(path_p, p_s1_init, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| echo: true
+# display the plot
+knitr::include_graphics(path_p)
+```
+
+Now we fit a linear regression model:
+
+```{r}
+fit <- lm(Revenue ~ Advertising, data = data_tbl_s1)
+fit |> summary()
+```
+
+We can add the fitted line to the initial plot:
+
+```{r}
+
+coef_vec <- coef(fit)
+coef_vec
+p_s1_fit <- p_s1_init +
+  geom_abline(
+    # specify the slope and intercept of the line
+    intercept = coef_vec[["(Intercept)"]],
+    slope = coef_vec[["Advertising"]],
+    # specify the colour of the line
+    col = col_vec_3[2],
+    size = 1.5
+  )
+# save the plot:
+# specify the path to save the plot to
+path_p <- file.path(path_dir_fig_dem, "p-scenario1-fit.png")
+# save the plot to the path.
+# specify the width and height of the plot (10cm each)
+ggsave(path_p, p_s1_fit, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| echo: false
+knitr::include_graphics(path_p)
+```
+
+We can add the line `y=x`, which would likely mean we would not want to spend money on advertising:
+
+```{r}
+
+plot_tbl_45 <- tibble(
+  x = c(0, 420),
+  y = c(coef_vec[["(Intercept)"]], coef_vec[["(Intercept)"]] + 420)
+)
+p_s1_45 <- p_s1_fit +
+  geom_abline(
+    # specify the slope and intercept of the line
+    intercept = coef_vec[["(Intercept)"]],
+    slope = 1,
+    # specify the colour of the line
+    col = col_vec_3[3],
+    linetype = "11",
+    size = 2
+  )
+# save the plot:
+# specify the path to save the plot to
+path_p <- file.path(path_dir_fig_dem, "p-scenario1-fit-45.png")
+# save the plot to the path.
+# specify the width and height of the plot (10cm each)
+ggsave(path_p, p_s1_45, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| echo: false
+knitr::include_graphics(path_p)
+```
+
+### Scenario II
+
+- Now, suppose a doctor wants to decide whether a three-month old baby has a healthy weight.
+- Why would the correlation coefficient not be useful?
+  - We do not know what the typical weight of a healthy six-month old is, so we cannot say whether the baby's weight is healthy based on the correlation coefficient alone.
+
+#### Example
+
+First we simulate some data:
+
+```{r}
+set.seed(3)
+x_vec <- runif(1e2, 0, 6)
+y_vec <- 3 + 0.75 * x_vec + rnorm(1e2, 0, 0.5)
+data_tbl_s2 <- tibble(Age = x_vec, Weight = y_vec)
+cor(x_vec, y_vec) |> signif(2)
+```
+
+Here we plot the data:
+
+```{r}
+
+p <- ggplot(
+  data_tbl_s2,
+  aes(x = Age, y = Weight)
+) +
+  geom_point(col = col_vec_3[1], alpha = 0.8) +
+  theme_cowplot_bg() +
+  background_grid(major = "xy") +
+  labs(x = "Age (months)", y = "Weight (kg)")
+# save the plot:
+path_p <- file.path(path_dir_fig_dem, "p-scenario2-init.png")
+ggsave(path_p, p, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| eco: false
+knitr::include_graphics(path_p)
+```
+
+Now we fit a linear regression model:
+
+```{r}
+fit <- lm(Weight ~ Age, data = data_tbl_s2)
+fit |> summary()
+```
+
+Now we plot the fitted line:
+
+```{r}
+p <- p +
+  geom_abline(
+    intercept = coef(fit)[["(Intercept)"]],
+    slope = coef(fit)[["Age"]],
+    col = col_vec_3[2],
+    size = 1.5
+  )
+# save the plot:
+path_p <- file.path(path_dir_fig_dem, "p-scenario2-fit.png")
+ggsave(path_p, p, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p)
+```
+
+Now we add the lines two standard deviations above and below:
+
+```{r}
+
+p <- p +
+  geom_abline(
+    intercept = coef(fit)[["(Intercept)"]] + 2 * sd(residuals(fit)),
+    slope = coef(fit)[["Age"]],
+    col = col_vec_3[3],
+    linetype = "11",
+    size = 1.5
+  ) +
+  geom_abline(
+    intercept = coef(fit)[["(Intercept)"]] - 2 * sd(residuals(fit)),
+    slope = coef(fit)[["Age"]],
+    col = col_vec_3[3],
+    linetype = "11",
+    size = 1.5
+  )
+# save the plot:
+path_p <- file.path(path_dir_fig_dem, "p-scenario2-fit-2sd.png")
+ggsave(path_p, p, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| echo: false
+knitr::include_graphics(path_p)
+```
+
+### Scenario III
+
+- Let's say you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
+- Also assert that more males took the drug than females.
+- Suppose we perform a $t$-test. How might someone object?
+  - Well, the $t$-test would be vulnerable to the confounding between the drug and sex.
+  - If there is a difference between the sexes on blood pressure, then the $t$-test would not be able to distinguish between the effect of the drug and the effect of sex.
+
+#### Example
+
+Let's simulate some data. We suppose that:
+- The average blood pressure for females who do not take the drug is 120.
+- The effect of the drug is to decrease blood pressure by 5.
+- Males have blood pressure higher than females by 15.
+- Males are more likely to take the drug than females.
+
+```{r}
+set.seed(4)
+x_vec_sex <- sample(c("Male", "Female"), 1e2, replace = TRUE)
+x_vec_sex_male <- x_vec_sex[x_vec_sex == "Male"]
+x_vec_sex_female <- x_vec_sex[x_vec_sex == "Female"]
+x_vec_drug_male <- sample(
+  c("Drug", "Placebo"),
+  size = length(x_vec_sex_male),
+  replace = TRUE,
+  prob = c(0.8, 0.2)
+)
+x_vec_drug_female <- sample(
+  c("Drug", "Placebo"),
+  size = length(x_vec_sex_female),
+  replace = TRUE,
+  prob = c(0.3, 0.7)
+)
+effect_male <- 15
+effect_drug <- -5
+y_vec_male <- 120 + effect_male + effect_drug * (x_vec_drug_male == "Drug")
+y_vec_female <- 120 + effect_drug * (x_vec_drug_female == "Drug")
+y_vec <- c(y_vec_male, y_vec_female) + rnorm(1e2, 0, 5)
+x_vec_sex <- c(x_vec_sex_male, x_vec_sex_female)
+x_vec_drug <- c(x_vec_drug_male, x_vec_drug_female)
+data_tbl_s3 <- tibble(
+  BP = y_vec, Sex = x_vec_sex, Drug = x_vec_drug
+)
+data_tbl_s3
+```
+
+We can plot the data ignoring sex:
+
+```{r}
+p1 <- ggplot(
+  data_tbl_s3 |>
+    dplyr::mutate(Drug = factor(Drug, levels = c("Placebo", "Drug"))),
+  aes(x = Drug, y = BP, fill = Drug)
+) +
+  geom_boxplot(outlier.colour = "gray75") +
+  theme_cowplot_bg() +
+  background_grid(major = "y") +
+  labs(x = "Drug", y = "Blood pressure") +
+  scale_fill_manual(
+    values = c("Drug" = "#b2df8a", "Placebo" = "#a6cee3")
+  ) +
+  theme(legend.title = element_blank())
+# save the plot:
+path_p <- file.path(path_dir_fig_dem, "p-scenario3-boxplot.png")
+ggsave(path_p, p1, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p)
+```
+
+We can now plot the data by sex:
+
+```{r}
+
+plot_tbl_s3 <- data_tbl_s3 |>
+  dplyr::mutate(
+    Drug = factor(
+      Drug,
+      levels = c("Placebo", "Drug")
+    )
+  ) |>
+  dplyr::mutate(
+    DrugSex = paste0(Drug, "_", Sex)
+  ) |>
+  dplyr::mutate(
+    DrugSex = factor(
+      DrugSex,
+      levels = c(
+        "Placebo_Female", "Drug_Female",
+        "Placebo_Male", "Drug_Male"
+      )
+    )
+  )
+p1 <- ggplot(
+  plot_tbl_s3,
+  aes(x = Drug, y = BP, fill = Sex)
+) +
+  geom_boxplot(outlier.colour = "gray75") +
+  theme_cowplot_bg() +
+  background_grid(major = "y") +
+  labs(x = "Drug", y = "Blood pressure") +
+  scale_fill_manual(
+    values = col_vec_3[1:2]
+  ) +
+  theme(legend.title = element_blank())
+# save plot
+path_p <- file.path(path_dir_fig_dem, "p-scenario3-boxplot-sex.png")
+ggsave(path_p, p1, width = 10, height = 10, units = "cm")
+```
+
+```{r}
+#| results: asis
+#| echo: false
+knitr::include_graphics(path_p)
+```
+
+Now fit a linear model, first without sex:
+
+```{r}
+lm(BP ~ Drug, data = data_tbl_s3) |> summary()
+```
+
+The above is a simple linear model, which does not account for the confounding between drug and sex.
+It is equivalent to the $t$-test.
+
+Now we fit a linear model, with sex:
+
+```{r}
+lm(BP ~ Drug + Sex, data = data_tbl_s3) |> summary()
+```
+
+Now we see what we should see - that the drug lowers blood pressure.

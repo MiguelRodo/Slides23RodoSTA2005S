@@ -3,178 +3,37 @@ title: "Regression Week I: Introduction and foundations to GLMs"
 subtitle: "Lecture II: General course advice and coding example"
 author: "Miguel Rodo (with credit to Prof Francesca Little and Yovna Junglee)"
 institute: University of Cape Town
-theme: Boadilla
-aspectratio: 169
+date: 23 July 2024
 format:
   beamer:
     embed-resources: true
-    colorlinks: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
     include-in-header:
-      text: |
-        \usepackage{mathpazo}
-        \usepackage{unicode-math}
-        \setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
-    classoption: "aspectratio=169"
+      file: preamble.tex
 ---
 
-# Summary of yesterday's lecture
-
-- Regression is a statistical technique to examine the relationship between variables.
-
-<!-- \pause !-->
-
-- Whilst being more involved, it allows us to:
-  - Perform flexible hypothesis testing
-  - Isolate the effects of different variables
-  - Predict the value of the response variable given the value of predictors
-
-<!-- \pause !-->
-
-- In this course, we restrict our attention to scenarios where:
-  - The mean of the response variable depends linearly on the predictors.
-  - The response is normally distributed around its mean.
-  - The variability of the response is independent of the mean and any explanatory variables.
-
-<!-- \pause !-->
-
-- There is nothing exclusive to yesterday's section that will be examinable, so don't stress about it. It was just an overiew. We'll go over these issues in more detail.
-
-<!-- \pause !-->
-
-- After some suggestions for approaching the course, we'll go through a demonstrative example.
-
-# Notes from the tutors 
-
-<!-- \pause !-->
+# Notes from last year's tutors 
 
 - Learning to code up analyses is perhaps the most useful part of the course.
-
-<!-- \pause !-->
-
 - Don't underestimate the course - passing STA2004F is great, but this is a lot of content. Marks are often terrible. 
-
-<!-- \pause !-->
-
 - Be wary of the assignments - they count as much as the tests, and take a long time. 
-
-<!-- \pause !-->
-
 - The exam counts 70%, so don't presume that assignments and tests will carry you through. Focus on understanding the content.
-
-<!-- \pause !-->
-
 - Questions to rehearse proofs are free marks. 
-
-<!-- \pause !-->
-
 - Experimental design in term four tends to be more difficult, so bank regression marks.
-
-# Suggestions for learning code I: Get R set up and start using it
-
-- Can't do anything without having the necessary programs installed, so do attend the following:
-  - Dr Erni's online introduction to R, tomorrow at 2pm
-  - Tutorials to set R up on your computer in SciLab D, on Thursday and Friday
-<!-- \pause !-->
-
-- We're still working it out, but practicals will probably take the form more of a demonstration than something for you struggle through
-  - More efficient use of time
-  - Less grating
-
-# Suggestions for learning code II: Take notes in a Q&A format
-
-- Take notes in a detailed, bite-sized Q&A format and check yourself on them.
-- This is based on [Cal Newport's](https://calnewport.com/4-weeks-to-a-40-streamline-your-notes/) and [Scott Young's](https://www.scotthyoung.com/blog/2019/03/18/5-strategies-ace-exam/) advice regarding note-taking, as well as my own experience.
-
-# Example Q&A-format notes
-
-- For example, a few weeks ago I was trying to learn bash (another programming language) based on an online course, these are some notes I took in the section on writing a script:
-
-```
-- First line?
-  - Shebang
-  - Structure?
-    - `#!/bin/bash`
-- Last line?
-  - Exit code
-  - What should it be?
-    - `exit 0`
-    - What would `exit 1` mean?
-      - A generic error
-    - What other numbers are available for errored exits?
-      - 2-255
-```
-
-# Motivation behind Q&A format
-
-- The reasons I think it works (see this [deep dive on memory](https://www.scotthyoung.com/blog/2019/02/15/memory/#spacing) for details):
-
-<!-- \pause !-->
-
-  - Processes content more deeply:
-    - Rephrase it into a question
-    - Write it down
-    
-<!-- \pause !-->
-
-  - Practice recall
-    - In other words, rehearsing it from scratch
-    - The single best way to learn
-
-<!-- \pause !-->
-
-  - Reduces cognitive load
-    - Break it down into smaller chunks
-    - Forces you (and allows you, really) to work on the details
-    - Helps identify what you don't know
-
-<!-- \pause !-->
-
-  - Easy to do
-    - Can do it somewhat thoughtlessly, so don't need to think too hard.
-    - This helps when you're tired, which means you're more likely to do it consistently.
-
-# Caveats to Q&A format
-
-- The first is that this is not a substitute for actually writing code (or practising written stats questions, if you're using it for that)
-  - But you can't make bricks without clay, and the idea is you'll have a better knowledge of the basics facts you'll need.
-  - Once you can use the code (or apply the technique) easily, you obviously don't need to go back to these Q&A notes.
-
-<!-- \pause !-->
-
-- Another caveat is that, if you're sufficiently comfortable programming in a given area, then this might not be time effective.
-
-# Learning code syntax using the `Q&A` format
-
-- Final piece of advice - write out code in a "general" format when learning syntax.
-
-<!-- \pause !-->
-
-- For example:
-
-```
-- What is the function to fit a linear model?
-  - `lm`
-  - What is the syntax for the formula?
-    - `<dep_var> ~ <exp_var_1> + <exp_var_2> + ...`
-```
-
-# Suggestions for learning code III: Mark confusing sections and return to them later
-
-- When you don't understand something immediately in your notes, mark it as not understood (preferably with a question as to what you don't understand) and return to it later
-- I suppose that a similar idea applies if you run out of time to write a note in a lecture
-
-<!-- \pause !-->
-
-- This has a few motivations:
-  - Your brain will think about the problem in the background.
-  - Later information can clarify.
-  - It's less frustrating.
-  - You're able to get the "low-hanging fruit"
 
 # For the remainder of this lecture
 
 - Introductory code example of a linear regression
 
-# Tomorrow
+# Regression section outline
 
-- Prerequisite linear algebra and statistical theory
+- **Week one**: statistical and mathematical prerequisites (statistical distributions and linear algebra), and useful proofs regarding the multivariate normal distribution
+- **Week two**: General linear model introduction (formulation, estimation and parameter distributions)
+- **Week three**: General linear model inference (confidence intervals and hypothesis testing)
+- **Week four**: ANOVA and model checking
+- **Week five**: Variable selection, Gauss-Markov theorem and data transformation
+- **Week six**: PCA and bootstrapping
+
