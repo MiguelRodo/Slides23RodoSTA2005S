@@ -1,5 +1,7 @@
 # CHANGELOG
 
+- Patch (v0.2.1): Miguel Julio Rodo (11:55:40)
+  - Allow skipping the imag not being available
 - *Minor* (v0.2.0): Miguel Julio Rodo (11:53:04)
   - Add final slides and dramatically updated demonstration for slide deck 2
 
