@@ -1,5 +1,6 @@
 ---
 title: "Introductory example of linear regression"
+subtitle: "End-to-end"
 author: "Miguel Rodo (with thanks to Prof. Little and Yovna Junglee)"
 format:
   html:
@@ -10,19 +11,38 @@ format:
     code-fold: true
 ---
 
+# End-to-end example of linear regression
+
 ## Introduction
 
 This is an example analysis of a simple dataset to illustrate the use of linear regression.
 
-Extra details, particularly those related to programming, are kept inside expandable "folds" (click on the triangle to the left of the fold to expand it) if you're viewing the HTML or inside HTML tags if you're viewing the qmd file.
-
-## Problem statement
+### Problem statement
 
 Suppose that you're a business analyst tasked with helping the executives decide how to advertise.
 
 You've gathered annual data across 200 markets in terms of sales revenue and advertising spend on TV, radio and newspaper. Your boss has heard about "regression", and wants to see if it can be more informative than simply understanding that more advertising leads to more sales.
 
+### Note on folded sections
+
+Extra details, particularly those related to programming, are kept inside expandable "folds" (click on the triangle to the left of the fold to expand it) if you're viewing the HTML or inside HTML tags if you're viewing the qmd file.
+
+Code is also "folded" away, so you can click on the triangle to the left of the code to expand it.
+
 ## Set-up
+
+#### Files
+
+To run this, you will have to download `w1s2.zip` from `Amathuba` (`Module 1 - Regression` >> `Introduction` >> `Slides`), unzip it, and copy the contents to the your working diretory.
+It contains two files, within the `_data_raw` folder.
+- `Advertising.csv`
+- `reg_img_exp.png`. This file (and not `Advertising.csv`) must be in the `img` sub-folder of `_data_raw`, i.e. at `_data_raw/img/reg_img_exp.png`.
+
+So, in your working directory you must have these files at these paths:
+- `_data_raw/Advertising.csv` (`Advertising.csv`)
+- `_data_raw/img/reg_img_exp.png` (`reg_img_exp.png`)
+
+#### `R` packages
 
 First we attach R packages we need, which make useful functions available: 
 
@@ -34,7 +54,7 @@ First we attach R packages we need, which make useful functions available:
 # install packages if missing
 pkg_vec <- c("tibble", "dplyr", "ggplot2", "cowplot")
 for (x in pkg_vec) {
-  if (!requireNamespace(x, character.only = TRUE)) {
+  if (!requireNamespace(x, quietly = TRUE)) {
     install.packages(x)
   }
 }
@@ -44,6 +64,8 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 ```
+
+#### Details
 
 <details>
   <summary>Indicating code in an qmd</summary>
@@ -87,6 +109,8 @@ library(cowplot)
   - Converting it to a `tibble` prevents too much information being printed to the console each time you print it 
 
 </details>
+
+## Data
 
 First we read our data in:
 
@@ -311,410 +335,3 @@ The only (subtle) change is that we now can confirm (in addition to the data exp
 
 - Over the next few weeks, we will develop the mathematical and statistical theory to estimate the parameters and conduct inference regarding them.
 - Once we've done that, we'll actually have a flexible inferential tool we can make use of.
-
-## Illustrating W1S1's scenarios
-
-First, we define some useful things:
-
-Here we define a directory to save the figures to:
-
-```{r}
-path_dir_fig_dem <- "_tmp/fig/w1s2dem"
-if (!dir.exists(path_dir_fig_dem)) {
-  dir.create(path_dir_fig_dem, recursive = TRUE)
-}
-```
-
-Now we define a custom theme for our plots:
-
-```{r}
-theme_cowplot_bg <- function() {
-  theme_cowplot() +
-    theme(
-      plot.background = element_rect(fill = "white"),
-      panel.background = element_rect(fill = "white")
-    )
-}
-```
-
-Now we define some colours for our plots (from `colorbrewer2.org`)
-
-```{r}
-col_vec_3 <- c(
-  "#1b9e77", "#d95f02", "#7570b3"
-)
-```
-
-### Scenario I
-
-- Image we work out what the correlation is between advertising spending and revenue.
-- In what way might the correlation coefficient be deficient?
-  - It does not tell us what the precise nature of the relationship between the two variables is.
-
-#### Example
-
-We simulate an illustrative dataset, with a correlation of roughly 0.8 between the two variables:
-
-```{r}
-set.seed(3)
-x_vec <- runif(1e2, 0, 100)
-y_vec <- 200 + 2 * x_vec + rnorm(1e2, 0, 50)
-data_tbl_s1 <- tibble(
-  Advertising = x_vec, Revenue = y_vec
-)
-cor(x_vec, y_vec) |> signif(2)
-```
-
-```{r}
-
-# create table for plotting correlation label
-plot_tbl_cor <- tibble(
-  x = 12, y = 430, label = cor(x_vec, y_vec) |> round(2)
-)
-# plot:
-# specify points dataset, and that
-# `x` and `y` are the columns to use
-# for the x and y axes, respectively
-p_s1_init <- ggplot(
-  data_tbl_s1,
-  aes(x = Advertising, y = Revenue)
-) +
-  # add points to the plot (blue, semi-transparent)
-  geom_point(col = col_vec_3[1], alpha = 0.8) +
-  # add a label to the plot
-  geom_text(
-    # specify the dataset for the label
-    data = plot_tbl_cor,
-    # specify what columns
-    # have the label, x and y values
-    aes(label = label, x = x, y = y),
-    # specify the size of the label
-    size = 5,
-    # specify that we don't want the
-    # label to inherit the aesthetics
-    # from the initial `ggplot` call
-    # (this note is more complicated)
-    inherit.aes = FALSE
-  ) +
-  # use our custom theme (cowplot theme, white background)
-  theme_cowplot_bg() +
-  # add gridlines
-  background_grid(major = "xy") +
-  # add labels to the axes
-  labs(x = "Advertising spending", y = "Revenue")
-
-# save the plot:
-# specify the path to save the plot to
-path_p <- file.path(path_dir_fig_dem, "p-scenario1-init.png")
-# save the plot to the path.
-# specify the width and height of the plot (10cm each)
-ggsave(path_p, p_s1_init, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| echo: true
-# display the plot
-knitr::include_graphics(path_p)
-```
-
-Now we fit a linear regression model:
-
-```{r}
-fit <- lm(Revenue ~ Advertising, data = data_tbl_s1)
-fit |> summary()
-```
-
-We can add the fitted line to the initial plot:
-
-```{r}
-
-coef_vec <- coef(fit)
-coef_vec
-p_s1_fit <- p_s1_init +
-  geom_abline(
-    # specify the slope and intercept of the line
-    intercept = coef_vec[["(Intercept)"]],
-    slope = coef_vec[["Advertising"]],
-    # specify the colour of the line
-    col = col_vec_3[2],
-    size = 1.5
-  )
-# save the plot:
-# specify the path to save the plot to
-path_p <- file.path(path_dir_fig_dem, "p-scenario1-fit.png")
-# save the plot to the path.
-# specify the width and height of the plot (10cm each)
-ggsave(path_p, p_s1_fit, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| echo: false
-knitr::include_graphics(path_p)
-```
-
-We can add the line `y=x`, which would likely mean we would not want to spend money on advertising:
-
-```{r}
-
-plot_tbl_45 <- tibble(
-  x = c(0, 420),
-  y = c(coef_vec[["(Intercept)"]], coef_vec[["(Intercept)"]] + 420)
-)
-p_s1_45 <- p_s1_fit +
-  geom_abline(
-    # specify the slope and intercept of the line
-    intercept = coef_vec[["(Intercept)"]],
-    slope = 1,
-    # specify the colour of the line
-    col = col_vec_3[3],
-    linetype = "11",
-    size = 2
-  )
-# save the plot:
-# specify the path to save the plot to
-path_p <- file.path(path_dir_fig_dem, "p-scenario1-fit-45.png")
-# save the plot to the path.
-# specify the width and height of the plot (10cm each)
-ggsave(path_p, p_s1_45, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| echo: false
-knitr::include_graphics(path_p)
-```
-
-### Scenario II
-
-- Now, suppose a doctor wants to decide whether a three-month old baby has a healthy weight.
-- Why would the correlation coefficient not be useful?
-  - We do not know what the typical weight of a healthy six-month old is, so we cannot say whether the baby's weight is healthy based on the correlation coefficient alone.
-
-#### Example
-
-First we simulate some data:
-
-```{r}
-set.seed(3)
-x_vec <- runif(1e2, 0, 6)
-y_vec <- 3 + 0.75 * x_vec + rnorm(1e2, 0, 0.5)
-data_tbl_s2 <- tibble(Age = x_vec, Weight = y_vec)
-cor(x_vec, y_vec) |> signif(2)
-```
-
-Here we plot the data:
-
-```{r}
-
-p <- ggplot(
-  data_tbl_s2,
-  aes(x = Age, y = Weight)
-) +
-  geom_point(col = col_vec_3[1], alpha = 0.8) +
-  theme_cowplot_bg() +
-  background_grid(major = "xy") +
-  labs(x = "Age (months)", y = "Weight (kg)")
-# save the plot:
-path_p <- file.path(path_dir_fig_dem, "p-scenario2-init.png")
-ggsave(path_p, p, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| eco: false
-knitr::include_graphics(path_p)
-```
-
-Now we fit a linear regression model:
-
-```{r}
-fit <- lm(Weight ~ Age, data = data_tbl_s2)
-fit |> summary()
-```
-
-Now we plot the fitted line:
-
-```{r}
-p <- p +
-  geom_abline(
-    intercept = coef(fit)[["(Intercept)"]],
-    slope = coef(fit)[["Age"]],
-    col = col_vec_3[2],
-    size = 1.5
-  )
-# save the plot:
-path_p <- file.path(path_dir_fig_dem, "p-scenario2-fit.png")
-ggsave(path_p, p, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-knitr::include_graphics(path_p)
-```
-
-Now we add the lines two standard deviations above and below:
-
-```{r}
-
-p <- p +
-  geom_abline(
-    intercept = coef(fit)[["(Intercept)"]] + 2 * sd(residuals(fit)),
-    slope = coef(fit)[["Age"]],
-    col = col_vec_3[3],
-    linetype = "11",
-    size = 1.5
-  ) +
-  geom_abline(
-    intercept = coef(fit)[["(Intercept)"]] - 2 * sd(residuals(fit)),
-    slope = coef(fit)[["Age"]],
-    col = col_vec_3[3],
-    linetype = "11",
-    size = 1.5
-  )
-# save the plot:
-path_p <- file.path(path_dir_fig_dem, "p-scenario2-fit-2sd.png")
-ggsave(path_p, p, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| echo: false
-knitr::include_graphics(path_p)
-```
-
-### Scenario III
-
-- Let's say you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
-- Also assert that more males took the drug than females.
-- Suppose we perform a $t$-test. How might someone object?
-  - Well, the $t$-test would be vulnerable to the confounding between the drug and sex.
-  - If there is a difference between the sexes on blood pressure, then the $t$-test would not be able to distinguish between the effect of the drug and the effect of sex.
-
-#### Example
-
-Let's simulate some data. We suppose that:
-- The average blood pressure for females who do not take the drug is 120.
-- The effect of the drug is to decrease blood pressure by 5.
-- Males have blood pressure higher than females by 15.
-- Males are more likely to take the drug than females.
-
-```{r}
-set.seed(4)
-x_vec_sex <- sample(c("Male", "Female"), 1e2, replace = TRUE)
-x_vec_sex_male <- x_vec_sex[x_vec_sex == "Male"]
-x_vec_sex_female <- x_vec_sex[x_vec_sex == "Female"]
-x_vec_drug_male <- sample(
-  c("Drug", "Placebo"),
-  size = length(x_vec_sex_male),
-  replace = TRUE,
-  prob = c(0.8, 0.2)
-)
-x_vec_drug_female <- sample(
-  c("Drug", "Placebo"),
-  size = length(x_vec_sex_female),
-  replace = TRUE,
-  prob = c(0.3, 0.7)
-)
-effect_male <- 15
-effect_drug <- -5
-y_vec_male <- 120 + effect_male + effect_drug * (x_vec_drug_male == "Drug")
-y_vec_female <- 120 + effect_drug * (x_vec_drug_female == "Drug")
-y_vec <- c(y_vec_male, y_vec_female) + rnorm(1e2, 0, 5)
-x_vec_sex <- c(x_vec_sex_male, x_vec_sex_female)
-x_vec_drug <- c(x_vec_drug_male, x_vec_drug_female)
-data_tbl_s3 <- tibble(
-  BP = y_vec, Sex = x_vec_sex, Drug = x_vec_drug
-)
-data_tbl_s3
-```
-
-We can plot the data ignoring sex:
-
-```{r}
-p1 <- ggplot(
-  data_tbl_s3 |>
-    dplyr::mutate(Drug = factor(Drug, levels = c("Placebo", "Drug"))),
-  aes(x = Drug, y = BP, fill = Drug)
-) +
-  geom_boxplot(outlier.colour = "gray75") +
-  theme_cowplot_bg() +
-  background_grid(major = "y") +
-  labs(x = "Drug", y = "Blood pressure") +
-  scale_fill_manual(
-    values = c("Drug" = "#b2df8a", "Placebo" = "#a6cee3")
-  ) +
-  theme(legend.title = element_blank())
-# save the plot:
-path_p <- file.path(path_dir_fig_dem, "p-scenario3-boxplot.png")
-ggsave(path_p, p1, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-knitr::include_graphics(path_p)
-```
-
-We can now plot the data by sex:
-
-```{r}
-
-plot_tbl_s3 <- data_tbl_s3 |>
-  dplyr::mutate(
-    Drug = factor(
-      Drug,
-      levels = c("Placebo", "Drug")
-    )
-  ) |>
-  dplyr::mutate(
-    DrugSex = paste0(Drug, "_", Sex)
-  ) |>
-  dplyr::mutate(
-    DrugSex = factor(
-      DrugSex,
-      levels = c(
-        "Placebo_Female", "Drug_Female",
-        "Placebo_Male", "Drug_Male"
-      )
-    )
-  )
-p1 <- ggplot(
-  plot_tbl_s3,
-  aes(x = Drug, y = BP, fill = Sex)
-) +
-  geom_boxplot(outlier.colour = "gray75") +
-  theme_cowplot_bg() +
-  background_grid(major = "y") +
-  labs(x = "Drug", y = "Blood pressure") +
-  scale_fill_manual(
-    values = col_vec_3[1:2]
-  ) +
-  theme(legend.title = element_blank())
-# save plot
-path_p <- file.path(path_dir_fig_dem, "p-scenario3-boxplot-sex.png")
-ggsave(path_p, p1, width = 10, height = 10, units = "cm")
-```
-
-```{r}
-#| results: asis
-#| echo: false
-knitr::include_graphics(path_p)
-```
-
-Now fit a linear model, first without sex:
-
-```{r}
-lm(BP ~ Drug, data = data_tbl_s3) |> summary()
-```
-
-The above is a simple linear model, which does not account for the confounding between drug and sex.
-It is equivalent to the $t$-test.
-
-Now we fit a linear model, with sex:
-
-```{r}
-lm(BP ~ Drug + Sex, data = data_tbl_s3) |> summary()
-```
-
-Now we see what we should see - that the drug lowers blood pressure.
