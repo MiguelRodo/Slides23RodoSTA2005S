@@ -1,5 +1,7 @@
 # CHANGELOG
 
+- Patch (v0.3.1): Miguel Julio Rodo (12:54:38)
+  - Correct QA on W1S1
 - *Minor* (v0.3.0): Miguel Julio Rodo (12:14:39)
   - Split demonstration for W1S2 into two docs
 
