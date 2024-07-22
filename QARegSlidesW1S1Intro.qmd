@@ -8,7 +8,7 @@ format:
 
 *Note: the headings map to slide headings in the slide deck `SlidesRegW1S1Intro.pdf`.*
 
-#### What is regression?
+### What is regression?
 
 - In terms of notation, what is the symbol for the:
   - Response variable?
@@ -50,7 +50,33 @@ format:
     - What is the model formula for multiple linear regression with two explanatory variables?
       - $Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \epsilon$
 
-#### Assumptions
+### Regression vs alternatives
+
+#### Correlation coefficient
+
+- Advantages of regression:
+  - First?
+    - Precise quantification of relationship
+  - Second?
+    - Able to predict
+- Advantage of correlation:
+  - First?
+    - Unitless
+  - Second?
+    - Directly quantifies strength of relationship
+
+#### $t$-test
+
+- Advantages of regression:
+  - First?
+    - Can handle multiple predictors
+  - Second?
+    - Can handle continuous and categorical predictors
+- Advantage of $t$-test?
+  - First?
+    - Compared to our regression model, can handle differing variances between groups
+
+### Assumptions
 
 - What type of regression do we consider?
   - Linear regression
@@ -78,20 +104,3 @@ format:
           - Each other
         - Second?
           - Predictor variables
-
-#### Linear algebra and statistical theory prerequisites
-
-- What is under Module 1: Regression/Introduction/Prerequisites?
-  - NotesRegW0StatDbn.pdf
-- What does NotesRegW0StatDbn.pdf cover?
-  - Facts about normal, $t$, and $F$ distributions
-- What does SlidesRegW0S1PrereqLA.pdf cover?
-  - Essential linear algebra
-- What is QARegSlidesW0S1PrereqLA.pdf?
-  - Questions and answers on the linear algebra content
-- What will be uploaded in the next day or two?
-  - Pre-recorded lecture video
-- What is DemRegW0LinearAlgebra.html about?
-  - Implementing linear algebra in $R$
-- What is the first few questions in TutReg1IntroMVNQuestions.pdf about?
-  - Linear algebra
