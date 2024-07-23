@@ -95,19 +95,17 @@ format:
 
 # Matrix multiplication
 
-- In $\symbf{AB}$, the $ij$-th element is the dot product of $i$-th row of $\symbf{A}$ and the the $j$-th column of $\symbf{B}$, i.e. $(\symbf{AB})_{ij} = \symbf{a}_{[i]}'\cdot\symbf{b}_{j}$.
+- In $\symbf{AB}$, the $ij$-th element is the dot product of $i$-th row of $\symbf{A}$ and the the $j$-th column of $\symbf{B}$, i.e. $(\symbf{AB})_{ij} = \symbf{a}_{[i]}'\symbf{b}_{j}$. We can also write $\symbf{a}_{[i]}'\symbf{b}_{j}$ as $\symbf{a}_{[i]}\cdot\symbf{b}_{j}$
 
 - For example, if both $\symbf{A}$ and $\symbf{B}$ are $3\times 3$, then 
-
-
 
 
 $$
 \symbf{AB}=
 \begin{bmatrix}
-\symbf{a}_{[1]}'\cdot\symbf{b}_{1} & \symbf{a}_{[1]}'\cdot\symbf{b}_{2} & \symbf{a}_{[1]}'\cdot\symbf{b}_{3} \\
-\symbf{a}_{[2]}'\cdot\symbf{b}_{1} & \symbf{a}_{[2]}'\cdot\symbf{b}_{2} & \symbf{a}_{[2]}'\cdot\symbf{b}_{3} \\
-\symbf{a}_{[3]}'\cdot\symbf{b}_{1} & \symbf{a}_{[3]}'\cdot\symbf{b}_{2} & \symbf{a}_{[3]}'\cdot\symbf{b}_{3}
+\symbf{a}_{[1]}'\symbf{b}_{1} & \symbf{a}_{[1]}'\symbf{b}_{2} & \symbf{a}_{[1]}'\symbf{b}_{3} \\
+\symbf{a}_{[2]}'\symbf{b}_{1} & \symbf{a}_{[2]}'\symbf{b}_{2} & \symbf{a}_{[2]}'\symbf{b}_{3} \\
+\symbf{a}_{[3]}'\symbf{b}_{1} & \symbf{a}_{[3]}'\symbf{b}_{2} & \symbf{a}_{[3]}'\symbf{b}_{3}
 \end{bmatrix}
 $$
 
@@ -155,8 +153,8 @@ $$
 \end{bmatrix}
 =
 \begin{bmatrix}
-\symbf{I}_2\symbf{B}^1_{2\times 2}  & \symbf{0}_{2\times1} \symbf{B}^2_{1\times 2}\\
-\symbf{0}_{1\times2}\symbf{B}^1_{2\times 2}  & 4\symbf{B}^2_{1\times 2}
+\symbf{I}_2\symbf{B}^1_{2\times 2} + \symbf{0}_{2\times1} \symbf{B}^2_{1\times 2}\\
+\symbf{0}_{1\times2}\symbf{B}^1_{2\times 2}  + 4\symbf{B}^2_{1\times 2}
 \end{bmatrix}
 =
 \begin{bmatrix}

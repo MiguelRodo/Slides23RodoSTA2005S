@@ -1,0 +1,141 @@
+---
+title: "Q&A: Week One - Slide deck one - Multivariate normal distribution"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+#### The univariate normal distribution
+
+- What is the PDF of $X \sim N(\mu, \sigma^2)$?
+  - $f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp \left( -\frac{(x - \mu)^2}{2\sigma^2} \right)$
+- What are $E(X)$ and $\text{Var}(X)$?
+  - $E(X) = \mu$
+  - $\text{Var}(X) = \sigma^2$
+
+#### The multivariate normal distribution
+
+- What is the density function of a random vector $\mathbf{X} \sim MVN(\mu, \symbf{\Sigma})$?
+  - $f(\mathbf{x}) = \frac{1}{(2\pi)^{p/2} |\symbf{\Sigma}|^{1/2}} \exp \left( -\frac{1}{2} (\mathbf{x} - \mu)^T \symbf{\Sigma}^{-1} (\mathbf{x} - \mu) \right)$
+- What does $\symbf{\Sigma}$ represent in this context?
+  - Covariance matrix
+
+#### Moment-generating function (MGF)
+
+- What is the definition of MGF?
+  - $E[e^{t'X}]$
+  - What is $t$?
+    - A constant
+- When does MGF exist?
+  - If the expectation is finite
+  - Where?
+    - in the region of $t = 0$
+- What does the $r$-th derivative of MGF evaluated at $t=0$ equal?
+  - $r$-th moment, $E[X^r]$
+- What is the main use of MGF in this context?
+  - To find the distribution of linear transformations of MVN random variables
+
+#### Linear transformation of MVN random variable: Theorem
+
+- Conditions:
+  - On $\symbf{X}$:
+    - Distribution?
+      - Normal
+    - Mean and variance?
+      - None
+    - Length?
+      - Any
+  - On $\symbf{C}$:
+    - Size?
+      - Same number of rows as length of $\symbf{X}$
+    - Rank?
+      - Any
+      - Consequence if rank is less than number of rows?
+        - $\symbf{C}\symbf{\Sigma}\symbf{C}^T$ is singular
+- Consequence:
+  - Notation for random variable of interest?
+    - $\symbf{Y}$
+  - Consequencues for $\symbf{Y}$:
+    - Distribution?
+      - Normal
+    - Mean?
+      - $\symbf{C}\mu$
+    - Variance?
+      - $\symbf{C}\symbf{\Sigma}\symbf{C}^T$
+
+#### Linear transformation of MVN random variable: Proof
+
+- First step?
+  - Write MGF of $\symbf{Y}$ in terms of $\symbf{X}$
+- Second step?
+  - Expand the MGF of $\symbf{X}$
+  - Special aspect?
+    - Parameter is not $\symbf{t}$
+    - What is it?
+      - $\symbf{C}'t$
+- Third step?
+  - Recognise the MGF as that of a normal distribution
+
+#### MVN partitions are MVN: Theorem
+
+- Conditions:
+  - On $\symbf{X}$:
+    - Distribution?
+      - MVN
+    - Mean and covariance matrix?
+      - $\mu$ and $\symbf{\Sigma}$
+    - Partition?
+      - $\symbf{X} = (\symbf{X}^{(1)}, \symbf{X}^{(2)})$
+- Consequences:
+  - On $\symbf{X}^{(i)}$:
+    - Distribution?
+      - MVN
+    - Mean and covariance matrix?
+      - $\mu^{(i)}$ and $\symbf{\Sigma}_{ii}$
+
+#### Idempotent quadratic product of standard MVN is $\chi^2$: theorem
+
+- Conditions:
+  - On $\symbf{A}$:
+    - Special property?
+      - Idempotent
+    - Rank?
+      - $k$
+  _ On $\symbf{Y}$:
+    - Distribution?
+      - MVN
+    - Mean?
+      - Zero
+    - Covariance matrix?
+      - $\symbf{I}$
+- Consequence:
+  - Random variable of interest?
+    - $\symbf{Y}^T \symbf{A} \symbf{Y}$
+  - Distribution:
+    - Family?
+      - $\chi^2$
+    - Degrees of freedom?
+      - $k$
+  
+#### Idempotent quadratic product of standard MVN is $\chi^2$: proof
+
+- First step:
+  - Part one?
+    - Define $\symbf{Z}$
+    - What is $\symbf{Z}$?
+      - $\symbf{P}'\symbf{Y}$
+  - Part two?
+    - Find the distribution of $\symbf{Z}$
+    - What is it?
+      - $N(0, \symbf{I})$
+- Second step:
+  - Re-express $\symbf{Y}^T \symbf{A} \symbf{Y}$
+  - In terms of?
+    - $\symbf{Z}$
+  - What does it become?
+    - $\sum_{i=1}^k Z_i^2$
+- Third step?
+  - Recognise the distribution of $\sum_{i=1}^k Z_i^2$
+  - What is it?
+    - $\chi^2_k$

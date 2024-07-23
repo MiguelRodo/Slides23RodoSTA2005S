@@ -1,12 +1,15 @@
 Package: Slides23RodoSTA2005S
 Title: Slides for STA2005S
-Version: 0.3.1
-Authors@R: person("Miguel", "Rodo", , "miguel.rodo@uct.ac.za", role = c("aut", "cre"))
+Version: 0.3.1-1
+Authors@R: person("Miguel", "Rodo", ,
+      "miguel.rodo@uct.ac.za", role = c("aut", "cre"))
 Maintainer: Miguel Rodo <miguel.rodo@uct.ac.za>
 Description: Slides for STA2005S
 License: {{ License }}
-URL: https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme
-BugReports: https://github.com/MiguelRodo/Slides23RodoSTA2005S/issues
+URL:
+      https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme
+BugReports:
+      https://github.com/MiguelRodo/Slides23RodoSTA2005S/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
