@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- *Minor* (v0.5.0): Miguel Julio Rodo (09:15:05)
+  - Add document motivating multiple linear regression
+
 - *Minor* (v0.4.0): Miguel Julio Rodo (18:56:52)
   - Add QA for W1S3
 
