@@ -1,0 +1,145 @@
+---
+title: Motivating multiple linear regression
+subtitle: Extension to SlidesRegW2S1GLM
+format:
+  html:
+    embed-resources: true
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+library(tibble)
+theme_cowplot_bg <- function() {
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# Introduction
+
+Suppose that we wish to uncover the relationship between revenue and advertising spend on TV and radio.
+
+Let's further assume that (known to us, as we're constructing this scenario) that radio spend has no effect on revenue, and that TV spend has a linear relationship with revenue.
+
+# Scenarios
+
+We'll consider two scenarios: one where companies only spend money on radio, and one where companies spend money on both TV and radio.
+
+## Scenario 1
+
+Suppose we have companies that spend only money on radio, and no money on TV.
+
+Then, for say 100 observations, we might have the following data:
+
+```{r}
+set.seed(1811)
+spend_vec_radio <- runif(1e2, 0, 3)
+revenue_vec <- rnorm(1e2, mean = 10, sd = 2)
+```
+
+Note that above the simulated revenues are not dependent on the radio spend.
+
+```{r}
+p <- ggplot(
+  data = data.frame(spend_vec_radio, revenue_vec),
+  aes(x = spend_vec_radio, y = revenue_vec)
+) +
+  theme_cowplot_bg() + 
+  cowplot::background_grid(major = "xy") +
+  geom_point(col = "dodgerblue") +
+  labs(x = "Radio spend", y = "Revenue")
+p
+```
+
+If we add a line of best fit, we can see that it's basically flat:
+
+```{r}
+p +
+  geom_smooth(method = "lm", se = FALSE, col = "orange", formula = y ~ x)
+```
+
+It's not perfectly flat just because of random noise in the data.
+
+If we fit a linear regression to the data, we could see that there's no effect:
+
+```{r}
+lm(revenue_vec ~ spend_vec_radio) |> summary()
+```
+
+## Scenario 2
+
+Now suppose that we have companies that spend money on TV, and that the more they spend on TV, they more they spend on radio:
+
+```{r}
+set.seed(0201)
+spend_vec_radio <- runif(1e2, 0, 3)
+spend_vec_tv <- spend_vec_radio * 1.2 + runif(1e2, 0, 3)
+revenue_vec <- spend_vec_tv * 2 + rnorm(1e2, mean = 10, sd = 2)
+```
+
+Note that above the simulated revenues are dependent on the TV spend, and that the TV spend is related to the radio spend - but there is no direct relationship between radio spend and revenue (i.e. `spend_vec_radio` does not appear in the formula for `revenue_vec`).
+So the effect of radio on revenue is the same as in the previous scenario.
+
+If we plot the data, we can see that there's a relationshp between TV spend and revenue:
+
+```{r}
+ggplot(
+  data = data.frame(spend_vec_tv, revenue_vec),
+  aes(x = spend_vec_tv, y = revenue_vec)
+) +
+  theme_cowplot_bg() + 
+  cowplot::background_grid(major = "xy") +
+  geom_point(col = "dodgerblue") +
+  labs(x = "TV spend", y = "Revenue") +
+  geom_smooth(method = "lm", se = FALSE, col = "orange", formula = y ~ x)
+```
+
+The simple linear regression model would show that there's a relationship between TV spend and revenue:
+
+```{r}
+lm(revenue_vec ~ spend_vec_tv) |> summary()
+```
+
+Now, we also now find that there's a relationship between radio spend and revenue:
+
+```{r}
+ggplot(
+  data = data.frame(spend_vec_radio, revenue_vec),
+  aes(x = spend_vec_radio, y = revenue_vec)
+) +
+  theme_cowplot_bg() + 
+  cowplot::background_grid(major = "xy") +
+  geom_point(col = "dodgerblue") +
+  labs(x = "Radio spend", y = "Revenue") +
+  geom_smooth(method = "lm", se = FALSE, col = "orange", formula = y ~ x)
+```
+
+```{r}
+lm(revenue_vec ~ spend_vec_radio) |> summary()
+```
+
+This is because radio spend is correlated with TV spend:
+
+```{r}
+ggplot(
+  data = data.frame(spend_vec_tv, spend_vec_radio),
+  aes(x = spend_vec_tv, y = spend_vec_radio)
+) +
+  theme_cowplot_bg() + 
+  cowplot::background_grid(major = "xy") +
+  geom_point(col = "dodgerblue") +
+  labs(x = "TV spend", y = "Radio spend") +
+  geom_smooth(method = "lm", se = FALSE, col = "orange", formula = y ~ x)
+```
+
+Now, if we fit a multiple linear regression of revenue against TV spend and radio spend, we can see that the model correctly identifies the relationship between TV and radio spend and revenue:
+
+```{r}
+lm(revenue_vec ~ spend_vec_tv + spend_vec_radio) |> summary()
+```
+
+There's a small negative effect of radio spend on TV estimated, but it's not statistically sigificant.
