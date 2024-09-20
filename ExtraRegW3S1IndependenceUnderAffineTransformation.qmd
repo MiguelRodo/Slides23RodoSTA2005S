@@ -1,0 +1,107 @@
+---
+title: "Proof of Independence for Multivariate Variables and Their Affine Transformations"
+format:
+  pdf:
+    embed-resources: true
+---
+
+# Introduction
+
+We aim to prove that two multivariate random vectors are independent if and only if their affine transformations are independent.
+
+# Definitions
+
+Let $\mathbf{X} \in \mathbb{R}^n$ and $\mathbf{Y} \in \mathbb{R}^m$ be random vectors.
+
+- **Affine Transformation:**
+
+  An affine transformation of $\mathbf{X}$ and $\mathbf{Y}$ is given by:
+
+  $$
+  \mathbf{U} = \mathbf{A} \mathbf{X} + \mathbf{b}, \quad \mathbf{V} = \mathbf{C} \mathbf{Y} + \mathbf{d},
+  $$
+
+  where $\mathbf{A}$ and $\mathbf{C}$ are invertible matrices of appropriate dimensions, and $\mathbf{b} \in \mathbb{R}^n$, $\mathbf{d} \in \mathbb{R}^m$ are vectors.
+
+- **Independence:**
+
+  Random vectors $\mathbf{X}$ and $\mathbf{Y}$ are independent if for all measurable sets $A \subset \mathbb{R}^n$ and $B \subset \mathbb{R}^m$,
+
+  $$
+  P(\mathbf{X} \in A \text{ and } \mathbf{Y} \in B) = P(\mathbf{X} \in A) \cdot P(\mathbf{Y} \in B).
+  $$
+
+# Theorem
+
+**Statement:** Random vectors $\mathbf{X}$ and $\mathbf{Y}$ are independent if and only if their affine transformations $\mathbf{U} = \mathbf{A} \mathbf{X} + \mathbf{b}$ and $\mathbf{V} = \mathbf{C} \mathbf{Y} + \mathbf{d}$ are independent.
+
+# Proof
+
+## Forward Direction
+
+**Assumption:** $\mathbf{X}$ and $\mathbf{Y}$ are independent.
+
+**Goal:** Show that $\mathbf{U}$ and $\mathbf{V}$ are independent.
+
+**Proof:**
+
+Since $\mathbf{X}$ and $\mathbf{Y}$ are independent, for any measurable sets $S \subset \mathbb{R}^n$ and $T \subset \mathbb{R}^m$,
+
+$$
+P(\mathbf{X} \in S \text{ and } \mathbf{Y} \in T) = P(\mathbf{X} \in S) \cdot P(\mathbf{Y} \in T).
+$$
+
+Let $A \subset \mathbb{R}^n$ and $B \subset \mathbb{R}^m$ be measurable sets. Consider the sets:
+
+$$
+S = \{\mathbf{x} \in \mathbb{R}^n : \mathbf{A} \mathbf{x} + \mathbf{b} \in A\}, \quad T = \{\mathbf{y} \in \mathbb{R}^m : \mathbf{C} \mathbf{y} + \mathbf{d} \in B\}.
+$$
+
+Then,
+
+$$
+\begin{aligned}
+P(\mathbf{U} \in A \text{ and } \mathbf{V} \in B) &= P(\mathbf{A} \mathbf{X} + \mathbf{b} \in A \text{ and } \mathbf{C} \mathbf{Y} + \mathbf{d} \in B) \\
+&= P(\mathbf{X} \in S \text{ and } \mathbf{Y} \in T) \\
+&= P(\mathbf{X} \in S) \cdot P(\mathbf{Y} \in T) \\
+&= P(\mathbf{A} \mathbf{X} + \mathbf{b} \in A) \cdot P(\mathbf{C} \mathbf{Y} + \mathbf{d} \in B) \\
+&= P(\mathbf{U} \in A) \cdot P(\mathbf{V} \in B).
+\end{aligned}
+$$
+
+Therefore, $\mathbf{U}$ and $\mathbf{V}$ are independent.
+
+## Reverse Direction
+
+**Assumption:** $\mathbf{U}$ and $\mathbf{V}$ are independent.
+
+**Goal:** Show that $\mathbf{X}$ and $\mathbf{Y}$ are independent.
+
+**Proof:**
+
+Since $\mathbf{U}$ and $\mathbf{V}$ are independent, for any measurable sets $A \subset \mathbb{R}^n$ and $B \subset \mathbb{R}^m$,
+
+$$
+P(\mathbf{U} \in A \text{ and } \mathbf{V} \in B) = P(\mathbf{U} \in A) \cdot P(\mathbf{V} \in B).
+$$
+
+Let $S = \{\mathbf{u} \in \mathbb{R}^n : \mathbf{A}^{-1} (\mathbf{u} - \mathbf{b}) \in A\}$ and $T = \{\mathbf{v} \in \mathbb{R}^m : \mathbf{C}^{-1} (\mathbf{v} - \mathbf{d}) \in B\}$.
+
+Then,
+
+$$
+\begin{aligned}
+P(\mathbf{X} \in A \text{ and } \mathbf{Y} \in B) &= P\left( \mathbf{A} \mathbf{X} + \mathbf{b} \in \mathbf{A} A + \mathbf{b} \text{ and } \mathbf{C} \mathbf{Y} + \mathbf{d} \in \mathbf{C} B + \mathbf{d} \right) \\
+&= P(\mathbf{U} \in \mathbf{A} A + \mathbf{b} \text{ and } \mathbf{V} \in \mathbf{C} B + \mathbf{d}) \\
+&= P(\mathbf{U} \in \mathbf{A} A + \mathbf{b}) \cdot P(\mathbf{V} \in \mathbf{C} B + \mathbf{d}) \\
+&= P\left( \mathbf{A}^{-1} (\mathbf{U} - \mathbf{b}) \in A \right) \cdot P\left( \mathbf{C}^{-1} (\mathbf{V} - \mathbf{d}) \in B \right) \\
+&= P(\mathbf{X} \in A) \cdot P(\mathbf{Y} \in B).
+\end{aligned}
+$$
+
+Therefore, $\mathbf{X}$ and $\mathbf{Y}$ are independent.
+
+# Conclusion
+
+We have shown that random vectors $\mathbf{X}$ and $\mathbf{Y}$ are independent if and only if their affine transformations $\mathbf{U} = \mathbf{A} \mathbf{X} + \mathbf{b}$ and $\mathbf{V} = \mathbf{C} \mathbf{Y} + \mathbf{d}$ are independent, provided that $\mathbf{A}$ and $\mathbf{C}$ are invertible.
+

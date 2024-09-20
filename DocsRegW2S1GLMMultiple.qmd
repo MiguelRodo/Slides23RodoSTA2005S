@@ -2,7 +2,7 @@
 title: Motivating multiple linear regression
 subtitle: Extension to SlidesRegW2S1GLM
 format:
-  html:
+  pdf:
     embed-resources: true
 ---
 

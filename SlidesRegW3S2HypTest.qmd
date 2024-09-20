@@ -1,0 +1,414 @@
+---
+title: "Regression Week III: Inference"
+subtitle: "Hypothesis Testing"
+author: "Miguel Rodo (with credit to Yovna Junglee)"
+institute: "Department of Statistical Sciences - University of Cape Town"
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Contrast hypothesis testing with confidence intervals {.smaller}
+
+- **Confidence Intervals:**
+  - Provide a range of plausible values for the parameter.
+  - Focus on estimating the precision of the effect.
+  
+- **Hypothesis Testing:**
+  - Determine whether an effect exists.
+  - Primary concern is whether to reject a state of no effect, not the precision of the estimate.
+  
+- **Example Scenario:**
+  - In genetic testing, identifying whether a particular gene is associated with a trait is crucial.
+  - Precision of the effect (confidence interval) is secondary to determining the existence of the association.
+
+
+
+# Introduction to hypothesis testing {.smaller}
+
+- **Definition:**
+  - A statistical method to decide whether to reject a null hypothesis based on sample data.
+  
+- **Key Concepts:**
+  - *Null Hypothesis ($H_0$):* Represents a statement of no effect or no difference. Typically, $H_0: \beta = 0$.
+  - *Alternative Hypothesis ($H_1$):* Represents a statement of an effect or difference. Typically, $H_1: \beta \neq 0$.
+  
+- **Objective:**
+  - Assess whether there is sufficient evidence in the data to reject the null hypothesis in favor of the alternative.
+
+# Note re coding {.smaller}
+
+Attach the following packages to run the `R` code snippets:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# Advertising dataset: Fit linear model {.smaller}
+
+```{r}
+#| results: hide
+# Simulate Advertising Dataset
+set.seed(201)
+spend_radio <- runif(100, 0, 3)
+spend_tv <- spend_radio * 1.2 + runif(100, 0, 3)
+revenue <- spend_tv * 2 + rnorm(100, mean = 10, sd = 2)
+ad_data <- tibble(
+  spend_radio = spend_radio,
+  spend_tv = spend_tv,
+  revenue = revenue
+)
+
+# Fit Linear Model
+fit_ad <- lm(revenue ~ spend_tv + spend_radio, data = ad_data)
+summary(fit_ad)
+```
+
+# Advertising dataset: Inference from fit {.smaller}
+
+\begin{center}
+\includegraphics[width=0.95\textwidth]{_data_raw/img/summary.png}
+\end{center}
+
+
+
+# Deriving hypothesis tests used by `summary` {.smaller}
+
+- **Objective:**
+  - Derive hypothesis tests that correspond to the coefficients in the linear model.
+  
+- **Approach:**
+  - Use the t-test for individual regression coefficients or linear combinations.
+  - Extend to F-tests for multiple coefficients or linear combinations.
+
+# Hypothesis test regarding linear combinations of the regression coefficients
+
+- As before, we note that quantities of interest are often linear combinations of the regressinon coefficients.
+- For example, suppose that $\symbf{\beta}' = (\beta_0, \beta_1, \beta_2)'$ are the regression coefficients.
+- We may be interested in the following hypothesis tests:
+  - $H_0: \beta_1 = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix} \symbf{\beta} = 0$
+  - $H_0: \beta_1 - \beta_2 = \begin{pmatrix} 0 & 1 & -1 \end{pmatrix} \symbf{\beta} = 0$
+
+
+# T-tests for quantities of interest {.smaller}
+
+- As before, let $\ell$ be a column vector of coefficients.
+- Suppose that we have the following null hypothesis:
+  - $H_0: \ell'\symbf{\beta} = \ell'\symbf{{\beta}}^{(0)}$
+    - For example, if $\ell = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix}$ and $\symbf{{\beta}}^{(0)'} = \begin{pmatrix} \beta_0 & 1 & \beta_2 \end{pmatrix}'$ then the null hypothesis is that $\beta_1 = 0$.
+  - $H_1: \ell'\symbf{\beta} \neq \ell'\symbf{{\beta}}^{(0)}$
+- If the null hypothesis is true, then
+
+$$
+\ell'\hat{\symbf{\beta}} \sim \mathcal{N}(\ell'\symbf{{\beta}}^{(0)}, \sigma^2 \ell'\symbf{C}\ell)
+$$
+
+# T-tests for quantities of interest {.smaller}
+
+- If the null hypothesis is true, then
+
+$$
+\frac{\ell'\hat{\symbf{\beta}} - \ell'\symbf{{\beta}}^{(0)}}{s\sqrt{\ell'\symbf{C}\ell}} \sim t_{n-k}
+$$
+
+- For example, if $\ell = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix}$ and $\symbf{{\beta}}^{(0)'} = \begin{pmatrix} \beta_0 & 1 & \beta_2 \end{pmatrix}'$ then
+
+$$
+\frac{\hat{\beta}_1-0}{s\sqrt{C_{22}}} = \frac{\hat{\beta}_1}{s\sqrt{C_{22}}}  \sim t_{n-k}
+$$
+
+- We then calculate the p-value as
+
+$$
+2 * \mathrm{Pr}(T_{n-k} > |t|)
+$$
+
+
+# Implementing the t-test in R {.smaller}
+
+- Suppose we wish to test the hypothesis $H_0: \beta_{\mathrm{TV}}= 0$.
+- Again, we fit the linear model to the advertising dataset:
+
+```{r}
+fit <- lm(revenue ~ spend_tv + spend_radio, data = ad_data)
+design_matrix <- model.matrix(fit)
+C_22 <- solve(t(design_matrix) %*% design_matrix)[2, 2]
+se_beta_tv <- summary(fit)$sigma * sqrt(C_22)
+t_stat <- coef(fit)[2] / se_beta_tv
+p_value <- 2 * (1 - pt(abs(t_stat), df = fit$df.residual))
+c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
+```
+
+# Reporting hypothesis test results {.smaller}
+
+\begin{center}
+\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\end{center}
+
+- Each one unit increase in TV spend increased average revenue by $2.01$ units ($p < 0.001$; 95% CI: $1.95$ to $2.07$), holding radio spend constant.
+  - In a real-world report, you would usually be less pecise and not specify "*average* revenue" or "holding radio spend constant". But for academic purposes, please rather state these.
+  - Very small p-values are usually better reported as "<0.001" (or "<0.0001").
+  - Do not use many significant digits (use `signif` or `round` in `R`).
+
+# Reporting hypothesis test results {.smaller}
+
+\begin{center}
+\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\end{center}
+
+- No effect of radio spend on average revenue was detected (p = 0.79; 95% CI: $1.95$ to $2.07$), when controlling for TV spend.
+  - When no effect was detected, you may omit the estimate.
+  - "When controlling for TV spend" is another way of saying "holding TV spend constant".
+  - When discussing the results, if there is no effect you may wish to discuss whether the sample size was sufficient to detect an effect.
+
+# Interpreting hypothesis tests {.smaller}
+
+- **p-values:**
+  - You may regard $p < 0.05$ as statistically significant.
+    - Note that the evidence against the null hypothesis increases dramatically as $p$ decreases.
+  - Do not interpret p-values as the probability that the null hypothesis is true.
+  - If the p-value is larger than 0.05, then consider whether the sample size was sufficient to detect an effect.
+
+- **Effect Size:**
+  - Consider the magnitude of the effect, not just statistical significance.
+  - A statistically significant result may have a negligible practical impact.
+
+- **Assumptions:**
+  - Ensure that model assumptions (linearity, independence, homoscedasticity, normality) are satisfied before interpreting results.
+
+# Testing linear combinations of coefficients {.smaller}
+
+- **Example Question:**
+  - Is there a statistically significant difference between the effects of TV and Radio advertising?
+  
+- **Formulating the Hypothesis:**
+  - **Null Hypothesis ($H_0$):** $\beta_{\text{TV}} - \beta_{\text{Radio}} = 0$
+  - **Alternative Hypothesis ($H_1$):** $\beta_{\text{TV}} - \beta_{\text{Radio}} \neq 0$
+  
+- **Test Statistic:**
+  - Setting $\ell = \begin{pmatrix} 0 & 1 & -1 \end{pmatrix}$, we have
+  
+$$
+t = \frac{\hat{\beta}_{\text{TV}} - \hat{\beta}_{\text{Radio}}}{\sqrt{s^2 (c_{\text{TV,TV}} + c_{\text{Radio,Radio}} - 2c_{\text{TV,Radio}})}} \sim t_{n - k}
+$$
+
+# Implementation in R {.smaller}
+
+```{r}
+# Define contrast matrix for testing beta_TV - beta_Radio = 0
+l <- c(0, 1, -1)  # Assuming intercept is the first coefficient
+
+# Compute the test statistic
+contrast <- sum(l * coef(fit_ad))
+vcov_beta <- summary(fit)$sigma^2 * solve(t(design_matrix) %*% design_matrix)
+se_contrast <- sqrt(l %*% vcov_beta %*% l)
+t_contrast <- contrast / se_contrast
+
+# Compute p-value
+p_value_contrast <- 2 * (1 - pt(abs(t_contrast), df = fit_ad$df.residual))
+
+# Display the results
+c("t-statistic" = t_contrast, "p-value" = p_value_contrast) |> signif(3)
+```
+
+# Testing multiple regression coefficients simultaneously {.smaller}
+
+- Sometimes, we want to test whether multiple coefficients are zero simultaneously.
+- **Example:**
+  - $H_0: \beta_1 = \beta_2 = 0$ (Both TV and Radio have no effect)
+  
+- This cannot be tested using a single t-test, but requires an F-test.
+
+# Multiple linear combinations
+
+- This can be viewed as testing multiple linear combinations of the coefficients.
+- Supposing that $\symbf{\beta}:3\times 1$, the null hypothesis $\beta_1 = \beta_2 = 0$ can be written as
+
+$$
+\symbf{L}\symbf{\beta} = \symbf{0}
+$$
+
+- for $\symbf{L}:q\times k = \symbf{L}:2\times 3 = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$ and $\symbf{0} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}$.
+- As with $\ell$, $\symbf{L}$ can take any form, but the rows must be linearly independent.
+
+# Deriving the F-statistic {.smaller}
+
+- **Distribution of $\mathbf{L}\hat{\boldsymbol{\beta}}$:**
+  - Under the general linear model, we have:
+
+  $$
+  \mathbf{L}\hat{\boldsymbol{\beta}} \sim \mathcal{N}(\mathbf{L}\boldsymbol{\beta}, \sigma^2 \mathbf{L} \mathbf{C} \mathbf{L}^T)
+  $$
+
+- **Quadratic Form:**
+  - Under $H_0: \mathbf{L}\boldsymbol{\beta} = \mathbf{L}\boldsymbol{\beta}^{(0)}$, the quadratic form:
+  
+    $$
+    Q = (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta}^{(0)})^\top (\sigma^2 \mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}}- \mathbf{L}\boldsymbol{\beta}^{(0)})
+    $$
+    
+    follows a $\chi^2_q$ distribution, where $q$ is the number of rows of $\mathbf{L}$.
+
+# Deriving the F-statistic {.smaller}
+
+- **Standardizing without $\sigma^2$:**
+  - Since we don't know $\sigma^2$, we use the unbiased estimator $s^2$.
+  - Also, recall that:
+  
+    $$
+    \frac{(n - k) s^2}{\sigma^2} \sim \chi^2_{n - k}
+    $$
+  
+- **Constructing the F-statistic:**
+  - The ratio of two independent chi-squared variables divided by their degrees of freedom follows an F-distribution:
+  
+    $$
+    F = \frac{\chi^2_m / m}{\chi^2_{n - k} / (n - k)} \sim F_{m, n - k}
+    $$
+
+# Deriving the F-statistic {.smaller} 
+  
+- **Our Test Statistic:**
+  
+  $$
+  F = \frac{Q / q}{(n - k) s^2 / \sigma^2 / (n - k)} = \frac{(\mathbf{L}\hat{\boldsymbol{\beta}}- \mathbf{L}\boldsymbol{\beta}^{(0)})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta}^{(0)})}{m s^2} \sim F_{q, n - k}
+  $$
+
+# Typical case: testing all coefficients are zero {.smaller}
+
+- Here, we have that $\mathbf{L}\boldsymbol{\beta}^{(0)}=\symbf{0}$, where the $i$-th row of $\symbf{L}$ has a 1 in the $i+1$-th position and zeros elsewhere, e.g.
+
+$$
+\symbf{L} = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+$$
+
+  where $\symbf{\beta}:3\times 1$.
+
+- In this case, the $F$ statistic simplifies to
+
+$$
+F = \frac{(\mathbf{L}\hat{\boldsymbol{\beta}})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}})}{2 s^2} \sim F_{2, n - k}
+$$
+
+# Applying the F-test to the advertising dataset {.smaller}
+
+- **Testing $H_0: \beta_{\text{TV}} = \beta_{\text{Radio}} = 0$**
+
+```{r}
+# Define L matrix for the hypotheses
+L <- matrix(c(0, 1, 0,
+              0, 0, 1), nrow = 2, byrow = TRUE)
+
+# Compute the contrast estimates
+contrast <- L %*% coef(fit)
+
+# Compute the covariance matrix of the contrasts
+se_contrast <- L %*% vcov_beta %*% t(L)
+
+# Compute the F-statistic
+F_stat <- t(contrast) %*% solve(se_contrast) %*% contrast / nrow(L) / summary(fit)$sigma^2
+```
+
+# Applying the F-test to the advertising dataset {.smaller}
+
+```{r}
+# Get the p-value
+p_value_F <- 1 - pf(F_stat, df1 = nrow(L), df2 = fit$df.residual)
+
+# Display the results
+c("F-statistic" = F_stat, "p-value" = p_value_F) |> signif(3)
+```
+
+- **Interpretation:**
+  - TV and radio have different effects on average revenue ($p<0.001$).
+
+# Advice on interpreting hypothesis tests {.smaller}
+
+- **p-values:**
+  - You may regard $p < 0.05$ as statistically significant.
+    - Note that the evidence against the null hypothesis increases dramatically as $p$ decreases.
+  - Do not interpret p-values as the probability that the null hypothesis is true.
+  - If the p-value is larger than 0.05, then consider whether the sample size was sufficient to detect an effect.
+
+- **Effect size:**
+  - Consider the magnitude of the effect, not just statistical significance.
+  - A statistically significant result may have a negligible practical impact.
+
+- **Assumptions:**
+  - Ensure that model assumptions (linearity, independence, homoscedasticity, normality) are satisfied before interpreting results.
+
+# Advice on reporting hypothesis tests {.smaller}
+
+- **Include p-values in text:**
+  - Example: "TV advertising has a significant effect on revenue ($\beta_{\text{TV}} = 2.01$, $p < 0.001$)."
+
+- **Avoid using asterisks:**
+  - Instead of using stars to denote significance levels, report the exact p-values.
+
+- **Visual representation:**
+  - Include p-values or significance levels in plots where appropriate.
+
+# Including p-values in coefficient plot {.smaller}
+
+```{r}
+#| echo: false
+# Prepare data for plotting
+confint_tbl <- confint(fit) |> as_tibble(rownames = "Coefficient")
+confint_tbl <- confint_tbl |>
+  dplyr::mutate(
+    Estimate = coef(fit),
+    p_value = summary(fit)$coefficients[, "Pr(>|t|)"]
+  )
+
+# Create the plot
+p <- ggplot(confint_tbl, aes(x = Coefficient)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  geom_text(aes(y = `97.5 %`, label = paste0("p = ", signif(p_value, 2))), vjust = -1, size = 3) +
+  geom_point(aes(y = Estimate), color = "dodgerblue") +
+  geom_errorbar(aes(ymin = `2.5 %`, ymax = `97.5 %`), width = 0.2, color = "dodgerblue") +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") + 
+  labs(title = "Regression Coefficients with p-values",
+       y = "Estimate",
+       x = "Coefficient") +
+  expand_limits(y = 13)  +
+  scale_y_continuous(breaks = seq(0, 12, 4))
+
+# Save and display the plot
+if (!dir.exists("_tmp/fig/w3/hypothesis_testing")) {
+  dir.create("_tmp/fig/w3/hypothesis_testing", recursive = TRUE)
+}
+path_fig <- "_tmp/fig/w3/hypothesis_testing/coefs_pvalues.png"
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 13,
+  height = 8.5,
+  units = "cm"
+)
+```
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{`r path_fig`}
+\end{center}

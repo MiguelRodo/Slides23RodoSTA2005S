@@ -1,0 +1,116 @@
+---
+title: "Q&A: Week three - Slide deck one - Confidence intervals"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+#### Recap
+
+- What is the general linear model estimator for $\hat{\beta}$?
+  - $(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}$
+
+- What is the distribution of $\hat{\beta}$?
+  - $\mathcal{N}(\mathbf{\beta}, \sigma^2(\mathbf{X}'\mathbf{X})^{-1})$
+
+- What is the unbiased estimator for $\sigma^2$?
+  - $s^2 = \frac{1}{n - k} \sum_{i=1}^n (y_i - \hat{y}_i)^2$
+
+- What is the distribution of $\frac{(n - k)s^2}{\sigma^2}$?
+  - $\chi^2_{n-k}$
+
+#### Introduction
+
+- What two primary questions does quantifying uncertainty in estimation help answer:
+  - First?
+    - What are plausible values for the regression coefficients
+    - Tool?
+      - Confidence intervals
+  - Second?
+    - Is the data compatible with there being no effect of the explanatory variable(s)?
+    - Tool?
+      - Hypothesis tests
+
+- `R` code:
+  - How is the confidence interval for individual coefficients obtained?
+    - Using the `confint()` function on the fitted linear model
+    - How are these visualised?
+      - Error bars
+      - `ggplot` function?
+        - `geom_errorbar`
+  - How is the confidence interval for a fitted value obtained?
+    - Using the `predict()` function on the fitted linear model
+    - What is the `interval` argument set to?
+      - `"confidence"`
+    - What argument specifies the predictor values?
+      - `newdata`
+      - What does it take?
+        - A data frame with the predictor values
+        - What is along each row?
+          - The predictor values for a single observation
+        - What columns must it have?
+          - Columns with same names as those used to fit the model
+    - How are these visualised?
+      - As a ribbon
+      - `ggplot` function?
+        - `geom_ribbon`
+
+#### Linear combinations
+
+- What quantities of interest can be represented as linear combinations of regression coefficients:
+  - First?
+    - Individual coefficients ($\beta_1$)
+  - Second?
+    - Fitted values ($\hat{y}_i$)
+
+- How is the distribution of linear combinations of $\hat{\beta}$ expressed?
+  - $\ell' \hat{\beta} \sim \mathcal{N}(\ell' \beta, \sigma^2 \ell' (\mathbf{X}'\mathbf{X})^{-1} \ell)$
+
+- Why can't we use the above to obtain the confidence interval?
+  - We don't know $\sigma^2$
+  - What would happen if we did?
+    - It would lead to confidence intervals not having the nominal coverage level
+
+- What is the expression for a $t_f$-distributed random variable?
+  - $\frac{Z}{\sqrt{V/f}}$
+  - What is:
+    - $Z$?
+      - $\mathcal{N}(0, 1)$
+    - $V$?
+      - $\chi^2_{f}$
+    - Relationship between $Z$ and $V$?
+      - Independence
+
+- What adjustment is needed to obtain a valid confidence interval when $\sigma^2$ is unknown?
+  - Divide $\symbf{Z}$ by $\sqrt{\frac{(n - k)s^2}{\sigma^2}/(n-k)}$ to obtain a t-distributed random variable
+
+- What must be shown to justify using the t-distribution for the confidence interval?
+  - Independence of the numerator and denominator in the test statistic
+
+- What example is given to highlight the importance of independence?
+  - Constructing a t-statistic using $T = \frac{Z}{\sqrt{Z^2}}$
+  - What does it simplify to?
+    - $\text{sign}(Z)$
+    - Problem?
+      - Not $t$-distributed
+
+- What are the confidence intervals for the quantities of interest:
+  - $\hat{\beta}_i$?
+    - $\hat{\beta}_i \pm t_{\alpha/2} s \sqrt{C_{(i+1)(i+1)}}$
+  - $\hat{y}_i$?
+    - $\hat{y}_i \pm t_{\alpha/2} s \sqrt{\mathbf{x}_{[i]}' \mathbf{C} \mathbf{x}_{[i]}}$
+
+- What do the simulations show regarding the coverage of the confidence interval for $\beta_{\mathrm{TV}}$?
+  - Improved coverage using the t-distribution-based confidence interval
+
+#### Interpretation
+
+- What is indicated if the confidence interval for an individual regression coefficient includes zero?
+  - No significant relationship is plausible between the predictor and the response
+
+- Why do confidence intervals not imply the probability that the true parameter lies within the interval?
+  - The true parameter is fixed; it either lies within the interval or it does not
+
+- What is important to check before interpreting confidence intervals?
+  - Validity of the model assumptions
