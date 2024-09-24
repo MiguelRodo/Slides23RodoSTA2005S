@@ -1,0 +1,548 @@
+---
+title: "Regression Week IV: ANOVA and Model Validation"
+subtitle: "ANOVA"
+author: "Miguel Rodo (with credit to Yovna Junglee)"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Where we are in the course
+
+- **Previous Topics Covered:**
+  - Estimation of regression coefficients
+  - Construction of confidence intervals
+  - Hypothesis testing for linear combinations of coefficients
+  - Simultaneous hypothesis tests
+- **Next Steps:**
+  - Describing ANOVA in the context of linear regression
+
+# ANOVA: Analysis of Variance
+
+- ANOVA is a statistical technique used to compare the means of two or more groups.
+- **Historical Context:**
+  - Developed by Ronald Fisher in the early 20th century.
+  - Served as a foundational method before the development of general linear models.
+- **Directly Considers Sums of Squares:**
+  - ANOVA focuses on partitioning total variability into components.
+  - Emphasizes understanding the sources of variation in data.
+
+# Note re running code
+
+- Run the following code chunk to load the necessary libraries and functions, if you want to run the code in the slides:
+
+```{r}
+#| eval: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# One-way ANOVA example
+
+- Suppose individuals are given a placebo or one of two treatments to lower their blood pressure:
+
+```{r}
+set.seed(1811)
+n <- 10
+placebo <- rnorm(n, mean = 120, sd = 10)
+trt_a <- rnorm(n, mean = 110, sd = 10)
+trt_b <- rnorm(n, mean = 120, sd = 10)
+trt_tbl <- tibble(
+  group = rep(c("Placebo", "Treatment A", "Treatment B"), each = n),
+  bp = c(placebo, trt_a, trt_b)
+)
+```
+
+# One-way ANOVA example
+
+- The data looks like this:
+
+```{r}
+trt_tbl[c(1, 11, 21), ]
+```
+
+# Blood pressure by treatment category
+
+```{r}
+#| echo: false
+drug_col_vec <- stats::setNames(
+  c("#b2df8a", "#a6cee3", "#1f78b4"),
+  c("Placebo", "Treatment A", "Treatment B")
+)
+p <- ggplot(
+  trt_tbl |>
+    dplyr::mutate(
+      group = factor(group, levels = c("Placebo", "Treatment A", "Treatment B"))
+    ),
+  aes(x = group, y = bp, fill = group)
+) +
+  theme_cowplot_bg() +
+  geom_boxplot() +
+  cowplot::background_grid(major = "xy") +
+  ggforce::geom_sina(alpha = 0.75) +
+  labs(
+    x = "Treatment Group",
+    y = "Blood Pressure"
+  ) +
+  theme(
+    legend.position = "none"
+  ) +
+  scale_fill_manual(
+    values = drug_col_vec
+  )
+path_fig <- "_tmp/fig/w4/s1anova/simple_anova_example-boxplot.pdf"
+if (!dir.exists(dirname(path_fig))) {
+  dir.create(dirname(path_fig), recursive = TRUE)
+}
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 9,
+  height = 4.5,
+  dpi = 300
+)
+```
+
+\begin{center}
+\includegraphics[width=\textwidth]{`r path_fig`}
+\end{center}
+
+# One-way ANOVA model specification
+
+Here is the model for a one-way ANOVA with $a$ groups.
+
+- *ANOVA Model:*
+
+  $$
+  Y_{ij} = \mu + \alpha_i + e_{ij}
+  $$
+
+  - $\mu$ is the overall mean.
+  - $\alpha_i$ is the effect of group $i$.
+  - $e_{ij}$ is the random error term for the $j$-th observation from the $i$-th group.
+
+- *Assumptions:*
+  - The observations are normally distributed
+    - Or, less strictly, the sample size is large
+  - The observations are independent
+  - Variance is equal across groups
+  - $\sum \alpha_i = 0$
+
+# Hypothesis testing using the one-way ANOVA model
+
+- **Null Hypothesis:**
+  - $H_0: \alpha_1 = \alpha_2 = \ldots = \alpha_a = 0$
+  - In our example, $a = 3$.
+  - There is no difference in means across groups.
+- **Alternative Hypothesis:**
+  - $H_1: \text{At least one } \alpha_i \neq 0$
+  - In our example, $H_1: \text{At least one of } \alpha_1,\;\alpha_2 \text{ and } \alpha_3 \neq 0$
+  - There is a difference in means across groups.
+
+# Formulae for $SS_A$ and $SSE$
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- **$SS_A$ (between-group sum of squares):**
+
+  $$
+  SS_A = \sum_{i=1}^{a} n_i (\bar{Y}_{i\cdot} - \bar{Y}_{\cdot\cdot})^2
+  $$
+
+  - $n_i$ is the number of observations in group $i$.
+  - $\bar{Y}_{i\cdot}$ is the mean of group $i$.
+  - $\bar{Y}_{\cdot\cdot}$ is the overall mean.
+
+:::
+
+:::{.column width="50%"}
+
+- **$SSE$ (within-group sum of squares):**
+
+  $$
+  SSE = \sum_{i=1}^{a} \sum_{j=1}^{n_i} (Y_{ij} - \bar{Y}_{i\cdot})^2
+  $$
+
+:::
+
+::::
+
+# Test statistic for one-way ANOVA
+
+- The test statistic for ANOVA is the $F$-statistic:
+
+  $$
+  F = \frac{SS_A / (a - 1)}{SSE / (n - a)} = \frac{MS_A}{MSE}
+  $$
+
+  - $SS_A$ is the sum of squares between groups.
+  - $SSE$ is the sum of squares within groups.
+  - $a$ is the number of groups.
+  - $n$ is the total number of observations.
+  - $MS_A$ is the mean square between groups.
+  - $MSE$ is the mean square within groups.
+
+- Under the null hypothesis, $F \sim F(a - 1, n - a)$.
+
+# Calculating the above from first principles
+
+```{r}
+y_bar <- mean(trt_tbl$bp)
+n_i <- table(trt_tbl$group)
+y_j_bar <- tapply(trt_tbl$bp, trt_tbl$group, mean)
+ssa <- sum(n_i * (y_j_bar - y_bar)^2)
+sse <- sum(tapply(
+  trt_tbl$bp, trt_tbl$group, function(x) sum((x - mean(x))^2)
+  ))
+ssa |> signif(3)
+sse |> signif(3)
+```
+
+# Obtaining the p-value
+
+We first calculate the F-statistic:
+
+```{r}
+a <- length(n_i)
+n <- nrow(trt_tbl)
+f_stat <- (ssa / (a - 1)) / (sse / (n - a))
+f_stat |> signif(3)
+```
+
+We now calculate the p-value:
+
+```{r}
+1 - pf(f_stat, a - 1, n - a)
+```
+
+# ANOVA as a subset of linear regression
+
+::::{.callout-tip appearance="minimal"}
+"Analysis of variance is a special case of regression, and both are special cases of the
+GLM ["(generalised linear model)"]. All ANOVA problems can be solved through regression, but the reverse is not
+true: Not all regression problems can be solved using traditional ANOVA."
+[@tabachnick07]
+::::
+
+
+- ANOVA is a special case of linear regression:
+  - When all predictors are categorical variables represented by dummy variables, the linear regression model becomes equivalent to an ANOVA model.
+
+# ANOVA as a subset of linear regression
+
+- For this reason, the `anova` function accepts a linear model object as an argument:
+
+```{r}
+fit <- lm(bp ~ group, data = trt_tbl)
+anova(fit)
+```
+
+- This yields the same results as the "direct" ANOVA test.
+
+# Why bother describing ANOVA then?
+
+- Statistical methodology is often described in terms of ANOVA.
+  - Even though ANOVA is a subset of linear regression.
+- Collaborators may be familiar with ANOVA rather than regression.
+  - This is largely a result of their training:
+    - ANOVA is essentially an hypothesis-testing approach, which by focusing on one statistic (the p-value) is easier to understand.
+    - Regression adds in additional elements: estimation and prediction.
+  - To work with them, we need to be able to communicate in their language.
+
+# Handling multi-level categorical explanatory variables in regression
+
+- One-way ANOVA, at this stage, is in fact beyond what we've recovered in regression thus far.
+- To bring regression up to speed, we need to consider how to handle multi-level categorical variables.
+- The key is to use dummy variables, but we need to be careful about how we do this.
+
+# An approach that won't work: the model
+
+- Imagine that we used the following model, where each level of a categorical variable got its own regression parameter:
+
+$$
+Y = \beta_0 + I(\text{group} = 1)\beta_1 + I(\text{group} = 2)\beta_2 + \ldots + I(\text{group} = a)\beta_a + e
+$$
+
+- Note that $I(\text{group} = i)$ is an indicator function that is 1 if the group is $i$ and 0 otherwise.
+- For example, if an individual belongs to group 2, the model becomes:
+
+$$
+Y = \beta_0 + 0\beta_1 + 1\beta_2 + 0\beta_3 + \ldots + 0\beta_r + e  = \beta_0 + \beta_2 + e
+$$
+
+# An approach that won't work: the design matrix
+
+- In this design matrix, we have $n$ rows and, importantly, $a+1$ columns: one for the intercept and one for each level of the categorical variable.
+- Suppose that, for the sake of illustration, the first row of the design matrix belongs to category 1, the second row to category 2, and so on until the $a$-th row to category $a$:
+
+$$
+\symbf{X}_{1:r,:} = \begin{bmatrix}
+1 & 1 & 0 & \ldots & 0 \\
+1 & 0 & 1 & \ldots & 0 \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+1 & 0 & 0 & \ldots & 1
+\end{bmatrix}
+$$
+
+# An approach that won't work: the design matrix
+
+- If $a=3$, the first two rows of the design matrix would be:
+
+$$
+\symbf{X}_{1:3,:} = \begin{bmatrix}
+1 & 1 & 0 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+- All the rows below repeat one of these first three rows.
+- Clearly, therefore, the columns are linearly dependent, as the first column is the sum of the other columns.
+
+# An approach that won't work: the estimator
+
+- The linear dependence of the estimator makes $\symbf{X}'\symbf{X}$ non-invertible, and therefore
+
+  $$
+  \hat{\symbf{\beta}} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y}
+  $$
+
+  does not exist.
+
+# Adopting a reference level
+
+- When each level of categorical variable got its own parameter, we would tend to think of $\beta_0$ as the overall mean, like $\mu$ in ANOVA.
+- However, in ANOVA this is achieved by constraining the group effects to sum to zero ($\sum \alpha_i = 0$).
+- In regression, we could do that, but typically we adopt a reference level.
+- The reference level is the level for which $\beta_0$ is the mean (assuming all other explanatory variables are zero).
+
+# Adopting a reference level
+
+- We achieve a reference level by creating dummy variables for all but one level.
+- If we drop the $a$-th level, the model then becomes
+
+$$
+Y = \beta_0 + I(\text{group} = 1)\beta_1 + I(\text{group} = 2)\beta_2 + \ldots + I(\text{group} = a-1)\beta_{a-1} + e
+$$
+
+- The mean of group $a$ is then $\beta_0$.
+- The mean of group $i$ is $\beta_0 + \beta_i$.
+- The interpretation of $\beta_i$ is therefore the difference in means between group $i$ and group $a$.
+  - Hence the term "reference" level.
+
+# The design matrix used by `lm` for our drug example
+
+- Let's view the rows of the design matrix ($\symbf{X}$) of our `group` variable, corresponding to the three groups:
+
+```{r}
+model.matrix(fit)[c(1, 11, 21), ]
+```
+
+- The first row corresponds to the reference level (placebo).
+- The second row corresponds to treatment A.
+- The third row corresponds to treatment B.
+
+# Translation of one-way ANOVA to the regression: the null hypothesis
+
+- The null hypothesis in ANOVA is equivalent to the following null hypothesis in regression:
+
+  $$
+  H_0: \symbf{L}\symbf{\beta} = \symbf{L}\symbf{\beta}^{(0)} = \symbf{0}
+  $$
+
+- where:
+  - $\symbf{L}$ is an $(a-1)\times k$ with one 1 per row and 0s otherwise, e.g. $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$
+  - The non-zero column indices in $\symbf{L}$ correspond to the positions of the categorical variable's regression parameters in $\symbf{\beta}$.
+  - For example, in our drug example, $\symbf{L} = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ as $\symbf{\beta}' = \left(\beta_0, \beta_{A}, \beta_B\right)$
+  - $\symbf{\beta}^{(0)} = \symbf{0}$
+
+# Translation of one-way ANOVA to the regression: the null hypothesis
+
+- Alternatively, 
+
+  $$
+  H_0: \beta_i = 0 \text{ for all } i \in \mathbb{A}
+  $$
+
+  for $\mathbb{A}$ the positions in $\symbf{\beta}$ corresponding to the categorical variable's effects.
+
+# Translation of one-way ANOVA to regression: the $F$-test
+
+- The one-way ANOVA $F$-statistic is equivalent to the following $F$-statistic in regression:
+
+$$
+F = \frac{(\symbf{L}\symbf{\beta} - \symbf{L}\symbf{\beta}^{(0)})'(s^2\symbf{L}\symbf{C}\symbf{L}^T)^{-1}(\symbf{L}\symbf{\beta} - \symbf{L}\symbf{\beta}^{(0)})}{a-1} = \frac{(\symbf{L}\symbf{\beta})'(s^2\symbf{L}\symbf{C}\symbf{L}^T)^{-1}(\symbf{L}\symbf{\beta})}{a-1} 
+$$
+
+- where:
+  - $\symbf{L}$ is an $(a-1)\times k$ matrix of zeros and ones, e.g. $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$,
+  - implicitly, $\symbf{\beta}^{(0)} = \symbf{0}$
+- Under the null, $F \sim F(a - 1, n - a)$.
+
+# The $F$-test for our drug example
+
+- We can calculate the $F$-statistic for our drug example:
+
+```{r}
+L <- matrix(c(0, 1, 0, 0, 0, 1), nrow = 2, byrow = TRUE)
+C <- solve(t(model.matrix(fit)) %*% model.matrix(fit))
+s2 <- summary(fit)$sigma^2
+coef_mat <- matrix(coef(fit), ncol = 1)
+f_stat <- (t(L %*% coef_mat) %*% solve(L %*% C %*% t(L)) %*% (L %*% coef_mat)) / s2 / nrow(L)
+1 - pf(f_stat, nrow(L), nrow(model.matrix(fit)) - ncol(model.matrix(fit)))
+```
+
+# Multi-way ANOVA and regression
+
+- Two-way ANOVA and beyond:
+  - Includes two (two-way) or more (multiple) categorical variables.
+  - May include interaction terms (i.e. the effect of one variable depends on the level of another variable).
+- We have not covered interaction terms yet (next week), but we note that regression can handle multi-way ANOVA.
+
+# Multi-way ANOVA and regression
+
+- However, the relationship between ANOVA and regression becomes more complicated at this point:
+  - *Order of entry of variables*:
+    - In regression, the effect of each variable is calculated after all other variables have been accounted for.
+    - In ANOVA, this is flexible.
+  - *Interaction terms*:
+    - In ANOVA, interaction terms can be handled in different ways, e.g. type I, II, or III sum of squares.
+    - In regression, we typically take the approach of type III sum of squares.
+- You can take approaches to regression that correspond directly to the ANOVA approaches, but these are more than simply fitting one model.
+  - For example, to mimick sequential ANOVA, you could fit a series of models, each with one more variable than the last.
+  - To mimick type II ANOVA testing, you would test main effects using a model without interaction terms.
+
+# Reduced and full models
+
+- The $F$-test for a subset of coefficients being zero can be calculated in an alternative fashion using two model fits.
+- Suppose that we have a reduced model, $M_0$, and a full model, $M_1$:
+  - Under $M_1$:
+    - Suppose that $Y=\symbf{X}\symbf{\beta} + \symbf{\epsilon}$.
+  - Under $M_0$:
+    - Let $\symbf{X}^{(0)}$ be a subset of the columns of $\symbf{X}$ (after excluding the columns corresponding to coefficients that are zero), and $\symbf{\beta}^{(0)}$ be the corresponding estimates.
+    - Then $Y=\symbf{X}^{(0)}\symbf{\beta}^{(0)} + e$.
+
+# Sums of squares for the reduced and full models
+
+- Let $\hat{\symbf{Y}}$ and $\hat{\symbf{Y}}^{(0)}$ be the predicted values under the full and reduced models, respectively.
+- Let $SSE_{UR}$ be the sum of squared errors under the unrestricted (full) model and $SSE_{R}$ be the sum of squared errors under the restricted (reduced) model.
+- Suppose that the number of parameters in the full and reduced models are $k_{UR}$ (just $k$, really) and $k_{R}$ (some value less than $k$), respectively.
+- Then
+
+  $$
+  SSE_{UR} = \sum_{i=1}^{n} (Y_i - \hat{Y}_i)^2, \quad SSE_{R} = \sum_{i=1}^{n} (Y_i - \hat{Y}_i^{(0)})^2.
+  $$
+
+# The $F$-test using the reduced and full models
+
+- The $F$-statistic is then
+
+  $$
+  F = \frac{(SSE_{R} - SSE_{UR}) / (k_{UR} - k_{R})}{SSE_{UR} / (n - k_{UR})}
+  $$
+
+- Under the null hypothesis, $F \sim F(k_{UR} - k_{R}, n - k_{UR})$.
+
+# Application of this $F$-test calculation to our drug example
+
+- We can calculate the $F$-statistic for the full and reduced models in our drug example:
+
+```{r}
+fit_reduced <- lm(bp ~ 1, data = trt_tbl)
+fit_full <- lm(bp ~ group, data = trt_tbl)
+sse_ur <- sum(residuals(fit_full)^2)
+sse_r <- sum(residuals(fit_reduced)^2)
+k_ur <- length(coef(fit_full))
+k_r <- length(coef(fit_reduced))
+f_stat <- ((sse_r - sse_ur) / (k_ur - k_r)) / (sse_ur / (n - k_ur))
+1 - pf(f_stat, k_ur - k_r, nrow(trt_tbl) - k_ur)
+```
+
+# F-statistic in the output of `summary(lm(...))`
+
+- The $F$-statistic in the output of `summary(lm(...))` tests the null hypothesis that all non-intercept coefficients are zero.
+- In other words, it tests the following null hypothesis:
+
+  $$
+  H_0: \beta_1 = \beta_2 = \ldots = \beta_k = 0
+  $$
+- It is useful for testing whether the explanatory variablles provide any information at all.
+
+# F-statistic in the output of `summary(lm(...))`
+
+- As the $F$ tests above assessed whether either drugs were different from placebo, they are equivalent to the $F$-statistic in the output of `summary(lm(...))`:
+
+```{r}
+#| results: hide
+summary(lm(bp ~ group, data = trt_tbl))
+```
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{_data_raw/img/f_stat.png}
+\end{center}
+
+# Extensions of ANOVA
+
+- **ANCOVA (Analysis of Covariance):**
+  - Combines ANOVA and regression by including both categorical and continuous predictors.
+  - *Regression Equivalent:* Regression models with both categorical and continuous variables.
+
+- **Repeated Measures ANOVA:**
+  - Used when the same subjects are measured multiple times.
+  - *Regression Equivalent:* Mixed-effects models.
+
+- **MANOVA (Multivariate ANOVA):**
+  - Extends ANOVA when there are multiple dependent variables.
+  - *Regression Equivalent:* Multivariate regression models.
+
+# Take-aways
+
+- ANOVA is a statistical technique used to compare the means of two or more groups.
+  - It can handle multiple groups and multiple levels of categorical variables.
+- ANOVA is a special case of linear regression.
+  - The $F$-statistic in ANOVA is equivalent to the $F$-statistic in regression for a subset of coefficients being zero.
+    - This equivalency always holds in one-way ANOVA, but becomes more complicated in multi-way ANOVA.
+- Regression uses dummy variables to handle categorical variables.
+  - The reference level is the level for which the intercept is the mean.
+  - The effect of each level is the difference in means between that level and the reference level.
+  - For a categorical variable with $a$ levels, $a-1$ dummy variables (and therefore $a-1$ regression coefficients) are needed.
+- The $F$-test can be calculated in three different ways:
+  - Directly from the sums of squares (i.e. using $SS_A$ and $SSE$).
+  - Using the full and reduced models (i.e. using $SSE_{UR}$ and $SSE_{R}$).
+  - Using the linear regression model (i.e. using $\symbf{L}$ and $\symbf{C}$).
+
+# Works cited
+

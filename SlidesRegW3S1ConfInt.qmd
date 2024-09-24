@@ -409,7 +409,7 @@ signif(mean(beta_tv_contained_t) * 1e2, 4)
 - The coverage is given by
 
 $$
-P(z^{\alpha/2} < \frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{s\sqrt{\ell' \symbf{C} \ell}} < 1- z^{\alpha/2}) = P(z^{\alpha/2} < t_{n-k} < z^{1-\alpha/2}).
+P(z^{\alpha/2} < \frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{s\sqrt{\ell' \symbf{C} \ell}} < z^{1-\alpha/2}) = P(z^{\alpha/2} < t_{n-k} < z^{1-\alpha/2}).
 $$
 
 # Exact calculation: coverage of confidence interval {.smaller}

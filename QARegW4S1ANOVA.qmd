@@ -1,0 +1,342 @@
+---
+title: "Q&A: Regression Week IV: ANOVA"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+#### Where we are in the course
+
+- What topics have been previously covered:
+  - First?
+    - Estimation of regression coefficients
+  - Second?
+    - Construction of confidence intervals
+  - Third?
+    - Hypothesis testing for linear combinations of coefficients
+  - Fourth?
+    - Simultaneous hypothesis tests
+- What is the next step?
+  - Describing ANOVA in the context of linear regression
+
+#### ANOVA: Analysis of Variance
+
+- What is ANOVA?
+  - A statistical technique used to compare the means of two or more groups
+- Who developed ANOVA?
+  - Ronald Fisher
+- When was ANOVA developed?
+  - Early 20th century
+- What did ANOVA serve as?
+  - A foundational method before the development of general linear models
+- What does ANOVA directly consider?
+  - Sums of squares
+- What does ANOVA focus on?
+  - Partitioning total variability into components
+- What does ANOVA emphasize understanding?
+  - The sources of variation in data
+
+#### One-way ANOVA example
+
+- What is the example scenario?
+  - Individuals given a placebo or one of two treatments to lower blood pressure
+- How many treatments are considered?
+  - Two treatments and a placebo
+- How many individuals are in each group?
+  - Ten individuals
+- What are the names of the groups:
+  - First?
+    - Placebo
+  - Second?
+    - Treatment A
+  - Third?
+    - Treatment B
+
+#### One-way ANOVA model specification
+
+- What is the model for one-way ANOVA?
+  - $Y_{ij} = \mu + \alpha_i + e_{ij}$
+- What does $\mu$ represent?
+  - The overall mean
+- What does $\alpha_i$ represent?
+  - The effect of group $i$
+  - Compared to?
+    - The overall mean
+- What does $e_{ij}$ represent?
+  - The random error term for the $j$-th observation in group $i$
+- What are the assumptions of the one-way ANOVA model:
+  - First?
+    - Observations are normally distributed
+  - Second?
+    - Observations are independent
+  - Third?
+    - Variance is equal across groups
+  - Fourth?
+    - The sum of group effects equals zero ($\sum \alpha_i = 0$)
+
+#### Hypothesis testing using the one-way ANOVA model
+
+- What is the null hypothesis ($H_0$)?
+  - $\alpha_1 = \alpha_2 = \ldots = \alpha_a = 0$
+- In the example, what is the value of $a$?
+  - Three
+- What does the null hypothesis imply in the example?
+  - No difference in means across groups
+- What is the alternative hypothesis ($H_1$)?
+  - At least one $\alpha_i \neq 0$
+- What does the alternative hypothesis imply?
+  - There is a difference in means across groups
+
+#### Formulae for $SS_A$ and $SSE \ )
+
+- What does $SS_A$ represent?
+  - Between-group sum of squares
+- How is $SS_A$ calculated?
+  - $SS_A = \sum_{i=1}^{a} n_i (\bar{Y}_{i\cdot} - \bar{Y}_{\cdot\cdot})^2$
+- What does $n_i$ represent?
+  - Number of observations in group $i$
+- What does $\bar{Y}_{i\cdot}$ represent?
+  - Mean of group $i$
+- What does $\bar{Y}_{\cdot\cdot}$ represent?
+  - Overall mean
+- What does $SSE$ represent?
+  - Within-group sum of squares
+- How is $SSE$ calculated?
+  - $SSE = \sum_{i=1}^{a} \sum_{j=1}^{n_i} (Y_{ij} - \bar{Y}_{i\cdot})^2$
+
+#### Test statistic for one-way ANOVA
+
+- What is the test statistic used in ANOVA?
+  - The $F$-statistic
+- How is the $F$-statistic calculated?
+  - $F = \frac{SS_A / (a - 1)}{SSE / (n - a)}$
+- What does $MS_A$ stand for?
+  - Mean square between groups
+- What does $MSE$ stand for?
+  - Mean square within groups
+- Under the null hypothesis, what is the distribution of $F$?
+  - $F$ follows an $F$-distribution with $a - 1$ and $n - a$ degrees of freedom
+
+#### Obtaining the p-value
+
+- What is calculated first to obtain the p-value?
+  - The $F$-statistic
+- How is the p-value obtained?
+  - By finding the probability of observing the $F$-statistic under the null hypothesis
+- Which function is used in R to calculate the p-value?
+  - `pf()` function with appropriate parameters
+
+#### ANOVA as a subset of linear regression
+
+- What is the relationship between ANOVA and regression?
+  - ANOVA is a special case of linear regression
+- When does the linear regression model become equivalent to standard ANOVA?
+  - When all predictors are categorical variables represented by dummy variables
+- Which function in R accepts a linear model object to perform ANOVA?
+  - `anova()`
+
+#### Why bother describing ANOVA then?
+
+- Why is it important to understand ANOVA separately?
+  - Because statistical methodology is often described in terms of ANOVA
+- Why might collaborators prefer ANOVA over regression?
+  - They may be more familiar with ANOVA due to their training
+- What does ANOVA focus on that makes it easier to understand?
+  - Hypothesis testing with a focus on the p-value
+- What additional elements does regression add?
+  - Estimation and prediction
+
+#### Handling multi-level categorical explanatory variables in regression
+
+- What key method is used to handle categorical variables in regression?
+  - Dummy variables
+- Why do we need to be careful when using dummy variables?
+  - To avoid issues like multicollinearity
+- What challenge does multi-level categorical data present in regression?
+  - It extends beyond basic regression techniques covered so far
+
+#### An approach that won't work: the model
+
+- What model is considered that won't work?
+  - A model where each level of a categorical variable gets its own regression parameter
+- How is the problematic model expressed?
+  - $Y = \beta_0 + I(\text{group} = 1)\beta_1 + \ldots + I(\text{group} = a)\beta_a + e$
+- What is $I(\text{group} = i)$?
+  - An indicator function that is 1 if the group is $i$, otherwise 0
+- What issue arises with this model?
+  - Linear dependence among the columns of the design matrix
+
+#### An approach that won't work: the design matrix
+
+- How many columns are in the design matrix for this model?
+  - $a + 1$ columns
+- What causes the columns to be linearly dependent?
+  - The intercept column is the sum of the group indicator columns
+- What is the consequence of linear dependence in the design matrix?
+  - The matrix $\mathbf{X}'\mathbf{X}$ is non-invertible
+
+#### An approach that won't work: the estimator
+
+- Why does the estimator $\hat{\boldsymbol{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}$ not exist?
+  - Because $\mathbf{X}'\mathbf{X}$ is non-invertible due to linear dependence
+
+#### Adopting a reference level
+
+- How do we resolve the issue of linear dependence?
+  - By adopting a reference level and dropping one dummy variable
+- Which level is typically used as the reference level?
+  - The last level or a baseline category
+- How does the model change after adopting a reference level?
+  - It includes $a - 1$ dummy variables instead of $a$
+- What does $\beta_0$ represent in the adjusted model?
+  - The mean of the reference group
+- What does $\beta_i$ represent?
+  - The difference in means between group $i$ and the reference group
+
+#### The design matrix used by `lm` for our drug example
+
+- What function is used to view the design matrix in R?
+  - `model.matrix()`
+  - What is the notation for this matrix?
+    - $\mathbf{X}$
+
+#### Translation of one-way ANOVA to the regression: the null hypothesis
+
+- How is the null hypothesis expressed in regression terms?
+  - $H_0: \mathbf{L}\boldsymbol{\beta} = \mathbf{0}$
+- What is $\mathbf{L}$ in this context?
+  - A contrast matrix with ones and zeros indicating coefficients to test
+- What does $\boldsymbol{\beta}^{(0)}$ represent?
+  - The hypothesized value of coefficients under $H_0$, often zero
+- In the drug example, how is $\mathbf{L}$ constructed?
+  - $\mathbf{L} = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$
+
+#### Translation of one-way ANOVA to regression: the $F$-test
+
+- How is the $F$-statistic expressed in regression terms?
+  - $F = \frac{(\mathbf{L}\boldsymbol{\beta})' (s^2 \mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\boldsymbol{\beta})}{a - 1}$
+- What does $s^2$ represent?
+  - The estimated variance of the errors
+- What does $\mathbf{C}$ represent?
+  - The covariance matrix of the estimated coefficients
+- Under the null hypothesis, what distribution does $F$ follow?
+  - An $F$-distribution with $a - 1$ and $n - a$ degrees of freedom
+
+#### The $F$-test for our drug example
+
+- What is calculated using the $F$-test in the drug example?
+  - Whether the treatment groups have a significant effect on blood pressure
+- How is the p-value obtained?
+  - By computing $1 - \text{pf}(F, \text{df}_1, \text{df}_2)$
+- What does $\text{df}_1$ represent?
+  - Degrees of freedom for the numerator ($a - 1$)
+- What does $\text{df}_2$ represent?
+  - Degrees of freedom for the denominator ($n - a$)
+
+#### Multi-way ANOVA and regression
+
+- What does multi-way ANOVA include?
+  - Two or more categorical variables
+- What additional terms may multi-way ANOVA include?
+  - Interaction terms
+- What do interaction terms represent?
+  - The effect of one variable depends on the level of another variable
+- Can regression handle multi-way ANOVA?
+  - Yes
+
+#### Relationship complications between ANOVA and regression
+
+- How does the order of entry of variables differ between regression and ANOVA?
+  - Regression calculates the effect after accounting for all other variables
+  - ANOVA can be flexible with the order
+- How are interaction terms handled differently?
+  - ANOVA uses types I, II, or III sums of squares
+  - Regression typically uses type III sums of squares
+- How can sequential ANOVA be mimicked in regression?
+  - By fitting a series of models, each adding one more variable
+- How can type II ANOVA testing be mimicked?
+  - By testing main effects using a model without interaction terms
+
+#### Reduced and full models
+
+- What is a reduced model ($M_0$)?
+  - A model that excludes certain coefficients, assuming they are zero
+- What is a full model ($M_1$)?
+  - A model that includes all coefficients
+- How is the $F$-test calculated using reduced and full models?
+  - By comparing the sum of squared errors between $M_0$ and $M_1$
+- What does $SSE_{UR}$ represent?
+  - Sum of squared errors for the unrestricted (full) model
+- What does $SSE_{R}$ represent?
+  - Sum of squared errors for the restricted (reduced) model
+
+#### The $F$-test using the reduced and full models
+
+- How is the $F$-statistic calculated using these models?
+  - $F = \frac{(SSE_{R} - SSE_{UR}) / (k_{UR} - k_{R})}{SSE_{UR} / (n - k_{UR})}$
+- What does $k_{UR}$ represent?
+  - Number of parameters in the full model
+- What does $k_{R}$ represent?
+  - Number of parameters in the reduced model
+- Under the null hypothesis, what distribution does $F$ follow?
+  - An $F$-distribution with $k_{UR} - k_{R}$ and $n - k_{UR}$ degrees of freedom
+
+#### Application of this $F$-test calculation to our drug example
+
+- What are the two models compared in the example?
+  - The full model with the group variable and the reduced model with only the intercept
+- How is $SSE_{UR}$ obtained?
+  - From the residuals of the full model
+- How is $SSE_{R}$ obtained?
+  - From the residuals of the reduced model
+- What is concluded if the $F$-statistic is significant?
+  - The group variable has a significant effect on blood pressure
+
+#### Extensions of ANOVA
+
+- What are some extensions of ANOVA:
+  - First?
+    - ANCOVA (Analysis of Covariance)
+  - Second?
+    - Repeated Measures ANOVA
+  - Third?
+    - MANOVA (Multivariate ANOVA)
+- What does ANCOVA combine?
+  - ANOVA and regression by including both categorical and continuous predictors
+  - Which variables does ANOVA provide inference with respect to?
+    - Categorical variables
+    - Does it provide inference for continuous variables?
+      - No
+    - What is the role of the continuous predictors?
+      - To adjust for their effects
+- What is the regression equivalent of ANCOVA?
+  - Regression models with both categorical and continuous variables
+- What is Repeated Measures ANOVA used for?
+  - When the same subjects are measured multiple times
+- What is the regression equivalent of Repeated Measures ANOVA?
+  - Mixed-effects models
+- What does MANOVA extend ANOVA to?
+  - Multiple dependent variables
+- What is the regression equivalent of MANOVA?
+  - Multivariate regression models
+
+#### Take-aways
+
+- What is ANOVA used for?
+  - Comparing the means of two or more groups
+- Is ANOVA a special case of another statistical method?
+  - Yes, a special case of linear regression
+- How does regression handle categorical variables?
+  - By using dummy variables
+- What is the reference level in regression?
+  - The category for which the intercept represents the mean
+- How many dummy variables are needed for a categorical variable with $a$ levels?
+  - $a - 1$ dummy variables
+- In how many ways can the $F$-test be calculated:
+  - First?
+    - Directly from sums of squares ($SS_A$ and $SSE$)
+  - Second?
+    - Using full and reduced models ($SSE_{UR}$ and $SSE_{R}$)
+  - Third?
+    - Using the linear regression model ($\mathbf{L}$ and $\mathbf{C}$)

@@ -1,0 +1,175 @@
+---
+title: "Q&A: Regression Week III: Inference - Hypothesis Testing"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+#### Contrast hypothesis testing with confidence intervals
+
+- What do confidence intervals provide?
+  - A range of plausible values for the parameter.
+
+- What do confidence intervals focus on?
+  - Estimating the precision of the effect.
+
+- What does hypothesis testing determine?
+  - Whether an effect exists.
+  - What is another way of saying this?
+    - Detecting differences
+
+- What is the typical concern of hypothesis testing?
+  - Whether to reject a state of no effect.
+
+#### Introduction to hypothesis testing
+
+- What is hypothesis testing?
+  - A statistical method to decide whether to reject a null hypothesis based on sample data.
+
+- What does the null hypothesis ($H_0$) typically represent?
+  - A statement of no effect or no difference.
+
+- How is the null hypothesis typically formulated?
+  - $H_0: \beta = 0$.
+
+- What does the alternative hypothesis ($H_1$) represent?
+  - A statement of an effect or difference.
+
+- How is the alternative hypothesis typically formulated?
+  - $H_1: \beta \neq 0$.
+
+- What is the objective of hypothesis testing?
+  - To assess whether there is sufficient evidence to reject the null hypothesis in favor of the alternative.
+
+#### Deriving hypothesis tests used by `summary`
+
+- What statistical test is used for individual regression coefficients or linear combinations?
+  - The t-test.
+
+- What statistical test is used for multiple coefficients or linear combinations?
+  - The F-test.
+
+#### Hypothesis test regarding linear combinations of the regression coefficients
+
+- What are quantities of interest often in regression analysis?
+  - Linear combinations of the regression coefficients.
+
+- Given $\boldsymbol{\beta}' = (\beta_0, \beta_1, \beta_2)'$, what hypothesis tests might we be interested in, for example:
+  - First?
+    - $H_0: \beta_1 = 0$.
+  - Second?
+    - $H_0: \beta_1 - \beta_2 = 0$.
+
+- How can $H_0: \beta_1 = 0$ be expressed as a linear combination?
+  - As $\begin{pmatrix} 0 & 1 & 0 \end{pmatrix} \boldsymbol{\beta} = 0$.
+
+- How can $H_0: \beta_1 - \beta_2 = 0$ be expressed?
+  - As $\begin{pmatrix} 0 & 1 & -1 \end{pmatrix} \boldsymbol{\beta} = 0$.
+
+#### T-tests for quantities of interest
+
+- In the context of t-tests, what is the null hypothesis?
+  - $H_0: \ell' \boldsymbol{\beta} = \ell' \boldsymbol{\beta}^{(0)}$.
+
+- If the null hypothesis is true, what is the distribution of $\ell' \hat{\boldsymbol{\beta}}$?
+  - It follows a normal distribution with mean $\ell' \boldsymbol{\beta}^{(0)}$ and variance $\sigma^2 \ell' \mathbf{C} \ell$.
+
+- How is the t-statistic calculated?
+  - By $\frac{\ell' \hat{\boldsymbol{\beta}} - \ell' \boldsymbol{\beta}^{(0)}}{s \sqrt{\ell' \mathbf{C} \ell}}$.
+
+- Under the null hypothesis, what distribution does the t-statistic follow?
+  - A t-distribution with $n - k$ degrees of freedom.
+
+- How is the p-value calculated in a t-test?
+  - As $2 \times \mathrm{Pr}(T_{n - k} > |t|)$.
+
+#### Testing linear combinations of coefficients
+
+- What is an example question when testing linear combinations of coefficients, regarding the advertising dataset?
+  - Is there a statistically significant difference between the effects of TV and Radio advertising?
+
+- How is the null hypothesis formulated for the above formulated?
+  - $H_0: \beta_{\text{TV}} - \beta_{\text{Radio}} = 0$.
+
+- How is the alternative hypothesis formulated?
+  - $H_1: \beta_{\text{TV}} - \beta_{\text{Radio}} \neq 0$.
+
+- How is the test statistic calculated in this context?
+  - By setting $\ell = \begin{pmatrix} 0 & 1 & -1 \end{pmatrix}$ and computing the t-statistic.
+
+#### Testing multiple regression coefficients simultaneously
+
+- When might we need to test multiple regression coefficients simultaneously?
+  - When we want to test whether multiple coefficients are zero at the same time.
+
+- What is an example of such a hypothesis?
+  - $H_0: \beta_1 = \beta_2 = 0$.
+
+- What statistical test is required to test multiple coefficients simultaneously?
+  - An F-test.
+
+#### Multiple linear combinations
+
+- How can testing multiple coefficients be viewed?
+  - As testing multiple linear combinations of the coefficients.
+
+- How can the null hypothesis $\beta_1 = \beta_2 = 0$ be expressed in matrix form?
+  - As $\mathbf{L} \boldsymbol{\beta} = \mathbf{0}$.
+
+- What is the dimension of $\mathbf{L}$ in this case?
+  - $\mathbf{L}$ is a $2 \times 3$ matrix.
+
+#### Deriving the F-statistic
+
+- Under the general linear model, what is the distribution of $\mathbf{L}\hat{\boldsymbol{\beta}}$?
+  - It follows a normal distribution with mean $\mathbf{L}\boldsymbol{\beta}$ and variance $\sigma^2 \mathbf{L} \mathbf{C} \mathbf{L}^\top$.
+
+- What is the formula for the quadratic form closely related to this?
+  - $(\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^\top)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta})$.
+  - What is its distribution?
+    - $\chi^2_{q}$.
+  - Symbol for it?
+    - $Q$.
+
+- Why do we use $s^2$ instead of $\sigma^2$ in constructing the F-statistic?
+  - Because $\sigma^2$ is unknown, and $s^2$ is its unbiased estimator.
+
+- What is the final form of the F-statistic?
+  - $\frac{Q/q}{s^2}$.
+  - Written out fully?
+    - $\frac{(\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^\top)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta})/q}{s^2}$.
+  - What is its distribution?
+    - An F-distribution with $q$ and $n - k$ degrees of freedom.
+
+#### Advice on interpreting hypothesis tests
+
+- What are some key points about interpreting p-values:
+  - First, regarding the threshold?
+    - $p < 0.05$ is often considered statistically significant.
+  - Second, regarding the evidence?
+    - The evidence against the null hypothesis increases as $p$ decreases.
+  - Third, regarding interpreting it probabilistically?
+    - Do not interpret p-values as the probability that the null hypothesis is true.
+  - Fourth, when the p-value is larger than 0.05?
+    - If the p-value is larger than 0.05, consider whether the sample size was sufficient to detect an effect.
+
+- What should be considered besides statistical significance?
+  - The magnitude of the effect (effect size).
+
+- Why is considering effect size important?
+  - Because a statistically significant result may have a negligible practical impact.
+
+- What model assumptions should be ensured before interpreting results?
+  - Linearity, independence, homoscedasticity, and normality.
+
+#### Advice on reporting hypothesis tests
+
+- What is one piece of advice on including p-values in text?
+  - Include p-values directly in the text when reporting results.
+
+- What should be avoided when denoting significance levels?
+  - Using asterisks; instead, report exact p-values.
+
+- Where else can p-values or significance levels be included?
+  - In plots where appropriate.

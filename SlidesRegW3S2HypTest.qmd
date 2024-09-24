@@ -33,7 +33,6 @@ knitr::opts_chunk$set(echo = TRUE)
   - Precision of the effect (confidence interval) is secondary to determining the existence of the association.
 
 
-
 # Introduction to hypothesis testing {.smaller}
 
 - **Definition:**
@@ -90,7 +89,6 @@ summary(fit_ad)
 \begin{center}
 \includegraphics[width=0.95\textwidth]{_data_raw/img/summary.png}
 \end{center}
-
 
 
 # Deriving hypothesis tests used by `summary` {.smaller}
