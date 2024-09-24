@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- *Minor* (v0.6.0): Miguel Julio Rodo (11:55:52)
+  - Add slides and Q&A up until W4S1 ANOVA
+
 - *Minor* (v0.5.0): Miguel Julio Rodo (09:15:05)
   - Add document motivating multiple linear regression
 

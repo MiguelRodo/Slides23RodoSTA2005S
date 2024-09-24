@@ -1,6 +1,6 @@
 Package: Slides23RodoSTA2005S
 Title: Slides for STA2005S
-Version: 0.5.0-1
+Version: 0.6.0
 Authors@R: person("Miguel", "Rodo", , "miguel.rodo@uct.ac.za", role = c("aut", "cre"))
 Maintainer: Miguel Rodo <miguel.rodo@uct.ac.za>
 Description: Slides for STA2005S
