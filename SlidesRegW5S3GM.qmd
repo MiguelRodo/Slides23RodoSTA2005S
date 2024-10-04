@@ -1,0 +1,125 @@
+---
+title: "Regression Week V: Gauss-Markov Theorem"
+author: "Miguel Rodo (rewrite of William Msemburi's slides)"
+institute: "University of Cape Town"
+theme: Boadilla
+format:
+  pdf:
+    embed-resources: true
+    colorlinks: true
+---
+
+# The Gauss-Markov Theorem
+
+**Theorem**: In the model $\symbf{Y} = \symbf{X}\symbf{\beta} + \symbf{e}$, where $\mathrm{E}(\symbf{e}) = \symbf{0}$ and $E(\symbf{e}\symbf{e}') = \sigma^2 \symbf{I}_n$, the OLS estimate $\hat{\symbf{\beta}}$ is the **BLUE** (Best Linear Unbiased Estimator) of $\symbf{\beta}$.
+
+## Assumptions:
+
+- The model is linear in the parameters, i.e., $\symbf{Y} =  \symbf{X}\symbf{\beta} + \symbf{e}$, where:
+  - $\symbf{Y}$ is an observed $n \times 1$ vector
+  - $\symbf{X}$ is an $n \times k$ observed, full column-rank matrix
+  - $\symbf{e}$ is an $n \times 1$ vector of unobserved errors
+- The errors satisfy:
+  - $E(\symbf{e} | \symbf{X}) = \symbf{0}$ (unbiased)
+  - $\text{Var}(\symbf{e} | \symbf{X}) = \sigma^2 \symbf{I}_n$ (homoskedasticity and no autocorrelation)
+
+# Proof
+
+Proof: Let $\tilde{\symbf{\beta}} = A\symbf{Y}$ for any matrix $A$. Choose $A$ to be
+
+$$
+A = (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B}
+$$
+
+where $\symbf{B}$ is arbitrary. To be unbiased, we need that $E(\tilde{\symbf{\beta}}) = \symbf{\beta}$. Taking the expectation of $\tilde{\symbf{\beta}}$, we have that:
+
+$$
+\begin{aligned}
+E(\tilde{\symbf{\beta}}) &= E(A\symbf{Y}) = A E(\symbf{Y}) = A \symbf{X}\symbf{\beta} \\
+&= \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{X}\symbf{\beta} \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} \\
+&= \symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta}.
+\end{aligned}
+$$
+
+Therefore, for $\tilde{\symbf{\beta}}$ to be unbiased, we need that $\symbf{B}\symbf{X} = \symbf{0}$.
+
+Now, we consider the variance of $\tilde{\symbf{\beta}}$.
+
+As $E(\tilde{\symbf{\beta}}) = \symbf{\beta}$, the covariance of $\tilde{\symbf{\beta}}$ is:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}})
+&= E\left[(\tilde{\symbf{\beta}} - \symbf{\beta})(\tilde{\symbf{\beta}} - \symbf{\beta})'\right] \\
+\end{aligned}
+$$
+
+Substituting in the expression for $\tilde{\symbf{\beta}}$, we have:
+
+$$
+\tilde{\symbf{\beta}} - \symbf{\beta} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{Y} - \symbf{\beta} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)(\symbf{X}\symbf{\beta} + \symbf{e}) - \symbf{\beta}
+$$
+
+Simplifying:
+
+$$
+\begin{aligned}
+\tilde{\symbf{\beta}} - \symbf{\beta} &= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} - \symbf{\beta} \\
+&= \symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} - \symbf{\beta} \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \quad \text{(since } \symbf{B}\symbf{X} = \symbf{0}).
+\end{aligned}
+$$
+
+Therefore, the covariance is:
+
+$$
+\text{cov}(\tilde{\symbf{\beta}}) = E\left[ \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \right) \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \right)' \right].
+$$
+
+Simplify:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) E[\symbf{e}\symbf{e}'] \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)' \\
+&= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)'.
+\end{aligned}
+$$
+
+Expanding the product:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}(\symbf{X}'\symbf{X})^{-1} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{B}' + \symbf{B}\symbf{X}(\symbf{X}'\symbf{X})^{-1} + \symbf{B}\symbf{B}' \right).
+\end{aligned}
+$$
+
+Since $\symbf{B}\symbf{X} = \symbf{0}$ and $\symbf{X}'\symbf{B}' = (\symbf{B}\symbf{X})' = \symbf{0}'$, the middle terms vanish:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1} + \symbf{B}\symbf{B}' \right).
+\end{aligned}
+$$
+
+Let $\symbf{G} = \symbf{B}\symbf{B}'$, then we have:
+
+$$
+\text{cov}(\tilde{\symbf{\beta}}) = \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1} + \symbf{G} \right).
+$$
+
+The variances of the individual elements of $\tilde{\symbf{\beta}}$ are the diagonal elements of $\text{cov}(\tilde{\symbf{\beta}})$. As $\symbf{X}$ is fixed, the diagonal elements of $\symbf{G}$ must be minimized. Since $\symbf{G} = \symbf{B}\symbf{B}'$, the diagonal elements of $\symbf{G}$ are sums of squares of the elements of $\symbf{B}$, which is minimized when $\symbf{B} = \symbf{0}$.
+
+Considering our original definition of $\tilde{\symbf{\beta}}$, we have that:
+
+$$
+\tilde{\symbf{\beta}} = A\symbf{Y} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{Y} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y} = \hat{\symbf{\beta}}.
+$$
+
+Therefore, the OLS estimator is the BLUE.
+
+# Importance of the Gauss-Markov Theorem
+
+- **Optimal Estimation**: Establishes OLS as the most efficient linear unbiased estimator under the specified conditions.
+- **Foundation for Regression Analysis**: Provides a theoretical backbone for the widespread use of OLS in statistical modeling.
+- **Guidance on Model Assumptions**: Highlights the critical assumptions needed for OLS to be optimal, informing model diagnostics and adjustments.

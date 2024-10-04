@@ -1,5 +1,5 @@
 ---
-title: "Regression Week V: Prediciton"
+title: "Regression Week V: Prediction"
 author: "Miguel Rodo"
 institute: "University of Cape Town"
 aspectratio: 169
