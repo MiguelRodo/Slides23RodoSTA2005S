@@ -1,0 +1,207 @@
+---
+title: "Q&A: Week four - Slide deck two - Model checking"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+#### Proportion of Variation Explained by the Model
+
+- What is the proportion of variation explained by the model called?
+  - The **coefficient of determination**, denoted as $R^2$.
+
+- What is the formula for $R^2$?
+  - $R^2 = \dfrac{SSR}{SST} = 1 - \dfrac{SSE}{SST}$.
+
+- What do the terms $SSR$, $SSE$, and $SST$ represent?
+  - $SSR$: Regression sum of squares, $\sum_{i=1}^n (\hat{Y}_i - \bar{Y})^2$.
+  - $SSE$: Error sum of squares, $\sum_{i=1}^n (Y_i - \hat{Y}_i)^2$.
+  - $SST$: Total sum of squares, $\sum_{i=1}^n (Y_i - \bar{Y})^2$.
+
+- Why is the formula for $R^2$ considered sensible?
+  - Because $SST = SSR + SSE$, so $R^2$ represents the proportion of total variability explained by the model.
+
+- What is another name for $R^2$?
+  - The **coefficient of determination**.
+
+#### Coefficient of Determination - Example
+
+- What happens to $R^2$ when more predictors are added to a model?
+  - $R^2$ tends to **increase** as more predictors are added.
+
+- Why might increasing $R^2$ by adding more predictors be misleading?
+  - Because it may increase even when the new predictors are **not significant**, potentially overfitting the model.
+
+- How can we demonstrate the effect of adding predictors on $R^2$?
+  - By fitting models with an increasing number of predictors and observing the changes in $R^2$.
+
+#### Coefficient of Determination
+
+- How is the correlation coefficient $R$ defined in terms of sums of squares?
+  - $R = \sqrt{\dfrac{\sum_{j=1}^n \hat{Y}_j^2 - n\bar{Y}^2}{\sum_{j=1}^n Y_j^2 - n\bar{Y}^2}} = \sqrt{\dfrac{\hat{\beta}'X'Y - n\bar{Y}^2}{Y'Y - n\bar{Y}^2}}$.
+
+- What is the range of values for $R$?
+  - $R$ ranges between $-1$ and $1$.
+
+#### Coefficient of Determination Continued
+
+- What measure is commonly used instead of $R$ and why?
+  - The **square of $R$**, denoted $R^2$, because it represents the proportion of variance explained by the model and ranges from $0$ to $1$.
+
+- What does an $R^2$ value close to $1$ indicate?
+  - It indicates a **good fit**, meaning the model explains a large proportion of the variability in the response variable.
+
+- Does a higher $R^2$ guarantee that all predictors are significant?
+  - **No**, a higher $R^2$ does not guarantee that all predictors are statistically significant.
+
+- Is $R^2$ applicable to all types of models?
+  - $R^2$ is primarily valid for **linear models**.
+
+- How can we interpret $R^2$ in the context of regression?
+  - $R^2$ measures the **proportion of variance** in the dependent variable that is explained by the independent variables in the model.
+
+#### Some More Comments
+
+- What happens to $R^2$ as more variables are added to the model?
+  - $R^2$ **always increases** or stays the same when more variables are added.
+
+- Why can the increase in $R^2$ be misleading?
+  - Because it may suggest an improved model fit even if the new variables are **not meaningful**, leading to overfitting.
+
+- What statistic is preferred over $R^2$ when comparing models with different numbers of predictors?
+  - The **Adjusted $R^2$**, denoted $R^2_{\text{adj}}$.
+
+- What is the formula for Adjusted $R^2$?
+  - $R^2_{\text{adj}} = 1 - \left(1 - R^2\right)\left(\dfrac{n - 1}{n - k}\right)$, where $n$ is the number of observations and $k$ is the number of parameters.
+
+- How does Adjusted $R^2$ differ from $R^2$?
+  - Adjusted $R^2$ accounts for the number of predictors in the model and can **decrease** if non-significant variables are added.
+
+- When comparing models, which one should be preferred based on Adjusted $R^2$?
+  - The model with the **highest Adjusted $R^2$** value.
+
+#### Example
+
+- What may happen to Adjusted $R^2$ if added predictors do not significantly improve the model?
+  - Adjusted $R^2$ may **decrease**, indicating that the added predictors do not enhance the model.
+
+- How can we calculate and compare $R^2$ and Adjusted $R^2$ for different models?
+  - By fitting the models and using statistical software to compute and compare these statistics.
+
+#### Model Checking
+
+##### Model Assumptions
+
+- What are the four key assumptions of the linear regression model?
+  1. **Linearity**: $E(e_j) = 0$ for all $j$.
+  2. **Homoscedasticity**: $E(e_j^2) = \sigma^2$ for all $j$.
+  3. **Independence**: $E(e_j e_k) = 0$ for $j \neq k$.
+  4. **Normality**: $e_j \sim N(0, \sigma^2)$ for all $j$.
+
+- Why is it important to validate these assumptions?
+  - To ensure the **reliability** and **validity** of the regression results and inferences.
+
+#### Model Checking Plots (Using the `mtcars` Dataset)
+
+- Which dataset is used for illustrating model checking?
+  - The built-in `mtcars` dataset in R.
+
+- What is the purpose of the Residuals vs Fitted plot?
+  - To check for **non-linearity** and **heteroscedasticity** (non-constant variance) in the residuals.
+
+- What pattern in the Residuals vs Fitted plot suggests heteroscedasticity?
+  - A **funnel shape** where the spread of residuals increases or decreases with fitted values.
+
+- What does a random scatter of residuals around zero indicate?
+  - It suggests that the assumptions of **linearity** and **homoscedasticity** are satisfied.
+
+#### Analysis of Residuals
+
+##### Outliers vs Influential Observations
+
+- What defines an outlier in regression analysis?
+  - An observation with a **large residual** that is not well fitted by the model.
+
+- What defines an influential observation?
+  - An observation that has a **significant impact** on the estimation of model parameters due to its position in the predictor space.
+
+- How can we detect outliers and influential observations?
+  - By analyzing **standardized residuals**, **studentized residuals**, **leverage values**, and **Cook's Distance**.
+
+#### Estimated Residuals
+
+- How are the estimated residuals calculated?
+  - $\hat{e} = Y - \hat{Y} = (I - H)Y = MY$, where $M = I - H$.
+
+- What is the hat matrix $H$ and its role?
+  - $H = X(X'X)^{-1}X'$ is the **hat matrix** that projects $Y$ onto the space spanned by $X$; it determines the fitted values.
+
+- What properties does the matrix $M = I - H$ have?
+  - $M$ is **idempotent** ($M^2 = M$) and **symmetric**.
+
+#### Analysis of Residuals - Outliers
+
+- What is the formula for the variance of the residuals?
+  - $\text{Var}(\hat{e}_i) = \sigma^2(1 - h_i)$.
+
+- How are standardized residuals calculated?
+  - $r_i = \dfrac{\hat{e}_i}{s\sqrt{1 - h_i}}$, where $s^2 = \dfrac{\hat{e}'\hat{e}}{n - k}$.
+
+- What is the rule of thumb for identifying potential outliers using standardized residuals?
+  - Observations with $|r_i| > 2$ are considered potential outliers.
+
+#### Analysis of Residuals - Externally Studentized Residuals
+
+- What are externally studentized residuals and how are they calculated?
+  - $t_i = \dfrac{\hat{e}_i}{s_{(i)}\sqrt{1 - h_i}}$, where $s_{(i)}$ is the standard error calculated without observation $i$.
+
+- Why are externally studentized residuals preferred over standardized residuals for detecting outliers?
+  - Because they account for the **influence** of each observation on the estimate of $\sigma^2$, providing a more accurate assessment.
+
+- What threshold is commonly used with externally studentized residuals to identify outliers?
+  - Observations with $|t_i| > 2$ or beyond the critical value from the $t$-distribution are considered potential outliers.
+
+#### Analysis of Residuals - Influential Points
+
+- What is leverage and how is it calculated?
+  - **Leverage** $(h_i)$ measures the influence of an observation's predictor values and is calculated as the diagonal elements of the hat matrix $H$.
+
+- What is the average leverage value in a regression model?
+  - The average leverage is $\dfrac{k}{n}$, where $k$ is the number of parameters and $n$ is the number of observations.
+
+- What is the rule of thumb for identifying high leverage points?
+  - Observations with $h_i > \dfrac{2k}{n}$ are considered to have high leverage.
+
+#### Cook's Distance and Modified Cook's Statistic
+
+- What does Cook's Distance measure?
+  - It measures the **influence** of each observation on the estimated regression coefficients.
+
+- How is Cook's Distance $D_i$ calculated?
+  - $D_i = \left( \dfrac{t_i^2}{k} \right) \dfrac{h_i}{1 - h_i}$, where $t_i$ is the externally studentized residual and $h_i$ is the leverage.
+
+- What is the suggested cut-off value for Cook's Distance to identify influential observations?
+  - Observations with $D_i > \dfrac{4}{n - k - 1}$ are considered influential.
+
+#### Modified Cook's Distance (Atkinson's Method)
+
+- What is Atkinson's Statistic and how is it calculated?
+  - $A_i = \sqrt{(n - k)D_i} = \sqrt{\left( \dfrac{n - k}{k} \right) \dfrac{h_i}{1 - h_i}} |t_i|$.
+
+- What are the proposed cut-off values for Atkinson's Statistic?
+  - Cut-off values of **2 or 3** are suggested; observations exceeding these values are considered influential.
+
+#### Summary
+
+- What are the key points to remember when analyzing residuals in regression?
+  - **Outliers**: Observations with large residuals not well explained by the model.
+  - **Influential Points**: Observations that significantly affect the model's estimates.
+  - **Leverage**: Indicates the potential of an observation to influence the model due to its predictor values.
+  - **Studentized Residuals**: Used to detect outliers with consideration of each observation's influence.
+  - **Cook's Distance**: Combines residual size and leverage to identify influential observations.
+  - **Atkinson's Statistic**: An alternative measure to Cook's Distance for assessing influence.
+
+- Why is it important to identify outliers and influential observations?
+  - To ensure the **accuracy** of the model estimates and the **validity** of statistical inferences drawn from the model.
+

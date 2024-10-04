@@ -1,0 +1,902 @@
+---
+title: "Regression Week V: Matching the model to the data"
+author: Miguel Rodo
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+In general models, we have several key assumptions:
+
+- Linear relationship
+- Independence of errors
+- Homoscedasticity
+- Normality of residuals
+
+However, the datasets we're given are not interested in our assumptions!
+
+We will discuss how to adjust our model such that the assumptions are (more closely) met.
+
+# Initial example
+
+Let's consider a dataset where the relationship between the dependent variable $Y$ and the independent variable $X$ is not linear:
+
+```{r}
+set.seed(10)
+x_vec <- runif(30, 1, 10)
+y_vec <- x_vec^4 
+example_tbl_quad <- tibble(
+  x = x_vec / sd(x_vec),
+  y = y_vec / sd(y_vec) + rnorm(30, 0, 0.15)
+)
+```
+
+# Initial example
+
+```{r}
+#| include: false
+p_init <- ggplot(example_tbl_quad, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "initial_example-nonlinear_relationship.pdf"
+  )
+ggsave(path_fig, plot = p_init, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# We can already deal with this! If imperfectly
+
+Let us discretise the $X$ variable and fit a linear model:
+
+```{r}
+example_tbl_quad <- example_tbl_quad |>
+  dplyr::mutate(
+    x_cut = cut(x, breaks = 4)
+  )
+example_tbl_quad
+unique(example_tbl_quad$x_cut)
+```
+
+# Fit the model {.smaller}
+
+```{r}
+fit <- lm(y ~ x_cut, data = example_tbl_quad)
+```
+
+```{r}
+#| echo: false
+est_vec <- coef(fit)
+confint_tbl <- confint(fit)
+confint_tbl |>
+  tibble::as_tibble(
+    rownames = "Variable"
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec
+  ) |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    across(where(is.numeric), function(x) signif(x, 2))
+  ) |>
+  dplyr::select(
+    Variable, Estimate, Lower, Upper
+  )
+```
+
+# Plot the model: actual vs. predicted (discrete x-axis)
+
+```{r}
+#| echo: false
+pred_tbl <- example_tbl_quad |>
+  dplyr::group_by(
+    x_cut
+  ) |>
+  dplyr::slice(1) |>
+  dplyr::ungroup()
+pred_tbl$y_hat <- predict(fit, newdata = pred_tbl)
+pred_tbl <- pred_tbl |>
+  dplyr::mutate(
+    # Extract lower and upper bounds using stringr
+    x_low = as.numeric(stringr::str_extract(x_cut, "(?<=\\().*?(?=,)")),
+    x_high = as.numeric(stringr::str_extract(x_cut, "(?<=,).*?(?=\\])")),
+    x_mid = (x_low + x_high) / 2,
+    width = min(x_high - x_low) / 2
+  )
+# boxplots, with mean overlaid
+p_disc_actual <- ggplot(
+  example_tbl_quad, aes(x = x_cut, y = y)
+) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_boxplot(fill = "dodgerblue", alpha = 0.8) +
+  geom_point(
+    data = pred_tbl,
+    mapping = aes(x = x_mid, y = y_hat),
+    color = "red", inherit.aes = FALSE
+  ) +
+  labs(x = "X", y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "discretized_x_variable_actual.pdf"
+  )
+ggsave(path_fig, plot = p_disc_actual, width = 12, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Plot the model: actual vs. predicted (continuous x-axis)
+
+```{r}
+#| echo: false
+p_disc <- ggplot(example_tbl_quad, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(
+    aes(x = x, y = y),
+    method = "lm", se = FALSE, color = "orange"
+  ) +
+  geom_errorbarh(
+    data = pred_tbl,
+    mapping = aes(
+      y = y_hat, xmin = x_low, xmax = x_high),
+    color = "red", inherit.aes = FALSE, alpha = 0.8
+  ) +
+  geom_point(
+    data = pred_tbl,
+    mapping = aes(x = x_mid, y = y_hat),
+    color = "red", inherit.aes = FALSE
+  ) +
+  labs(x = "X", y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "discretized_x_variable.pdf"
+  )
+ggsave(path_fig, plot = p_disc, width = 12, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Suite of tactics
+
+We have the following tactics to deal with non-linear relationships:
+
+- Transform the dependent variable $Y$
+- Transform the independent variables $X_i$
+- Introduce new explanatory variables (e.g., polynomials, interaction terms)
+
+Which of these three did we do previously?
+
+# Transformed the independent variable and introduced new explanatory variables
+
+When fitting the continuous model, we had:
+
+```{r}
+model.matrix(lm(y ~ x, data = example_tbl_quad))[1:2, ]
+```
+
+After discretizing the $X$ variable, we had:
+
+```{r}
+model.matrix(lm(y ~ x_cut, data = example_tbl_quad))[1:2, ]
+```
+
+# Transforming the dependent variable $Y$: why do it?
+
+1. Linearize relationships:
+    - Transform non-linear relationships into linear ones.
+2. Stabilize variance:
+    - Address heteroscedasticity by equalizing the spread of residuals.
+3. Reduce skewness:
+    - Address skewed distributions of $Y$ to meet model assumptions.
+4. Handle outliers:
+    - Reduce the impact of extreme values on the model.
+
+# Example: Transforming the dependent variable
+
+Suppose we observe increasing variance with the mean of $Y$:
+
+```{r}
+set.seed(11)
+n <- 1000
+x_vec <- runif(n, 1, 10)
+y_vec <- x_vec + rpois(n, x_vec)^1.5 + runif(n, 0, 3)
+example_tbl_non_constant_var <- tibble(
+  x = x_vec, y = y_vec
+)
+```
+
+# Variance of $Y$ increases with the mean
+
+```{r}
+#| include: false
+p_init <- ggplot(example_tbl_non_constant_var, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "example_transform_y-nonlinear_relationship.pdf"
+  )
+ggsave(path_fig, plot = p_init, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Taking the square root of $Y$
+
+```{r}
+example_tbl_non_constant_var$y_sqrt <-
+  sqrt(example_tbl_non_constant_var$y)
+``` 
+
+```{r}
+#| echo: false
+p <- ggplot(example_tbl_non_constant_var, aes(x = x, y = y_sqrt)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "sqrt(Y)")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "example_transform_y-sqrt_relationship.pdf"
+  )
+ggsave(path_fig, plot = p, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.7\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Benefits of Transforming $Y$
+
+- Less biased predictions and estimates
+  - Particularly when the relationship is non-linear.
+- More reliable inference
+- Occasionally, better interpretability
+
+# Common Transformations of $Y$
+
+1. **Logarithmic Transformation ($Y' = \log(Y)$)**
+   - Useful when $Y$ grows exponentially with $X$.
+   - Stabilizes variance and linearizes multiplicative relationships.
+   - Pulls in extreme values.
+   $$
+   Y = \exp\{\beta_0 + \beta_1 X\} \Rightarrow \log{Y} = \beta_0 + \beta_1 X
+   $$
+   - Note: undefined for $Y=0$ (if appropriate, use $\log(Y + 1)$).
+2. **Square Root Transformation ($Y' = \sqrt{Y}$)**
+   - Applied when variance increases with the mean of $Y$.
+   - Appropriate for count data and moderate heteroscedasticity.
+3. **Reciprocal Transformation ($Y' = 1/Y$)**
+   - Suitable when large values of $Y$ correspond to small variances.
+
+# Effect on interpretation
+
+- Coefficients retain the same interpretation as before - but on the transformed scale.
+  - For example, after logging the response, $\beta_1$ represents the increase in $\log{Y}$ for a unit change in $X$.
+- However, this is not the case on the transformed scale:
+  - *Logging*:
+    - When logging the response, $\exp{\beta_1}$ represents the multiplicative change in $Y$ for a unit change in $X$.
+    - However, it is no longer the increase in the *average* of $Y$, but rather the *median*.
+  - *Square root*: 
+    - When taking the square root of the response, $\beta_1$ represents the change in $\sqrt{Y}$ for a unit change in $X$.
+    - However, there is no direct interpretation for the change in the distribution of $Y$.
+
+# Practical Steps for Transforming $Y$
+
+1. *Explore the Data*:
+   - Use plots to detect non-linearity, heteroscedasticity, and skewness.
+2. *Choose an Appropriate Transformation*:
+   - Based on observed patterns (e.g., log for exponential growth).
+3. *Apply the Transformation and Re-fit the Model*:
+   - Transform $Y$ and assess the new model fit.
+4. *Evaluate Model Diagnostics*:
+   - Check residual plots, normality, and variance.
+5. *Interpret Results Carefully*:
+   - Adjust interpretations to account for the transformation.
+
+# Transforming Individual Explanatory Variables
+
+- In some cases, the relationship between the dependent variable $Y$ and one of the explanatory variables $X_i$ is non-linear, while the relationship with other variables is linear.
+- Transforming $Y$ may not be desirable, as it would alter the relationship with all explanatory variables.
+- Instead, we can transform the specific $X_i$ that has a non-linear relationship with $Y$.
+
+# Example: Non-linear Relationship with One Explanatory Variable
+
+Suppose we have a dataset with two explanatory variables, $X_1$ and $X_2$, where $Y$ has a linear relationship with $X_1$ but an exponential relationship with $X_2$.
+
+```{r}
+set.seed(123)
+n <- 100
+x1 <- runif(n, 0, 10)
+x2 <- runif(n, 1, 5)
+y <- 2 + 3 * x1 + 5 * exp(0.7 * x2) + rnorm(n, 0, 2)
+example_tbl <- tibble(
+  x1 = x1,
+  x2 = x2,
+  y = y
+)
+```
+
+# Plotting $Y$ against $X_1$ and $X_2$
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "Y", title = "Y vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = x2, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X2", y = "Y", title = "Y vs X2")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{`r path_fig`}
+\end{center}
+
+# Observations
+
+- **Plot A (Y vs X1)**: The relationship appears linear.
+- **Plot B (Y vs X2)**: The relationship is clearly non-linear (exponential).
+
+If we transform $Y$, for example by taking the square root or logarithm, we:
+
+- change its relationship with both $X_1$ and $X_2$
+- affect the variance
+
+# Logging $Y$ alters both relationships and renders variance non-constant
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = log(y))) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "log(Y)", title = "Log(Y) vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = x2, y = log(y))) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X2", y = "Y", title = "Log(Y) vs X2")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables-log_y.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{`r path_fig`}
+\end{center}
+
+# Transforming $X_2$
+
+To linearise the relationship between $Y$ and the variable relating to $X_2$, we can exponentiate $X_2$:
+
+```{r}
+example_tbl <- example_tbl |>
+  dplyr::mutate(
+    x2_exp = exp(x2) # Add 1 to avoid log(0)
+  )
+```
+
+# Plotting $Y$ against Transformed $X_2$
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "Y", title = "Y vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = exp(x2), y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "exp(X2)", y = "Y", title = "Y vs exp(X2)")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables-exp_x2.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{`r path_fig`}
+\end{center}
+
+# Observations
+
+- The transformation of $X$ ($X^2$) has a linear relationship relationship with $Y$.
+- Now we can proceed with fitting a linear model without affecting the relationship between $Y$ and $X_1$, or the variance of the residuals.
+
+# Comparing model outputs {.smaller}
+
+::::{.columns}
+
+:::{.column width="80%"}
+
+
+```{r}
+#| eval: false
+lm(y ~ x1 + x2, data = example_tbl)
+```
+
+```{r}
+#| echo: false
+fit <- lm(y ~ x1 + x2, data = example_tbl[1:10, ])
+sd_lin <- summary(fit)$sigma |> signif(2)
+est_vec <- coef(fit) |> stats::setNames(NULL)
+coef_tbl <- confint(fit) |>
+  as.data.frame() |>
+  rownames_to_column("Variable") |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec,
+    `P-value` = broom::tidy(fit)$p.value,
+    across(where(is.numeric), function(x) signif(x, 2)),
+  ) |>
+  dplyr::select(
+    Variable, Estimate, `P-value`, Lower, Upper
+  )
+coef_tbl
+```
+
+```{r}
+#| eval: false
+lm(y ~ x1 + x2_exp, data = example_tbl)
+```
+
+```{r}
+#| echo: false
+fit <- lm(y ~ x1 + x2_exp, data = example_tbl[1:10, ])
+est_vec <- coef(fit) |> stats::setNames(NULL)
+sd_quad <- summary(fit)$sigma |> signif(2)
+coef_tbl <- confint(fit) |>
+  as.data.frame() |>
+  rownames_to_column("Variable") |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec,
+    `P-value` = broom::tidy(fit)$p.value,
+    across(where(is.numeric), function(x) signif(x, 2)),
+  ) |>
+  dplyr::select(
+    Variable, Estimate, `P-value`, Lower, Upper
+  )
+coef_tbl
+```
+
+:::
+
+:::{.column width="20%"}
+
+$\hat{\sigma}^2$:
+
+- Linear: `r sd_lin`
+- Exponential: `r sd_quad`
+
+
+:::
+
+::::
+
+# Common non-linear relationships: logarithmic, exponential, square root and square
+
+```{r}
+#| include: false
+set.seed(123)
+n <- 100
+
+example_tbl_trans <- tibble(
+  x_log = runif(n, 1, 1e2),
+  x_exp = runif(n, 1, 4),
+  x_sqrt = runif(n, 1, 100),
+  x_quad = runif(n, 1, 10)
+) |>
+  dplyr::mutate(
+    y_log = log(x_log) + rnorm(n, 0, 0.2),
+    y_exp = exp(x_exp) + rnorm(n, 0, 1),
+    y_sqrt = sqrt(x_sqrt) + rnorm(n, 0, 0.2),
+    y_quad = x_quad^2 + rnorm(n, 0, 2)
+  )
+
+p11 <- ggplot(example_tbl_trans, aes(x = x_log, y = y_log)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == log(X) + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p12 <- ggplot(example_tbl_trans, aes(x = x_exp, y = y_exp)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == e^{X} + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p21 <- ggplot(example_tbl_trans, aes(x = x_sqrt, y = y_sqrt)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == sqrt(X) + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p22 <- ggplot(example_tbl_trans, aes(x = x_quad, y = y_quad)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == X^2 + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p_grid <- cowplot::plot_grid(
+  p11, p12, p21, p22, nrow = 2, ncol = 2
+)
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_explanatory_variables.pdf"
+)
+ggsave(path_fig, plot = p_grid, width = 16, height = 12, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.65\linewidth]{`r path_fig`}
+\end{center}
+
+# Transformations to correct common-linear relationship
+
+- In this case, you simply apply the function to $X$ that describes the relationship between $X$ and $Y$, and then fit the model.
+- For example:
+  - If $Y = \log(X) + \epsilon$, then:
+    - Do not fit the model $Y = \beta_0 + \beta_1 X$.
+    - Instead, fit this model: $Y = \beta_0 + \beta_1 \log(X)$.
+  - Example R code: `lm(y ~ log(x), data = data)`
+
+# Effect on Interpretation
+
+- **Coefficients represent the change in $Y$ for a unit change in the transformed $X$**.
+- Interpretations should be made in terms of the transformed variable.
+  - For example, with $X' = \log(X)$, $\beta_1$ represents the change in $Y$ for a one-unit increase in $\log(X)$.
+
+# Additional multiple variables corresponding to a single variable
+
+- The final tactic is to introduce new explanatory variables that correspond to a single explanatory variable.
+- This is particularly useful when the relationship between the dependent variable $Y$ and the explanatory variable $X$ is non-linear.
+
+# Example: Discretizing the $X$ variable {.smaller}
+
+This is precisely what we did when we discretised the $X$ variable:
+
+- *Continuous X*:
+  - Model formulation: $Y = \beta_0 + \beta_1 X + \epsilon$
+  - Single row of design matrix: $\begin{bmatrix}1 & X\end{bmatrix}$
+- *Discrete X*:
+  - Break $X$ into intervals and create dummy variables for each interval. Denote interval $i$ by $I_i$ (e.g. $I_1 = [0, 2)$, $I_2 = [2, 4)$, etc.).
+  - Model formulation: $Y = \beta_0 + \beta_{G_2}I(X \in I_2) + \ldots + \beta_{G_a}I(X \in I_a) + \epsilon$
+  - Single row of design matrix: $\begin{bmatrix}1 & I(X \in I_2) & \ldots & I(X \in I_a)\end{bmatrix}$
+
+# Additional example: Polynomial terms {.smaller}
+
+- Previously, we considered squaring the $X$ variable.
+- The design matrix went from this:
+  - $\begin{bmatrix}1 & X\end{bmatrix}$
+- To this:
+  - $\begin{bmatrix}1 & X^2\end{bmatrix}$.
+- However, we could retain the original $X$ term and add the squared term:
+  - $\begin{bmatrix}1 & X & X^2\end{bmatrix}$
+- Leading to the following model:
+  - $Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \epsilon$
+- This is useful when we're not sure of the relationship between $Y$ and $X$.
+  - For example, if the relationship is actually linear, the model will fit $\hat{\beta}_2 \approx 0$.
+
+# Introducing interaction terms
+
+Interaction terms allow us to model situations where the effect of one explanatory variable on the response variable depends on the level of another explanatory variable.
+
+# Example of interactions
+
+Suppose we have a dataset with two explanatory variables, $X$ and $Group$, where the effect of $X$ on $Y$ differs between groups.
+
+```{r}
+set.seed(456)
+n <- 100
+x <- runif(n, 0, 10)
+group <- sample(c("A", "B"), n, replace = TRUE)
+y <- ifelse(group == "A",
+            2 + 0.5 * x + rnorm(n, 0, 1),
+            2 + 1.5 * x + rnorm(n, 0, 1))
+example_interaction <- tibble(
+  x = x,
+  group = group,
+  y = y
+)
+```
+
+# Plotting the Interaction
+
+```{r}
+#| include: false
+p <- ggplot(example_interaction, aes(x = x, y = y, color = group)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "X", y = "Y") +
+  theme(legend.title = element_blank()) +
+  scale_colour_manual(values = c("dodgerblue", "orange"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "interaction_continuous_categorical.pdf"
+)
+ggsave(path_fig, plot = p, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{`r path_fig`}
+\end{center}
+
+# Model formulation: two-level categorical variable
+
+To model the interaction between $X$ and $Group$, we fit the following linear model:
+
+$$
+Y = \beta_0 + \beta_1 X + \beta_G I(\text{Group} = B) + \beta_{X:G} X \times I(\text{Group} = B) + \epsilon
+$$
+
+We get one additional coefficient $\beta_{X:G}$ for the interaction term $X \times \text{Group}$.
+
+In `R`, this is done by including the interaction term `X * Group` in the formula:
+
+```{r}
+fit_interaction <- lm(y ~ x * group, data = example_interaction)
+```
+
+# Design matrix
+
+- To understand the effect of interactions, it is helpful to look at the design matrix:
+
+```{r}
+model.matrix(fit_interaction)[c(1, 4), ]
+```
+
+- Compared to a model with no interaction term, there is one additional column (`x:groupB`).
+  - When `group` is "A" (the reference category), the interaction variable value is 0.
+  - When `group` is "B", the interaction variable value is the same as `x`.
+  - The interaction term is the product of `x` and the dummy variable for `group` being "B".
+
+# Mean values of $Y$ for different groups {.smaller}
+
+- The general form of a row of the design matrix for a two-level categorical variable is:
+
+$$
+\begin{bmatrix}
+1 & x & I(\text{Group} = B) & x \times I(\text{Group} = B)
+\end{bmatrix}
+$$
+
+- This implies the following mean response values ($\mathrm{E}[Y] = \symbf{x}'\symbf{\beta}$):
+  - Group A: $\mathrm{E}[Y] = \begin{bmatrix}1 & x & 0& x \times 0 \end{bmatrix}\symbf{\beta}= \beta_0 + \beta_X x$
+  - Group B: $\mathrm{E}[Y] = \begin{bmatrix}1 & x & 1 & x \times 1 \end{bmatrix}\symbf{\beta}= \beta_0 + \beta_X x + \beta_G + \beta_{X:G} x$
+- If we group the terms, we get:
+  - Group A: $\beta_0 + \beta_X x$
+    - $\beta_X$ represents the effect of $X$ on $Y$ for group "A".
+  - Group B: $(\beta_0 + \beta_G) + (\beta_X + \beta_{X:G}) x$
+    - $\beta_X + \beta_{X:G}$ represents the effect of $X$ on $Y$ for group "B".
+    - $\beta_{X:G}$ represents the difference in the effect of $X$ between groups.
+
+# Model interpretation: two-level categorical variable {.smaller}
+
+```{r}
+#| echo: false
+coef_tbl <- broom::tidy(fit_interaction) |>
+  dplyr::mutate(
+    across(where(is.numeric), function(x) signif(x, 2))
+  ) |>
+  dplyr::select(
+    term, estimate, std.error, statistic, p.value
+  )
+coef_tbl
+```
+
+- As group $A$ is the reference group, the coefficient $\beta_{X}$ (`x`) represents the effect of $X$ on $Y$ for group $A$.
+  - In this case, a unit increase in $X$ increases $Y$ by $0.48$ units for group "A".
+- The interaction term $\beta_{X:G}$ represents the difference in the effect of $X$ between groups.
+  - In this case, a unit increase in $X$ increases $Y$ by $0.99$ units more for group "B" than for group "A".
+- The interaction term plus the main effect of $X$ gives the effect of $X$ for group "B".
+  - In this case, the effect of $X$ on $Y$ is $0.48 + 0.99 = 1.47$ units for group "B".
+
+# Hypothesis testing
+
+```{r}
+#| echo: false
+coef_tbl
+```
+
+- The first concern is whether the interaction term is significant.
+  - Clearly, the interaction term is significant in this case ($p < 0.0001$).
+  - Therefore, the effect of $X$ depends on the group.
+- The second concern is whether the main effect of $X$ is significant.
+  - Since the main effects for group $A$ and $B$ differ, they will have different hypothesis tests.
+  - As $\beta_{X}$ represents the effect of $X$ for group $A$, its p-value tells us whether $X$ has an effect on $Y$ for group "A". In this case, it does ($p < 0.0001$).
+
+# Hypothesis testing (cont.)
+
+```{r}
+#| echo: false
+coef_tbl
+```
+
+- However, the p-value for the effect of $B$ on $Y$ is not actually available.
+  - For $B$ to have no effect, we need that $\beta_{X} + \beta_{X:G} = 0$.
+  - Here are the null and alternative hypotheses:
+    - $H_0: \beta_{X} + \beta_{X:G} = 0$
+    - $H_1: \beta_{X} + \beta_{X:G} \neq 0$
+- As $\symbf{\beta}'=\begin{pmatrix} \beta_0 & \beta_X & \beta_{G} & \beta_{X:G} \end{pmatrix}$, we can set $\ell = \begin{pmatrix} 0 & 1 & 0 & 1 \end{pmatrix}$ to test the hypothesis (using the $t$ or $F$ test):
+  - $H_0: \ell'\symbf{\beta} = \begin{pmatrix} 0 & 1 & 0 & 1 \end{pmatrix}\symbf{\beta} = \beta_X + \beta_{X:G} = 0$
+
+# Hypothesis testing (cont.)
+
+```{r}
+l_vec <- matrix(c(0, 1, 0, 1), ncol = 1)
+coef_vec <- matrix(coef(fit_interaction), ncol = 1)
+vcov_mat <- vcov(fit_interaction)
+se_lin_combn <- sqrt(t(l_vec) %*% vcov_mat %*% l_vec)
+t_stat <- (t(l_vec) %*% coef_vec) / se_lin_combn
+p_val <- 2 * pt(
+  -abs(t_stat),
+  df = nrow(example_interaction) - ncol(example_interaction)
+)
+p_val |> signif()
+```
+
+# Interactions involving $a$-level categorical variable
+
+*Model formulation*: In general, for an $a$-level categorical variable, we get $a-1$ additional coefficients for the interaction terms:
+
+$$
+\begin{aligned}
+Y &= \beta_0 + \beta_1 X + \beta_{G_2} I(\text{Group} = 2) + \ldots + \beta_{G_a} I(\text{Group} = B)_a \\
+  &\quad + \beta_{X:G_2} X \times \text{Group}_2 + \ldots + \beta_{X:G_a} X \times \text{Group}_a + \epsilon
+\end{aligned}
+$$
+
+*Interpretation*: The interpretation is similar to the two-level categorical variable case, but with $a-1$ additional interaction terms. Each interaction term represents the difference in the effect of $X$ between the reference group and the group corresponding to the interaction term.
+
+# Hypothesis testing: $a$-level categorical variable
+
+- *Does the effect of X depend on group?*:
+  - This is now a simultaneous test of all interaction terms:
+    - $H_0: \beta_{X:G_2} = \ldots = \beta_{X:G_a} = 0$
+    - $H_1$: At least one of the interaction terms is non-zero.
+  - Accordingly, we would use an $F$-test to assess the significance of the interaction terms.
+- *Does the effect of X depend on group $i$?*:
+  - This is a test of the interaction term corresponding to group $i$:
+    - $H_0: \beta_{X:G_i} = 0$
+    - $H_1: \beta_{X:G_i} \neq 0$
+  - We would use a $t$-test to assess the significance of the interaction term.
+
+# Hypothesis testing: $a$-level categorical variable
+
+- *Does X affect Y for group i?*:
+  - This is a test of the main effect of X for group $i$:
+    - $H_0: \beta_X + \beta_{X:G_i} = 0$ 
+    - $H_1: \beta_X + \beta_{X:G_i} \neq 0$
+  - We would use a $t$-test to assess the significance of the main effect of X for group $i$, with the appropriate linear combination.
+
+# Types of interaction terms {.smaller}
+
+1. **Continuous x Categorical**: Interaction between a continuous and a categorical variable.
+  - What we have discussed so far.
+2. **Categorical x Categorical**: Interaction between two categorical variables.
+  - In this case, there are $(a_1-1) \times (a_2-1)$ interaction-term coefficients added to the model, where $a_1$ and $a_2$ are the number of levels of the two categorical variables.
+  - The additional columns (variables) added to the design matrix are still the product of the dummy variables for the two categorical variables.
+3. **Continuous x Continuous**: Interaction between two continuous variables.
+  - The interaction term is the product of the two continuous variables.
+  - In this case, only one additional coefficient is added to the model.

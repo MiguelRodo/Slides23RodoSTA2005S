@@ -1,0 +1,370 @@
+---
+title: "Regression Week IV: Model Checking"
+subtitle: "Model Checking"
+author: "Yovna Junglee"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+```{r}
+library(tibble)
+library(ggplot2)
+```
+
+# So far...
+
+1. **Formulated** a linear model.
+2. **Parameter estimation** using least squares.
+3. Constructed **confidence intervals** for the parameters.
+4. Performed **hypothesis testing** and **ANOVA**.
+
+**Next:** **Model checking** to validate our model assumptions.
+
+# Proportion of variation explained by the model
+
+- The proportion of variation explained by the model is given by the **coefficient of determination**, $R^2$:
+
+  $$
+  R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST},
+  $$
+
+  where
+
+  - $SSR$: Regression sum of squares
+    - $\sum_{i=1}^n (\hat{Y}_i - \bar{Y})^2$
+  - $SSE$: Error sum of squares
+    - $\sum_{i=1}^n (Y_i - \hat{Y}_i)^2$
+  - $SST$: Total sum of squares
+    - $\sum_{i=1}^n (Y_i - \bar{Y})^2$
+
+- It is a sensible formula as $SST = SSR + SSE$.
+- It is also known as the coefficient of determination.
+
+
+# Coefficient of Determination - Example
+
+To understand the **coefficient of determination ($R^2$)**, let's consider an example where we fit models with an increasing number of predictors.
+
+```{r}
+# Simulate data
+set.seed(123)
+n <- 100
+X1 <- rnorm(n)
+X2 <- rnorm(n)
+X3 <- rnorm(n)
+epsilon <- rnorm(n, sd = 2)
+Y <- 3 + 2 * X1 + epsilon
+
+# Fit models with increasing predictors
+model1 <- lm(Y ~ 1)           # Intercept only
+model2 <- lm(Y ~ X1)          # One predictor
+model3 <- lm(Y ~ X1 + X2)     # Two predictors
+model4 <- lm(Y ~ X1 + X2 + X3) # Three predictors
+mod_list <- list(model1, model2, model3, model4)
+```
+
+# Coefficient of Determination - Example
+
+- The $R^2$ value tends to increase as we add more predictors:
+
+```{r}
+# Compute R-squared values
+R2_values <- lapply(mod_list, function(x) summary(x)$r.squared)
+R2_values |> sapply(function(x) signif(x, 4))
+```
+
+```{r}
+# Compute predicted values
+Y_hat <- lapply(mod_list, function(x) predict(x))
+# Compute overall mean
+```
+
+# Coefficient of Determination - Example
+
+```{r}
+plot(1:4, R2_values, type = "b", pch = 19,
+     xlab = "Model", ylab = expression(R^2),
+     main = expression("R"^2 * " Values for Models with Increasing Predictors"),
+     xaxt = "n", ylim = c(0, 1))
+axis(1, at = 1:4, labels = c("Intercept Only", "X1", "X1 + X2", "X1 + X2 + X3"))
+```
+
+**Observation:** $R^2$ increases as we add more variables, indicating an improved fit.
+
+# Coefficient of Determination
+
+1. The example demonstrates that adding variables improves the model fit.
+2. Measuring the fit via the correlation between fitted and true $Y$ values is sensible.
+3. The correlation coefficient $R$ is:
+
+   $$
+   R = \sqrt{\frac{\sum_{j=1}^n \hat{Y}_j^2 - n\bar{Y}^2}{\sum_{j=1}^n Y_j^2 - n\bar{Y}^2}} = \sqrt{\frac{\hat{\beta}'X'Y - n\bar{Y}^2}{Y'Y - n\bar{Y}^2}}
+   $$
+   
+4. $R$ ranges between $-1$ and $1$.
+
+# Coefficient of Determination Continued
+
+1. We often use the square of $R$, the **coefficient of determination ($R^2$)**:
+
+   $$
+   R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST}
+   $$
+   
+   - $SSR$: Regression sum of squares.
+   - $SSE$: Error sum of squares.
+   - $SST$: Total sum of squares.
+
+2. $R^2$ ranges from 0 to 1.
+3. An $R^2$ close to 1 indicates a good fit.
+4. An $R^2$ close to 0 suggests a poor fit.
+5. A higher $R^2$ does not guarantee significant $\beta$ estimates.
+6. $R^2$ is a valid measure primarily for linear models.
+
+**Interpretation:** $R^2$ represents the proportion of variance in $Y$ explained by the model.
+
+# Some More Comments
+
+1. **Adding variables increases $R^2$**, even if they are not significant—this can be misleading.
+2. Use the **Adjusted $R^2$** ($R^2_{\text{adj}}$) to account for the number of predictors:
+
+   $$
+   R^2_{\text{adj}} = 1 - \frac{SSE/(n - k)}{SST/(n - 1)} = 1 - (1 - R^2)\left(\frac{n - 1}{n - k}\right)
+   $$
+   
+   - $n$: Number of observations.
+   - $k$: Number of parameters (including the intercept).
+
+3. $R^2_{\text{adj}} \leq R^2$.
+4. When comparing models, choose the one with the highest $R^2_{\text{adj}}$.
+
+# Example
+
+Calculate $R^2$ and $R^2_{\text{adj}}$ for our models:
+
+```{r}
+# Compute Adjusted R-squared values
+adj_R2_values <- c(
+  summary(model1)$adj.r.squared,
+  summary(model2)$adj.r.squared,
+  summary(model3)$adj.r.squared,
+  summary(model4)$adj.r.squared
+)
+
+# Combine results
+R2_results <- data.frame(
+  Model = c("Intercept Only", "X1", "X1 + X2", "X1 + X2 + X3"),
+  R_squared = round(R2_values, 4),
+  Adjusted_R_squared = round(adj_R2_values, 4)
+)
+
+print(R2_results)
+```
+
+**Observation:** Adjusted $R^2$ may decrease if added predictors do not improve the model significantly.
+
+# Model Checking
+
+## Model Assumptions
+
+For our linear regression model, we assume:
+
+1. **Linearity**: $E(e_j) = 0$ for all $j$.
+2. **Homoscedasticity**: $E(e_j^2) = \sigma^2$ for all $j$.
+3. **Independence**: $E(e_j e_k) = 0$ for $j \neq k$.
+4. **Normality**: $e_j \sim N(0, \sigma^2)$ for all $j$.
+
+**Goal:** Validate these assumptions through residual analysis.
+
+# Model Checking Plots (Using the `mtcars` Dataset)
+
+We will use the `mtcars` dataset to perform model checking.
+
+```{r}
+# Load dataset
+data(mtcars)
+
+# Fit multiple linear regression model
+fit <- lm(mpg ~ wt + hp + disp + drat, data = mtcars)
+```
+
+### Residuals vs Fitted Plot
+
+```{r}
+# Residuals vs Fitted
+plot(fit$fitted.values, fit$residuals,
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted Values")
+abline(h = 0, col = "red")
+```
+
+- **Analysis**: Check for patterns. A funnel shape suggests heteroscedasticity.
+- **Observation**: Residuals appear randomly scattered around zero.
+
+# Analysis of Residuals
+
+## Outliers vs Influential Observations
+
+- **Outlier**: An observation not well fitted by the model (large residual).
+- **Influential Observation**: Significantly affects model estimates (high leverage).
+
+We use statistical measures to detect them.
+
+# Estimated Residuals
+
+Residuals are calculated as:
+
+$$
+\hat{e} = Y - \hat{Y} = (I - H)Y = MY
+$$
+
+- $M = I - H$ is idempotent and symmetric.
+- $H = X(X'X)^{-1}X'$ is the hat matrix.
+
+# Analysis of Residuals - Outliers
+
+Variance of residuals:
+
+$$
+\text{Var}(\hat{e}_i) = \sigma^2(1 - h_i)
+$$
+
+Standardized residuals:
+
+$$
+r_i = \frac{\hat{e}_i}{s\sqrt{1 - h_i}}
+$$
+
+- $s^2 = \frac{\hat{e}'\hat{e}}{n - k}$
+- $h_i$: Leverage of observation $i$
+
+**Rule of Thumb:** $|r_i| > 2$ indicates potential outliers.
+
+```{r}
+# Standardized residuals
+std_residuals <- rstandard(fit)
+
+# Plot
+plot(fit$fitted.values, std_residuals,
+     xlab = "Fitted Values", ylab = "Standardized Residuals",
+     main = "Standardized Residuals vs Fitted Values")
+abline(h = c(-2, 0, 2), col = "red", lty = 2)
+```
+
+# Analysis of Residuals - Externally Studentized Residuals
+
+Externally studentized residuals:
+
+$$
+t_i = \frac{\hat{e}_i}{s_{(i)}\sqrt{1 - h_i}}
+$$
+
+- $s_{(i)}$: Standard error without observation $i$
+
+**Use:** Detect outliers more accurately.
+
+```{r}
+# Externally studentized residuals
+stud_residuals <- rstudent(fit)
+
+# Plot
+plot(fit$fitted.values, stud_residuals,
+     xlab = "Fitted Values", ylab = "Studentized Residuals",
+     main = "Externally Studentized Residuals vs Fitted Values")
+abline(h = c(-2, 0, 2), col = "red", lty = 2)
+```
+
+**Observation:** Points beyond $\pm2$ are potential outliers.
+
+# Analysis of Residuals - Influential Points
+
+Leverage ($h_i$):
+
+$$
+h_i = \text{Diagonal of } H
+$$
+
+- Average $h_i$: $\frac{k}{n}$
+- **Rule of Thumb:** $h_i > \frac{2k}{n}$ indicates high leverage.
+
+```{r}
+# Leverage values
+leverages <- hatvalues(fit)
+
+# Plot
+plot(leverages, type = "h",
+     xlab = "Observation", ylab = "Leverage",
+     main = "Leverage Values")
+abline(h = 2 * length(coef(fit)) / nrow(mtcars), col = "red", lty = 2)
+```
+
+**Observation:** Identify observations with high leverage.
+
+# Cook's Distance and Modified Cook's Statistic
+
+**Cook's Distance ($D_i$)**:
+
+$$
+D_i = \left( \frac{t_i^2}{k} \right) \frac{h_i}{1 - h_i}
+$$
+
+- Measures influence of observation $i$.
+- **Cut-off:** $D_i > \frac{4}{n - k - 1}$
+
+```{r}
+# Cook's Distance
+cooks_d <- cooks.distance(fit)
+
+# Plot
+plot(cooks_d, type = "h",
+     xlab = "Observation", ylab = "Cook's Distance",
+     main = "Cook's Distance Plot")
+abline(h = 4 / (nrow(mtcars) - length(coef(fit))), col = "red", lty = 2)
+```
+
+**Observation:** Points above the red line are influential.
+
+# Modified Cook's Distance (Atkinson's Method)
+
+**Atkinson's Statistic ($A_i$)**:
+
+$$
+A_i = \sqrt{(n - k)D_i} = \sqrt{\left( \frac{n - k}{k} \right) \frac{h_i}{1 - h_i}} |t_i|
+$$
+
+- **Cut-off values:** 2 or 3.
+
+```{r}
+# Atkinson's Statistic
+A_i <- sqrt((nrow(mtcars) - length(coef(fit))) * cooks_d)
+
+# Plot
+plot(A_i, type = "h",
+     xlab = "Observation", ylab = "Atkinson's Statistic",
+     main = "Atkinson's Plot")
+abline(h = c(2, 3), col = c("blue", "red"), lty = 2)
+legend("topright", legend = c("Cut-off at 2", "Cut-off at 3"),
+       col = c("blue", "red"), lty = 2)
+```
+
+**Observation:** Points above the lines are potentially influential.
+
+# Summary
+
+- **Outliers**: Large residuals; do not fit well.
+- **Influential Points**: Significantly impact model parameters.
+- **Leverage**: Indicates potential influence based on predictor values.
+- **Studentized Residuals**: Detect outliers.
+- **Cook's Distance**: Identifies influential observations.
+- **Atkinson's Statistic**: Alternative measure for influence.

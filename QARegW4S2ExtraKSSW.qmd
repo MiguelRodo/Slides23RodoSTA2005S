@@ -1,0 +1,67 @@
+---
+title: "Q&A: Regression Week IV: Model checking"
+subtitle: "Shapiro-Wilk & Kolmogorov Smirnov"
+format:
+  html:
+    embed-resources: true
+---
+
+1. **What is the Kolmogorov-Smirnov (K-S) test?**
+   - A nonparametric test comparing a sample's empirical distribution function to a reference cumulative distribution function.
+
+2. **What does the K-S test measure?**
+   - The maximum absolute difference between the empirical distribution function and the reference cumulative distribution function.
+
+3. **What is the empirical distribution function (EDF)?**
+   - A step function representing the proportion of sample observations less than or equal to a particular value.
+
+4. **How is the K-S test statistic $D_n$ defined?**
+   - $D_n = \sup_x | F_n(x) - F(x) |$, where $F_n(x)$ is the EDF and $F(x)$ is the reference CDF.
+
+5. **What are the hypotheses in the K-S test?**
+   - Null hypothesis ($H_0$): The sample comes from the reference distribution. Alternative hypothesis ($H_1$): The sample does not come from the reference distribution.
+
+6. **What are the limitations of the K-S test?**
+   - Less sensitive in the tails, less powerful than other tests for normality, and requires known parameters of the reference distribution.
+
+7. **When is the K-S test appropriate to use?**
+   - When comparing a sample to any specified continuous distribution, especially with large sample sizes.
+
+8. **Can the K-S test be used with estimated parameters?**
+   - Not reliably; standard critical values may not be accurate if parameters are estimated from the data.
+
+9. **What is the Shapiro-Wilk test designed for?**
+   - Specifically testing the normality of a sample.
+
+10. **How is the Shapiro-Wilk test statistic $W$ calculated?**
+    - $W = \frac{\left( \sum_{i=1}^{n} a_i X_{(i)} \right)^2}{\sum_{i=1}^{n} (X_i - \bar{X})^2}$
+
+11. **What do the weights $a_i$ represent in the Shapiro-Wilk test?**
+    - Constants based on expected values of order statistics from a normal distribution, depending only on sample size.
+
+12. **Do the weights $a_i$ depend on the sample data?**
+    - No, they are predetermined constants for each sample size.
+
+13. **How are the weights $a_i$ computed?**
+    - Using expected values $m_i$ and covariance matrix $V$ of normal order statistics: $a = V^{-1} m / \sqrt{m^T V^{-1} V^{-1} m}$
+
+14. **What are the hypotheses in the Shapiro-Wilk test?**
+    - Null hypothesis ($H_0$): Data are from a normally distributed population. Alternative hypothesis ($H_1$): Data are not from a normal distribution.
+
+15. **When is the Shapiro-Wilk test most powerful?**
+    - With small to moderate sample sizes (typically $n \leq 2000$).
+
+16. **What happens in the Shapiro-Wilk test with large samples?**
+    - It may detect trivial deviations from normality, leading to rejection of $H_0$ even when data are approximately normal.
+
+17. **What is the main difference between the K-S and Shapiro-Wilk tests?**
+    - K-S is general for any continuous distribution; Shapiro-Wilk is specific to normality testing.
+
+18. **Why is normality testing important?**
+    - Many statistical methods assume normality; testing validates these assumptions.
+
+19. **What are alternatives to these normality tests?**
+    - Anderson-Darling test, D'Agostino-Pearson omnibus test, and graphical methods like Q-Q plots.
+
+20. **Can graphical methods complement these tests?**
+    - Yes, plots like Q-Q plots and histograms visually assess normality alongside formal tests.

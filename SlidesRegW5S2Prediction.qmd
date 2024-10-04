@@ -1,0 +1,587 @@
+---
+title: "Regression Week V: Prediciton"
+author: "Miguel Rodo"
+institute: "University of Cape Town"
+aspectratio: 169
+theme: Boadilla
+format:
+  beamer:
+    embed-resources: true
+    colorlinks: true
+    include-in-header:
+      file: preamble.tex
+    classoption: "aspectratio=169"
+---
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Predicting Individual Values
+
+- Suppose we want to predict the range of individual future observations.
+- We fit a linear regression model to our data.
+- Then, we can obtain **prediction intervals** for new observations:
+  - The prediction interval is an interval that contains the new observation with a certain probability.
+
+# Confidence Intervals vs. Prediction Intervals
+
+- **Confidence intervals** estimate the mean response at a given predictor value.
+  - Source of variability: Uncertainty in estimating $\beta$.
+- **Prediction intervals** estimate the range of individual future observations.
+  - Sources of variability: Uncertainty in estimating $\beta$ and random variation in future observations.
+
+# Example (ten observations)
+
+```{r}
+#| echo: false
+n <- 10
+x_vec <- runif(n, 0, 10)
+y_vec <- 2 * x_vec + rnorm(n, 0, 2)
+example_tbl <- tibble(x = x_vec, y = y_vec)
+fit_vec <- lm(y ~ x, data = example_tbl)
+x_vec_seq <- seq(min(x_vec), max(x_vec), length.out = 1e3)
+y_vec_seq_pred <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "prediction")
+y_vec_seq_conf <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "confidence")
+plot_tbl_int <- tibble(
+  x = rep(x_vec_seq, 2),
+  lower = c(y_vec_seq_pred[, 2], y_vec_seq_conf[, 2]),
+  upper = c(y_vec_seq_pred[, 3], y_vec_seq_conf[, 3]),
+  interval_type = rep(c("Prediction", "Confidence"), each = length(x_vec_seq))
+)
+
+p <- ggplot(example_tbl, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  geom_point(col = "dodgerblue", alpha = 0.8) +
+  geom_smooth(col = "orange", method = "lm", se = FALSE, size = 1.5) +
+  geom_ribbon(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Confidence"),
+     aes(x = x, ymin = lower, ymax = upper, fill = interval_type),
+     alpha = 0.5,
+    inherit.aes = FALSE) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = lower, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = upper, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  scale_colour_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  scale_fill_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  labs(
+    x = "Predictor",
+    y = "Response"
+  ) +
+  theme(
+    legend.title = element_blank()
+  )
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "ci_vs_pred.pdf"
+  )
+ggsave(path_fig, plot = p, width = 14, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Confidence intervals shrink to zero as sample size increases, but prediction intervals do not (100 observations)
+
+```{r}
+#| echo: false
+n <- 200
+x_vec <- runif(n, 0, 10)
+y_vec <- 2 * x_vec + rnorm(n, 0, 2)
+example_tbl <- tibble(x = x_vec, y = y_vec)
+fit_vec <- lm(y ~ x, data = example_tbl)
+x_vec_seq <- seq(min(x_vec), max(x_vec), length.out = 1e3)
+y_vec_seq_pred <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "prediction")
+y_vec_seq_conf <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "confidence")
+plot_tbl_int <- tibble(
+  x = rep(x_vec_seq, 2),
+  lower = c(y_vec_seq_pred[, 2], y_vec_seq_conf[, 2]),
+  upper = c(y_vec_seq_pred[, 3], y_vec_seq_conf[, 3]),
+  interval_type = rep(c("Prediction", "Confidence"), each = length(x_vec_seq))
+)
+
+p <- ggplot(example_tbl, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  geom_point(col = "dodgerblue", alpha = 0.1) +
+  geom_smooth(col = "orange", method = "lm", se = FALSE, size = 0.01) +
+  geom_ribbon(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Confidence"),
+     aes(x = x, ymin = lower, ymax = upper, fill = interval_type),
+     alpha = 0.5,
+    inherit.aes = FALSE) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = lower, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = upper, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  scale_colour_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  scale_fill_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  labs(
+    x = "Predictor",
+    y = "Response"
+  ) +
+  theme(
+    legend.title = element_blank()
+  )
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "ci_vs_pred_n.pdf"
+  )
+ggsave(path_fig, plot = p, width = 14, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+
+# Prediction Intervals: Derivation
+
+- **Goal:** Obtain a prediction interval for a new response $Y_f$ at predictor values $X_f$.
+
+- **Predicted value:**
+  $$
+  \hat{Y}_f = X_f' \hat{\beta}
+  $$
+
+- **Actual value:** $Y_f = X_f' \beta + \epsilon_f$, where $\epsilon_f \sim N(0, \sigma^2)$.
+
+
+
+# Prediction Intervals: Derivation
+
+- **Difference between actual and predicted values:**
+  $$
+  Z = Y_f - \hat{Y}_f
+  $$
+
+- **Expected value of $Z$:**
+  $$
+  E(Z) = E(Y_f - \hat{Y}_f) = X_f' \beta - X_f' E(\hat{\beta}) = 0
+  $$
+
+- **Variance of $Z$:**
+  $$
+  \text{Var}(Z) = \text{Var}(Y_f - \hat{Y}_f) = \sigma^2 + \sigma^2 X_f' (X'X)^{-1} X_f = \sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)
+  $$
+
+
+
+# Prediction Intervals: Derivation
+
+- **Standardized variable:**
+  $$
+  \frac{Z}{\sqrt{\sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)}} \sim N(0,1)
+  $$
+
+- **Estimate $\sigma^2$ with $s^2$:**
+  $$
+  t = \frac{Y_f - \hat{Y}_f}{s \sqrt{1 + X_f' (X'X)^{-1} X_f}} \sim t_{n - k}
+  $$
+
+- **Prediction interval:**
+  $$
+  Y_f \in \hat{Y}_f \pm t_{\alpha/2, n - k} \cdot s \sqrt{1 + X_f' (X'X)^{-1} X_f}
+  $$
+
+# Variable Selection Motivation
+
+- We may want fewer variables in our model for:
+  - Interpretation purposes.
+  - Practical application
+  - Prediction accuracy:
+    - Bias-variance trade-off.
+
+- Aim: **Select the best subset of variables** that provides the optimal balance.
+
+# The Combinatorial Challenge
+
+- With $p$ predictors, there are $2^p$ possible models.
+
+- **Example:** For $p = 100$, $2^{100} \approx 1.27 \times 10^{30}$ models.
+
+- **Computationally infeasible** to evaluate all models.
+
+# Greedy Algorithms for Variable Selection
+
+- So, we adopt heuristic approaches to select variables.
+
+- **Iterative, greedy optimization algorithms:**
+  - *Iterative:* Start with a given solution and iteratively improve it.
+  - *Greedy:* Always make the best immediate move without reconsideration.
+
+- **Approaches:**
+  - *Forward Selection*
+  - *Backward Elimination*
+  - *Stepwise Selection*
+
+
+
+# Forward Selection
+
+- Start with the intercept-only model.
+
+- Iteratively add** the variable that provides the best improvement according to a criterion.
+
+- Stop when no further improvement is possible.
+
+
+# Model Selection Criteria
+
+- **$R^2$:** Not suitable (always increases with more variables).
+
+- **Adjusted $R^2$:** Adjusts for the number of predictors.
+
+- **Akaike Information Criterion (AIC):**
+  $$
+  \text{AIC} = n \ln(\text{RSS}/n) + 2k
+  $$
+
+- **Bayesian Information Criterion (BIC):**
+  $$
+  \text{BIC} = n \ln(\text{RSS}/n) + \ln(n)k
+  $$
+
+- **Objective:** Minimize AIC or BIC.
+
+# Example: Forward Selection in R
+
+- **Simulate data with four variables: A, B, C, D.**
+
+- **Variables A and B** are related to the response.
+
+- **Variables C and D** are not related.
+
+# R Code: Simulating Data
+
+```{r}
+set.seed(123)
+
+# Sample size
+n <- 100
+
+# Predictor variables
+A <- rnorm(n)
+B <- rnorm(n)
+C <- rnorm(n)
+D <- rnorm(n)
+
+# Response variable
+Y <- 3 * A + 2 * B + rnorm(n)
+
+# Data frame
+data <- tibble(Y, A, B, C, D)
+```
+
+# R Code: Forward Selection
+
+- **Load required package:**
+
+```{r}
+library(MASS) # For stepAIC function
+```
+
+- **Start with intercept-only model:**
+
+```{r}
+null_model <- lm(Y ~ 1, data = data)
+full_model <- lm(Y ~ A + B + C + D, data = data)
+```
+
+- **Apply forward selection:**
+
+```{r}
+#| results: "hide"
+forward_model <- stepAIC(null_model, scope = list(lower = null_model, upper = full_model), direction = "forward")
+```
+
+# Model fitting process
+
+\begin{center}
+\includegraphics[width=\linewidth]{_data_raw/img/forward_selection.png}
+\end{center}
+
+# Forward Selection: Results
+
+```{r}
+#| echo: false
+coef(forward_model) |> signif(2)
+```
+
+- **Output shows that variables A and B are included.**
+
+# Backward Elimination
+
+- Start with the full model containing all predictors.
+
+- Iteratively remove the variable that least contributes to the model.
+
+- Stop when removing additional variables worsens the model.
+
+# Stepwise Selection
+
+- Combination of forward and backward methods.
+
+- At each step:
+  - Add the best variable.
+  - Remove any variable that no longer improves the model.
+
+- Allows variables to be reconsidered. (so, it's less greedy)
+
+# R Code: Backward Elimination
+
+- **Apply backward elimination:**
+
+```{r}
+#| results: "hide"
+backward_model <- stepAIC(full_model, direction = "backward")
+```
+
+- **Selected variables:**
+
+```{r}
+coef(backward_model) |> signif(2)
+```
+
+- **Variables A and B remain in the model.**
+
+# R Code: Stepwise Selection
+
+- **Apply stepwise selection:**
+
+```{r}
+#| results: "hide"
+stepwise_model <- stepAIC(
+  null_model,
+  scope = list(lower = null_model, upper = full_model),
+  direction = "both"
+)
+```
+
+- **Selected variables:**
+
+```{r}
+coef(stepwise_model) |> signif(2)
+```
+
+- **Again, variables A and B are selected.**
+
+# Larger Example: Simulating High-Dimensional Data
+
+- **Simulate data with 100 predictors, only 10 related to the response.**
+
+```{r}
+set.seed(123)
+# Sample size
+n <- 200; p <- 100
+
+# Generate predictors
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+colnames(X) <- paste0("X", 1:p)
+
+# True coefficients
+beta <- c(rep(2, 5), rep(-2, 5), rep(0, p - 10))
+
+# Response variable
+Y <- X %*% beta + rnorm(n, sd = 0.05)
+
+data_hd <- data.frame(Y, X) |> as_tibble()
+```
+
+# Apply forward, backward, and stepwise selection
+
+```{r}
+forward_model_hd <- stepAIC(
+  lm(Y ~ 1, data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "forward", trace = FALSE)
+backward_model_hd <- stepAIC(
+  lm(Y ~ ., data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "backward", trace = FALSE
+)
+stepwise_model_hd <- stepAIC(
+  lm(Y ~ 1, data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "both", trace = FALSE
+)
+```
+
+# Procedure performance
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+fw_inc <- sum(names(coef(forward_model_hd)) %in% colnames(X))
+bw_inc <- sum(names(coef(backward_model_hd)) %in% colnames(X))
+sw_inc <- sum(names(coef(stepwise_model_hd)) %in% colnames(X))
+
+fw_correct <- sum(names(coef(forward_model_hd)) %in% colnames(X)[1:10])
+bw_correct <- sum(names(coef(backward_model_hd)) %in% colnames(X)[1:10])
+sw_correct <- sum(names(coef(stepwise_model_hd)) %in% colnames(X)[1:10])
+
+results_tbl <- tibble(
+  Method = c("Full", "Forward", "Backward", "Stepwise"),
+  `# Included` = c(100, fw_inc, bw_inc, sw_inc),
+  `# Correct` = c(10, fw_correct, bw_correct, sw_correct),
+  `R^2` = c(
+    summary(lm(Y ~ ., data = data_hd))$r.squared,
+    summary(forward_model_hd)$r.squared,
+    summary(backward_model_hd)$r.squared,
+    summary(stepwise_model_hd)$r.squared
+  ),
+  `R^2_adj` = c(
+    summary(lm(Y ~ ., data = data_hd))$adj.r.squared,
+    summary(forward_model_hd)$adj.r.squared,
+    summary(backward_model_hd)$adj.r.squared,
+    summary(stepwise_model_hd)$adj.r.squared
+  ),
+  AIC = c(
+    AIC(lm(Y ~ ., data = data_hd)),
+    AIC(forward_model_hd),
+    AIC(backward_model_hd),
+    AIC(stepwise_model_hd)
+  ),
+  BIC = c(
+    BIC(lm(Y ~ ., data = data_hd)),
+    BIC(forward_model_hd),
+    BIC(backward_model_hd),
+    BIC(stepwise_model_hd)
+  )
+)
+results_tbl
+```
+
+# Estimating True Prediction Error
+
+- **Simulate data where no predictors are related to the response.**
+
+```{r}
+set.seed(123)
+
+n <- 150
+p <- 100
+
+# Generate predictors
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+colnames(X) <- paste0("X", 1:p)
+
+# Response variable with no relation to predictors
+Y <- rnorm(n)
+
+# Data frame
+data_null <- data.frame(Y, X)
+```
+
+# Applying Forward Selection
+
+- **Use forward selection:**
+
+```{r}
+null_model <- lm(Y ~ 1, data = data_null)
+full_model <- lm(Y ~ ., data = data_null)
+
+forward_model <- stepAIC(
+  null_model, scope = list(lower = null_model, upper = full_model), direction = "forward", trace = FALSE
+)
+```
+
+We actually include `r sum(names(coef(forward_model)) != "(Intercept)")` variables in the model.
+The mean squared error is then `r mean((data_null$Y - predict(forward_model, newdata = data_null))^2) |> signif(2)`.
+
+# Observations on Forward Selection
+
+- Our estimated error is much lower than it should be (it should be close to 1, the variance).
+- Using the same data to evaluate the model as was used to select the model leads to under-estimating the error.
+
+# Training-Test Split
+
+- **Split data into training and test sets:**
+
+```{r}
+set.seed(123)
+train_indices <- sample(1:n, size = floor(0.8 * n))
+
+# Training data
+train_data <- data_null[train_indices, ]
+
+# Test data
+test_data <- data_null[-train_indices, ]
+```
+
+# Evaluating Model Performance
+
+- **Fit model on training data:**
+
+```{r}
+forward_model_cv <- stepAIC(
+  lm(Y ~ 1, data = train_data),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "forward", trace = FALSE
+)
+```
+
+- **Predict on test data:**
+
+```{r}
+predictions <- predict(forward_model_cv, newdata = test_data)
+```
+
+- **Calculate Mean Squared Error (MSE):**
+
+```{r}
+mse_test <- mean((test_data$Y - predictions)^2)
+```
+
+The error is now `r mse_test |> signif(2)`, whereas when calculated on in-sample data it was `r mean((data_null$Y - predict(forward_model, newdata = data_null))^2) |> signif(2)`.
+
+
+# Observations on error rate estimation
+
+- Test MSE was closer to the true error than the in-sample error.
+
+# Summary
+
+- **Prediction intervals** account for uncertainty in both parameter estimation and future observations.
+
+- **Variable selection** helps in building parsimonious models.
+
+- **Selection criteria** like AIC and BIC balance model fit and complexity.
+
+- **Forward, backward, and stepwise selection** are practical methods for variable selection.
+
+- **Training-test split error estimation** helps in estimating true prediction error.

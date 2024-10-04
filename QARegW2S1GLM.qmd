@@ -1,0 +1,80 @@
+---
+title: "Q&A: Regression Week II: The General Linear Model"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+- What are the five principles of statistical modelling:
+  - First?
+    - Exploratory data analysis
+  - Second?
+    - Model formulation
+  - Third?
+    - Parameter estimation
+  - Fourth?
+    - Residuals and model checking
+  - Fifth?
+    - Inference and model interpretation
+- In simple linear regression, what is the model formulation?
+  - $y_i = \beta_0 + \beta_1 x_i + e_i$
+- What distribution is assumed for the error term $e_i$?
+  - Normal distribution with mean zero and variance $\sigma^2$
+- How is the model expressed in matrix form?
+  - $Y = \beta_0 1 + \beta_1 X + e$
+- What method is used to estimate $\beta_0$ and $\beta_1$?
+  - Ordinary Least Squares
+- What does OLS minimize?
+  - Sum of squared vertical distances between observed values and the fitted line
+- What is the expression for the sum of squared errors $g(\beta_0, \beta_1)$?
+  - $g(\beta_0, \beta_1) = \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i)^2$
+- By taking the derivative of $g$ with respect to $\beta_0$, what do we obtain?
+  - $\beta_0 = \bar{y} - \beta_1 \bar{x}$
+- By taking the derivative of $g$ with respect to $\beta_1$, what do we obtain?
+  - $\beta_1 = \frac{\text{cov}(X, Y)}{\text{var}(X)}$
+- In multiple regression, what is the general linear model formulation?
+  - $Y = \beta_0 1 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + e$
+- What are the assumptions about the error term $e$:
+  - First?
+    - Expected value of $e$ is zero
+  - Second?
+    - Variance-covariance matrix $E(ee^T) = \sigma^2 I_n$
+- What method is used to estimate $\beta$ and $\sigma^2$ in the general linear model?
+  - Maximum Likelihood Estimation
+- What does MLE maximize?
+  - The likelihood function
+- How is the likelihood function $L(\beta, \sigma^2)$ expressed?
+  - $L(\beta, \sigma^2) = \prod_{i=1}^{n} f(y_i | x_i, \beta, \sigma^2)$
+- How is the log-likelihood function $l(\beta, \sigma^2)$ expressed?
+  - $l(\beta, \sigma^2) = -\frac{n}{2} \log(2\pi) - \frac{n}{2} \log(\sigma^2) - \frac{(Y - X\beta)^T(Y - X\beta)}{2\sigma^2}$
+- By solving the partial derivatives of the log-likelihood, what estimator do we obtain for $\beta$?
+  - $\hat{\beta} = (X^T X)^{-1} X^T Y$
+- What is the distribution of the estimator $\hat{\beta}$?
+  - Multivariate normal distribution $N_k(\beta, \sigma^2 (X^T X)^{-1})$
+- How is $\sigma^2$ estimated using MLE?
+  - $\hat{\sigma}^2 = \frac{1}{n} (Y - X\hat{\beta})^T (Y - X\hat{\beta})$
+- Why is $\hat{\sigma}^2$ considered a biased estimator?
+  - It underestimates the true variance
+- What is the unbiased estimator of $\sigma^2$?
+  - $s^2 = \frac{1}{n - k} (Y - X\hat{\beta})^T (Y - X\hat{\beta})$
+- What is the distribution of $(n - k) \frac{s^2}{\sigma^2}$?
+  - Chi-squared distribution with $n - k$ degrees of freedom
+- What theorem describes the distribution of $\hat{\beta}$?
+  - Theorem stating $\hat{\beta} \sim N(\beta, \sigma^2 (X^T X)^{-1})$
+- What is the key result derived from the proof involving normal distributions?
+  - The estimator $\hat{\beta}$ follows a multivariate normal distribution
+- In regression analysis, why is understanding the distribution of $\hat{\beta}$ important?
+  - It allows for inference and hypothesis testing on the coefficients
+- What are the next steps after estimating $\beta$ and $\sigma^2$?
+  - Finding the distribution of the regression coefficients $\hat{\beta}$
+- In the context of regression coefficients, what does $\beta_j$ represent?
+  - The effect of predictor $X_j$ on the response variable
+  - What is a more accurate way of stating this?
+    - It represents the change in the average response for a one unit increases in $X_j$, holding other predictors constant
+- What is the purpose of residuals and model checking in statistical modelling?
+  - To assess the adequacy of the model and verify assumptions
+- Why is inference and model interpretation important in statistical modelling?
+  - It helps in understanding the implications of the estimated parameters
+- What is the overall goal of using the general linear model in data analysis?
+  - To model the relationship between predictors and response variables accurately

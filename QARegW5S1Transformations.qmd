@@ -1,0 +1,205 @@
+---
+title: "Q&A: Week five - Slide deck one - Transformation"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+- What are the key assumptions in general models:
+  - First?
+    - Linear relationship
+  - Second?
+    - Independence of errors
+  - Third?
+    - Homoscedasticity
+  - Fourth?
+    - Normality of residuals
+- What challenge do datasets often present?
+  - They may not meet our assumptions
+- What will we discuss to address this issue?
+  - Adjusting our model to better meet the assumptions
+- In the initial example, what is the issue with the relationship between $Y$ and $X$?
+  - It is non-linear
+- How can we imperfectly deal with a non-linear relationship?
+  - By discretizing the $X$ variable
+- What tactics do we have to handle non-linear relationships:
+  - First?
+    - Transform the dependent variable $Y$
+  - Second?
+    - Transform the independent variables $X_i$
+  - Third?
+    - Introduce new explanatory variables
+- Which tactics did we use previously:
+  - First?
+    - Transformed the independent variable $X$
+  - Second?
+    - Introduced new explanatory variables
+- When fitting the continuous model, what variable did we use?
+  - The independent variable $X$
+- After discretizing $X$, what variable did we use?
+  - The categorical variable $x_{\text{cut}}$
+- Why transform the dependent variable $Y$:
+  - First reason?
+    - Linearize relationships
+  - Second reason?
+    - Stabilize variance
+  - Third reason?
+    - Reduce skewness
+  - Fourth reason?
+    - Handle outliers
+- In the example, what issue do we observe with $Y$?
+  - Variance increases with the mean
+- What transformation did we apply to $Y$?
+  - Square root transformation
+- What effect did the square root transformation have on $Y$?
+  - Linearized the relationship and stabilized variance
+- What are the benefits of transforming $Y$:
+  - First benefit?
+    - Less biased predictions and estimates
+  - Second benefit?
+    - More reliable inference
+  - Third benefit?
+    - Better interpretability
+- What are common transformations of $Y$:
+  - First?
+    - Logarithmic transformation ($Y' = \log(Y)$)
+  - Second?
+    - Square root transformation ($Y' = \sqrt{Y}$)
+  - Third?
+    - Reciprocal transformation ($Y' = 1/Y$)
+- When is logarithmic transformation useful?
+  - When $Y$ grows exponentially with $X$
+- What are the benefits of logarithmic transformation?
+  - Stabilizes variance and linearizes multiplicative relationships
+- What is a limitation of the logarithmic transformation?
+  - Undefined for $Y = 0$
+- When is square root transformation applied?
+  - When variance increases with the mean of $Y$
+- When is reciprocal transformation suitable?
+  - When large $Y$ values correspond to small variances
+- How does transforming $Y$ affect interpretation:
+  - Do coefficients retain the same interpretation on the transformed scale?
+    - Yes, but on the transformed scale
+  - After logging $Y$, what does $\beta_1$ represent?
+    - Increase in $\log{Y}$ for a unit change in $X$
+  - What does $\exp{\beta_1}$ represent when logging $Y$?
+    - Multiplicative change in $Y$ for a unit change in $X$
+  - Does logging $Y$ affect the average of $Y$?
+    - Yes, it represents change in the median of $Y$
+- What are the practical steps for transforming $Y$:
+  - First step?
+    - Explore the data
+  - What does exploring the data involve?
+    - Using plots to detect non-linearity, heteroscedasticity, and skewness
+  - Second step?
+    - Choose an appropriate transformation
+  - How do you choose an appropriate transformation?
+    - Based on observed patterns
+  - Third step?
+    - Apply the transformation and re-fit the model
+  - Fourth step?
+    - Evaluate model diagnostics
+  - What does evaluating model diagnostics involve?
+    - Checking residual plots, normality, and variance
+  - Fifth step?
+    - Interpret results carefully
+  - Why interpret results carefully?
+    - To account for the transformation in interpretations
+- Why might we transform individual explanatory variables instead of $Y$?
+  - To address non-linear relationships without altering others
+- What happens if we transform $Y$ in this case?
+  - Alters relationships with all explanatory variables
+- In the example with two variables, what is the relationship between $Y$ and $X_1$?
+  - Linear
+- What is the relationship between $Y$ and $X_2$?
+  - Exponential (non-linear)
+- Why is transforming $Y$ not desirable in this case?
+  - It affects all relationships and variance
+- How can we linearize the relationship between $Y$ and $X_2$?
+  - By transforming $X_2$ using exponentiation
+- What transformation is applied to $X_2$?
+  - Exponentiation ($X_2' = \exp(X_2)$)
+- What is observed after transforming $X_2$?
+  - Linear relationship between $Y$ and transformed $X_2$
+- What is the benefit of transforming $X_2$ in this way?
+  - Fits a linear model without affecting other relationships
+- How does transforming $X$ affect interpretation:
+  - Coefficients relate to the transformed $X$
+  - How should interpretations be made?
+    - In terms of the transformed variable
+- What are common non-linear relationships between $Y$ and $X$:
+  - First?
+    - Logarithmic ($Y = \log(X) + \epsilon$)
+  - Second?
+    - Exponential ($Y = e^{X} + \epsilon$)
+  - Third?
+    - Square root ($Y = \sqrt{X} + \epsilon$)
+  - Fourth?
+    - Quadratic ($Y = X^2 + \epsilon$)
+- How do we correct a non-linear relationship between $Y$ and $X$?
+  - Apply the function to $X$ and fit the model
+- What is an example of this method?
+  - If $Y = \log(X) + \epsilon$, fit $Y = \beta_0 + \beta_1 \log(X)$
+- What is another example of introducing new explanatory variables?
+  - Adding polynomial terms
+- How does the design matrix change when adding polynomial terms?
+  - Includes additional columns for $X$ raised to powers
+- What is the benefit of adding polynomial terms?
+  - Captures non-linear relationships while retaining linearity
+- What does introducing interaction terms allow us to model?
+  - Effects depending on another variable
+- In the interaction example, what variables are involved?
+  - $X$ and $\text{Group}$
+- How is the interaction between $X$ and $\text{Group}$ modeled?
+  - By including the interaction term $X \times \text{Group}$
+- How many additional coefficients are added for the interaction term?
+  - One
+- How is this specified in R?
+  - By including `X * Group` in the formula
+- How does the design matrix change with the interaction term?
+  - An additional column for the interaction term
+- What values does the interaction term take when `Group` is "A"?
+  - Zero
+- What values does the interaction term take when `Group` is "B"?
+  - Same as $X$
+- How does the mean response differ between groups in the interaction model:
+  - For Group A?
+    - Mean response is $\beta_0 + \beta_X X$
+  - For Group B?
+    - Mean response is $(\beta_0 + \beta_G) + (\beta_X + \beta_{X:G}) X$
+- What does $\beta_{X:G}$ represent?
+  - Difference in the effect of $X$ between groups
+- How is the effect of $X$ on $Y$ for Group A represented?
+  - By $\beta_X$
+- How do you calculate the effect of $X$ on $Y$ for Group B?
+  - $\beta_X + \beta_{X:G}$
+- What does a significant interaction term indicate?
+  - Effect of $X$ depends on group
+- How can we test if $X$ affects $Y$ for Group B?
+  - By testing if $\beta_X + \beta_{X:G} = 0$
+- What is the null hypothesis for this test?
+  - $H_0: \beta_X + \beta_{X:G} = 0$
+- How many additional coefficients are added for interactions with an $a$-level categorical variable?
+  - $a - 1$ coefficients
+- What does each interaction term represent?
+  - Difference in the effect of $X$ between the reference group and each group
+- What hypothesis is tested to assess if the effect of $X$ depends on group?
+  - $H_0: \beta_{X:G_2} = \ldots = \beta_{X:G_a} = 0$
+- What test is used to assess multiple interaction terms?
+  - F-test
+- How do we test if the effect of $X$ depends on a specific group $i$?
+  - Test $H_0: \beta_{X:G_i} = 0$ using a t-test
+- What are the types of interaction terms:
+  - First?
+    - Continuous × Categorical
+  - Second?
+    - Categorical × Categorical
+  - Third?
+    - Continuous × Continuous
+- In a Categorical × Categorical interaction, how many additional coefficients are added?
+  - $(a_1 - 1) \times (a_2 - 1)$k coefficients
+- In a Continuous × Continuous interaction, how many additional coefficients are added?
+  - One
+- What does the interaction term represent in a Continuous × Continuous interaction?
+  - Product of the two continuous variables

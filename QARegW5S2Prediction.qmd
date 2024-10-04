@@ -1,0 +1,207 @@
+---
+title: "Q&A: Week five - Slide deck two - Prediction"
+subtitle: "Version 1"
+format:
+  html:
+    embed-resources: true
+---
+
+- What do we want to predict?
+  - The range of individual future observations.
+- What model do we fit to our data?
+  - A linear regression model.
+- What can we obtain for new observations?
+  - Prediction intervals.
+- What is a prediction interval?
+  - An interval that contains the new observation with a certain probability.
+- What do confidence intervals estimate?
+  - The mean response at a given predictor value.
+- What is the source of variability in confidence intervals?
+  - Uncertainty in estimating beta.
+- What do prediction intervals estimate?
+  - The range of individual future observations.
+- What are the sources of variability in prediction intervals:
+  - First?
+    - Uncertainty in estimating beta.
+  - Second?
+    - Random variation in future observations.
+- What happens to confidence intervals as sample size increases?
+  - They shrink to zero.
+- Do prediction intervals shrink as sample size increases?
+  - No.
+- What is the goal in deriving prediction intervals?
+  - To obtain a prediction interval for a new response $Y_f$ at predictor values $X_f$.
+- What is the predicted value of $Y_f$?
+  - $\hat{Y}_f = X_f' \hat{\beta}$.
+- What is the actual value of $Y_f$?
+  - $Y_f = X_f' \beta + \epsilon_f$.
+- What is the distribution of $\epsilon_f$?
+  - Normal distribution with mean zero and variance sigma squared.
+- How is $Z$ defined?
+  - $Z = Y_f - \hat{Y}_f$.
+- What is the expected value of $Z$?
+  - Zero.
+- What is the variance of $Z$?
+  - $\sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)$.
+- What is the standardized variable $Z$ divided by?
+  - $\sigma \sqrt{1 + X_f' (X'X)^{-1} X_f}$.
+- What is the distribution of the standardized variable?
+  - Standard normal distribution.
+- How is $t$ defined?
+  - $t = \frac{Y_f - \hat{Y}_f}{s \sqrt{1 + X_f' (X'X)^{-1} X_f}}$.
+- What is the distribution of $t$?
+  - $t$-distribution with $n - k$ degrees of freedom.
+- What is the prediction interval for $Y_f$?
+  - $\hat{Y}_f \pm t_{\alpha/2, n - k} \cdot s \sqrt{1 + X_f' (X'X)^{-1} X_f}$.
+- Why might we want fewer variables in our model:
+  - First reason?
+    - Interpretation purposes.
+  - Second reason?
+    - Practical application.
+  - Third reason?
+    - Prediction accuracy.
+- What trade-off is involved in prediction accuracy?
+  - Bias-variance trade-off.
+- How many possible models are there with $p$ predictors?
+  - $2^p$.
+- For $p = 100$, how many models are there approximately?
+  - Approximately $1.27 \times 10^{30}$.
+- Is it computationally feasible to evaluate all these models?
+  - No.
+- What type of approaches do we adopt to select variables?
+  - Heuristic approaches.
+- What kind of optimization algorithms are used?
+  - Iterative, greedy optimization algorithms.
+- What does iterative mean in this context?
+  - Start with a given solution and iteratively improve it.
+- What does greedy mean in this context?
+  - Always make the best immediate move without reconsideration.
+- What are the variable selection approaches:
+  - First?
+    - Forward selection.
+  - Second?
+    - Backward elimination.
+  - Third?
+    - Stepwise selection.
+- In forward selection, what model do we start with?
+  - The intercept-only model.
+- What do we do iteratively in forward selection?
+  - Add the variable that provides the best improvement.
+- When do we stop in forward selection?
+  - When no further improvement is possible.
+- Is $R^2$ suitable for model selection?
+  - No.
+- Why is $R^2$ not suitable?
+  - It always increases with more variables.
+- What adjusts for the number of predictors?
+  - Adjusted $R^2$.
+- What are the model selection criteria:
+  - First?
+    - Akaike Information Criterion (AIC).
+  - Second?
+    - Bayesian Information Criterion (BIC).
+- What is the formula for AIC?
+  - $\text{AIC} = n \ln(\text{RSS}/n) + 2k$.
+- What is the formula for BIC?
+  - $\text{BIC} = n \ln(\text{RSS}/n) + \ln(n)k$.
+- What is our objective when using AIC or BIC?
+  - To minimize AIC or BIC.
+- In the example, how many variables are simulated?
+  - Four variables.
+- What are the names of the variables:
+  - First?
+    - A.
+  - Second?
+    - B.
+  - Third?
+    - C.
+  - Fourth?
+    - D.
+- Which variables are related to the response:
+  - First?
+    - A.
+  - Second?
+    - B.
+- Which variables are not related to the response:
+  - First?
+    - C.
+  - Second?
+    - D.
+- What is the sample size $n$?
+  - 100.
+- How is the response variable $Y$ defined?
+  - $Y = 3A + 2B + \text{noise}$.
+- Which package is required for forward selection in R?
+  - MASS.
+- Which function is used for forward selection?
+  - `stepAIC`.
+- Which variables are included after forward selection:
+  - First?
+    - A.
+  - Second?
+    - B.
+- In backward elimination, what model do we start with?
+  - The full model containing all predictors.
+- What do we do iteratively in backward elimination?
+  - Remove the variable that least contributes to the model.
+- Which variables remain in the model after backward elimination:
+  - First?
+    - A.
+  - Second?
+    - B.
+- What is stepwise selection?
+  - A combination of forward and backward methods.
+- What actions happen at each step in stepwise selection:
+  - First?
+    - Add the best variable.
+  - Second?
+    - Remove any variable that no longer improves the model.
+- Does stepwise selection allow variables to be reconsidered?
+  - Yes.
+- Which variables are selected after stepwise selection:
+  - First?
+    - A.
+  - Second?
+    - B.
+- In the larger example, how many predictors are simulated?
+  - 100 predictors.
+- How many predictors are related to the response?
+  - 10 predictors.
+- How are the true coefficients $\beta$ defined:
+  - First?
+    - First 5 coefficients are 2.
+  - Second?
+    - Next 5 coefficients are $-2$.
+  - Third?
+    - The rest are 0.
+- How is the response variable $Y$ defined?
+  - $Y = X\beta + \text{noise}$.
+- Do the selection methods identify the correct variables in the larger example?
+  - Yes.
+- What is simulated in estimating true prediction error?
+  - Data where no predictors are related to the response.
+- When applying forward selection to unrelated data, do we include variables?
+  - Yes.
+- Is the estimated error lower than it should be?
+  - Yes.
+- Why does using the same data for model selection and evaluation lead to underestimation?
+  - Because it results in overfitting.
+- What is done to better estimate the prediction error?
+  - Split data into training and test sets.
+- Is the test MSE a better estimator of true error than the in-sample error?
+  - Yes.
+- What do prediction intervals account for?
+  - Uncertainty in parameter estimation and future observations.
+- What does variable selection help with?
+  - Building parsimonious models.
+- What do selection criteria like AIC and BIC do?
+  - Balance model fit and complexity.
+- What are practical methods for variable selection:
+  - First?
+    - Forward selection.
+  - Second?
+    - Backward elimination.
+  - Third?
+    - Stepwise selection.
+- What helps in estimating true prediction error?
+  - Training-test split error estimation.
