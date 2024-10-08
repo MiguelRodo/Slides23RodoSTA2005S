@@ -1,0 +1,202 @@
+---
+title: "Regression Week III: Inference"
+subtitle: "Additional Proofs"
+author: "Miguel Rodo (with credit to Prof Francesca Little and the class notes)"
+institute: "University of Cape Town"
+format:
+  pdf:
+    embed-resources: true
+    include-in-header:
+      text: |
+        \usepackage{graphicx}
+        \usepackage{booktabs}
+        \usepackage{amsmath}
+        \usepackage{url}
+        \usepackage{subfigure}
+        \usepackage{xcolor}
+        \usepackage{amsthm,amsfonts,amssymb,amscd,amsxtra}
+        \usepackage{pgfpages}
+        \usepackage{animate}
+        \usepackage{mathpazo}
+        \usepackage{unicode-math}
+---
+
+# Theorem 6
+
+**Statement:**
+
+Let $\symbf{Y} \in \mathbb{R}^n$ be a random vector with $\symbf{Y} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$. Let $\symbf{A}$ be an $n \times n$ symmetric idempotent matrix of rank $r$, and let $\symbf{B}$ be a $k \times n$ matrix such that $\symbf{B} \symbf{A} = \symbf{0}$. Then the linear form $\symbf{B} \symbf{Y}$ is independent of the quadratic form $\symbf{Y}' \symbf{A} \symbf{Y}$.
+
+## Proof
+
+**1. Diagonalization of $\symbf{A}$:**
+
+Since $\symbf{A}$ is symmetric and idempotent, it can be diagonalized by an orthogonal matrix $\symbf{P}$:
+
+$$
+\symbf{P}' \symbf{A} \symbf{P} = \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix},
+$$
+
+where $r = \operatorname{rank}(\symbf{A})$.
+
+**2. Transformation of $\symbf{Y}$:**
+
+Define $\symbf{Z} = \symbf{P}' \symbf{Y}$. Since $\symbf{P}$ is orthogonal and $\symbf{Y} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, it follows that $\symbf{Z} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$.
+
+**3. Expression of the Quadratic Form:**
+
+Compute the quadratic form using $\symbf{Z}$:
+
+$$
+\symbf{Y}' \symbf{A} \symbf{Y} = \symbf{Z}' \symbf{P}' \symbf{A} \symbf{P} \symbf{Z} = \symbf{Z}' \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} \symbf{Z}.
+$$
+
+Partition $\symbf{Z}$ accordingly:
+
+$$
+\symbf{Z} = \begin{bmatrix}
+\symbf{Z}_1 \\
+\symbf{Z}_2
+\end{bmatrix},
+$$
+
+where $\symbf{Z}_1 \in \mathbb{R}^r$ and $\symbf{Z}_2 \in \mathbb{R}^{n - r}$.
+
+Thus, the quadratic form simplifies to:
+
+$$
+\symbf{Y}' \symbf{A} \symbf{Y} = \symbf{Z}_1' \symbf{I}_r \symbf{Z}_1 = \symbf{Z}_1' \symbf{Z}_1 = \sum_{i=1}^r Z_i^2.
+$$
+
+**Conclusion:** The quadratic form $\symbf{Y}' \symbf{A} \symbf{Y}$ depends only on $\symbf{Z}_1$.
+
+**4. Expression of the Linear Form:**
+
+We have $\symbf{B} \symbf{A} = \symbf{0}$, so:
+
+$$
+\symbf{B} \symbf{A} \symbf{P} = \symbf{0}.
+$$
+
+Since $\symbf{P}' \symbf{A} \symbf{P} = \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix}$, it follows that:
+
+$$
+\symbf{B} \symbf{A} \symbf{P} = \symbf{B} \symbf{P} \symbf{P}' \symbf{A} \symbf{P} = \symbf{B} \symbf{P} \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} = \symbf{0}.
+$$
+
+Define $\symbf{C} = \symbf{B} \symbf{P}$. Then:
+
+$$
+\symbf{C} \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} = \symbf{0}.
+$$
+
+This implies that $\symbf{C}$ has the form:
+
+$$
+\symbf{C} = \left[ \symbf{0}_{k \times r} \ \ \symbf{C}_2 \right],
+$$
+
+where $\symbf{C}_2$ is a $k \times (n - r)$ matrix.
+
+**5. Dependency of the Linear Form:**
+
+Compute the linear form:
+
+$$
+\symbf{B} \symbf{Y} = \symbf{B} \symbf{P} \symbf{P}' \symbf{Y} = \symbf{C} \symbf{Z} = \left[ \symbf{0}_{k \times r} \ \ \symbf{C}_2 \right] \begin{bmatrix}
+\symbf{Z}_1 \\
+\symbf{Z}_2
+\end{bmatrix} = \symbf{C}_2 \symbf{Z}_2.
+$$
+
+**Conclusion:** The linear form $\symbf{B} \symbf{Y}$ depends only on $\symbf{Z}_2$.
+
+**6. Independence of $\symbf{Z}_1$ and $\symbf{Z}_2$:**
+
+Since $\symbf{Z} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, the subvectors $\symbf{Z}_1$ and $\symbf{Z}_2$ are independent.
+
+**7. Final Conclusion:**
+
+Because $\symbf{Y}' \symbf{A} \symbf{Y}$ depends only on $\symbf{Z}_1$ and $\symbf{B} \symbf{Y}$ depends only on $\symbf{Z}_2$, and since $\symbf{Z}_1$ and $\symbf{Z}_2$ are independent, it follows that $\symbf{Y}' \symbf{A} \symbf{Y}$ and $\symbf{B} \symbf{Y}$ are independent.
+
+# Theorem 10: Independence of Estimators of $\symbf{\beta}$ and $\sigma^2$
+
+**Statement:**
+
+Assuming $\symbf{Y} = \symbf{X} \symbf{\beta} + \symbf{e}$, where $\symbf{e} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, the least squares estimator $\hat{\symbf{\beta}} = (\symbf{X}' \symbf{X})^{-1} \symbf{X}' \symbf{Y}$ and the unbiased estimator of variance $s^2 = \frac{1}{n - p} (\symbf{Y} - \symbf{X} \hat{\symbf{\beta}})' (\symbf{Y} - \symbf{X} \hat{\symbf{\beta}})$ are independent.
+
+## Proof
+
+First, we define a useful multivariate standard normal random variable. Since $\symbf{Y} = \symbf{X}\symbf{\beta} + \symbf{e}$ where $\symbf{e} \sim \mathcal{N}(\symbf{0}, \sigma^2\symbf{I}_n)$, it follows that $\symbf{Z} = \frac{\symbf{Y} - \symbf{X}\symbf{\beta}}{\sigma} = \frac{\symbf{e}}{\sigma} \sim \mathcal{N}(\symbf{0}, \symbf{I}_n)$.
+
+Now, we wish to relate our estimators, $\hat{\symbf{\beta}}$ and $s^2$, to the forms $\symbf{B}\symbf{Z}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$, for $\symbf{A}$ idempotent.
+
+Since $\hat{\symbf{\beta}}=(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y}$, we have that
+
+$$
+\begin{aligned}
+\hat{\symbf{\beta}} - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta}
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y} - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta}, \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'(\symbf{Y} - \symbf{X}\symbf{\beta}), \\
+\frac{\hat{\symbf{\beta}} - \symbf{\beta}}{\sigma} 
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\frac{(\symbf{Y} - \symbf{X}\symbf{\beta})}{\sigma}, \\
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Z}, \\
+&=
+\symbf{B}\symbf{Z},
+\end{aligned}
+$$
+
+for $\symbf{B} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. Let $\hat{\symbf{\beta}}^{\ast} = \frac{\hat{\symbf{\beta}} - \symbf{\beta}}{\sigma}$.
+
+In the proof of the theorem showing that $\mathrm{E}[\hat{\sigma}^2_{\mathrm{MLE}}]\neq \sigma^2$, we found that
+
+$$
+n\hat{\sigma}^2_{\mathrm{MLE}} = \symbf{e}'\symbf{A}\symbf{e}
+$$
+
+for $\symbf{A}=\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. We also showed that $\symbf{A}$ is idempotent.
+
+From their definitions, we have that $\hat{\sigma}^2_{\mathrm{MLE}}=\frac{n-p}{n}s^2$. Substituting this into the above, it follows that 
+
+$$
+(n-p)s^2 = \symbf{e}'\symbf{A}\symbf{e}.
+$$
+
+Dividing through by $\sigma^2$, we then have that 
+
+$$
+\frac{n-p}{\sigma^2}s^2 = \left(\frac{\symbf{e}}{\sigma}\right)'\symbf{A}\left(\frac{\symbf{e}}{\sigma}\right) = \symbf{Z}'\symbf{A}\symbf{Z}.
+$$
+
+To show that $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are independent, we must show that $\symbf{B}\symbf{A} = \symbf{0}$ for $\symbf{B} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ and $\symbf{A}=\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. Accordingly,
+
+$$
+\begin{aligned}
+\symbf{B}\symbf{A} &= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\left(\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\right), \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}' - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}', \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}' - (\symbf{X}'\symbf{X})^{-1}\symbf{X}', \\
+&= \symbf{0}.
+\end{aligned}
+$$
+
+Therefore, applying Theorem 6, it follows that $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are independent. 
+
+Since $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are linearly related to $\hat{\symbf{\beta}}$ and $s^2$ by constant scalars, i.e., $\hat{\symbf{\beta}}^{\ast} = \frac{1}{\sigma}(\hat{\symbf{\beta}} - \symbf{\beta})$ and  $\symbf{Z}'\symbf{A}\symbf{Z} = \frac{n - p}{\sigma^2} s^2$, the independence of $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ implies the independence of $\hat{\symbf{\beta}}$ and $s^2$. 

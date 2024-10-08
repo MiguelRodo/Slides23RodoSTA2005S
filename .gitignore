@@ -21,11 +21,13 @@ SlidesRegW3S2AdditionalHypTest_files/**/*
 SCRATCH-2.qmd
 SCRATCH.qmd
 SlidesRegW3S1AdditionalProofs.log
-SlidesRegW3S1AdditionalProofs.qmd
 SlidesRegW3S1AdditionalProofs.tex
 SlidesRegW3S2HypTest.html
 SlidesRegW3S2HypTest_files/**/*
 Rplots.pdf
 
 SCRATCH-3.qmd
+
+SCRATCH.R
+SCRATCH_files/**
 
