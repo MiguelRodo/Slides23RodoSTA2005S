@@ -833,8 +833,8 @@ coef_tbl
 coef_tbl
 ```
 
-- However, the p-value for the effect of $B$ on $Y$ is not actually available.
-  - For $B$ to have no effect, we need that $\beta_{X} + \beta_{X:G} = 0$.
+- However, the p-value for the effect of $X$ on $Y$ for group "B" is not actually available.
+  - For $X$ to have no effect for group "B", we need that $\beta_{X} + \beta_{X:G} = 0$.
   - Here are the null and alternative hypotheses:
     - $H_0: \beta_{X} + \beta_{X:G} = 0$
     - $H_1: \beta_{X} + \beta_{X:G} \neq 0$
@@ -871,24 +871,28 @@ $$
 
 # Hypothesis testing: $a$-level categorical variable
 
-- *Does the effect of X depend on group?*:
-  - This is now a simultaneous test of all interaction terms:
-    - $H_0: \beta_{X:G_2} = \ldots = \beta_{X:G_a} = 0$
-    - $H_1$: At least one of the interaction terms is non-zero.
-  - Accordingly, we would use an $F$-test to assess the significance of the interaction terms.
-- *Does the effect of X depend on group $i$?*:
-  - This is a test of the interaction term corresponding to group $i$:
+- *Does the effect of $X$ depend on group $i$?*:
+  - This tests whether the effect of $X$ differs between group $i$ and the reference group:
     - $H_0: \beta_{X:G_i} = 0$
     - $H_1: \beta_{X:G_i} \neq 0$
   - We would use a $t$-test to assess the significance of the interaction term.
+- *Does the effect of $X$ depend on group?*:
+  - This tests whether the effect of $X$ is the same for all groups:
+    - $H_0: \beta_{X:G_2} = \ldots = \beta_{X:G_a} = 0$
+    - $H_1$: At least one of the interaction terms is non-zero.
+  - Accordingly, we would use an $F$-test to assess the significance of the interaction terms.
 
 # Hypothesis testing: $a$-level categorical variable
 
-- *Does X affect Y for group i?*:
-  - This is a test of the main effect of X for group $i$:
+- *Does $X$ affect Y for group $i$?*:
+  - This tests whether there is a non-zero slope for group $i$:
     - $H_0: \beta_X + \beta_{X:G_i} = 0$ 
     - $H_1: \beta_X + \beta_{X:G_i} \neq 0$
   - We would use a $t$-test to assess the significance of the main effect of X for group $i$, with the appropriate linear combination.
+- *Does group $i$ affect $Y$?*:
+  - This is a test for whether group $i$ has a different slope or intercept than the reference group:
+    - $H_0: \beta_{G_i} = \beta_{X:G_i} = 0$
+    - $H_1: \beta_{G_i} \neq 0$ or $\beta_{X:G_i} \neq 0$
 
 # Types of interaction terms {.smaller}
 

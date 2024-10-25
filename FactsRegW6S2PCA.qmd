@@ -1,0 +1,155 @@
+### Principal Component Analysis (PCA) Facts Document
+
+#### Purpose of PCA
+- **Dimensionality Reduction**: Simplifies complex datasets by reducing the number of variables while retaining most of the original variation.
+- **Pattern Recognition**: Identifies underlying structures and relationships within multivariate data.
+- **Data Visualization**: Facilitates the visualization of high-dimensional data in lower-dimensional spaces (e.g., 2D or 3D plots).
+- **Noise Reduction**: Filters out less significant components, enhancing signal clarity in the data.
+
+#### Definition of a Principal Component
+- **Linear Combination**: A principal component is a linear combination of the original variables.
+  - Mathematically: \( Y_k = a_{k1}X_1 + a_{k2}X_2 + \ldots + a_{kp}X_p \)
+- **Component Score Calculation**:
+  - Given coefficients \( \mathbf{a}_k = [a_{k1}, a_{k2}, \ldots, a_{kp}] \), the score for a principal component \( Y_k \) is calculated by multiplying each original variable \( X_i \) by its corresponding coefficient \( a_{ki} \) and summing the results.
+
+#### Relationship Between Principal Components
+- **Uncorrelated Components**: Each principal component is orthogonal (uncorrelated) to all other principal components.
+  - Ensures that each new axis captures unique variance in the data without overlap.
+  
+#### Choosing Coefficient Vectors
+- **Eigenvectors of Covariance Matrix**: The coefficients \( \mathbf{a}_k \) are the eigenvectors of the data's variance-covariance matrix \( \mathbf{\Sigma} \).
+- **Associated with Largest Eigenvalues**: Principal components are ordered by the magnitude of their corresponding eigenvalues, with the first principal component having the largest eigenvalue.
+
+#### Variance of Components
+- **Equal to Eigenvalues**:
+  - The variance of each principal component \( Y_k \) is equal to its corresponding eigenvalue \( \lambda_k \): 
+    \[
+    \text{Var}(Y_k) = \lambda_k
+    \]
+- **Total Variance**:
+  - The sum of the variances of all principal components equals the sum of the variances of the original variables:
+    \[
+    \sum_{k=1}^{p} \lambda_k = \sum_{i=1}^{p} \text{Var}(X_i)
+    \]
+- **Proportion of Variance Captured**:
+  - **First Component**:
+    \[
+    \frac{\lambda_1}{\sum_{j=1}^{p} \lambda_j}
+    \]
+  - **First \( k \) Components**:
+    \[
+    \frac{\sum_{i=1}^{k} \lambda_i}{\sum_{j=1}^{p} \lambda_j}
+    \]
+  
+#### Choosing the Number of Principal Components
+- **Eigenvalues Examination**:
+  - Select components associated with the largest eigenvalues, as they capture the most variance.
+  - Number of components chosen equals the number of non-zero eigenvalues if the covariance matrix is full rank.
+- **Scree Plot**:
+  - **Elbow Method**: Identify the "elbow" or "kink" point in the scree plot where the rate of variance explained sharply decreases.
+    - Components to the left of the elbow are retained.
+  - **Proportion of Variation**: Consider retaining enough components to capture a desired cumulative proportion of total variance (e.g., 80%).
+
+#### Eigenvalues in Variance-Covariance Matrix
+- **Quantity**:
+  - The number of eigenvalues equals the number of original variables (columns) in the data.
+- **Rank Consideration**:
+  - If the covariance matrix is not full rank (i.e., some variables are linearly dependent), some eigenvalues will be zero.
+
+#### Interpretation of Principal Components
+- **Understanding Loadings**:
+  - **Loadings** are the coefficients \( a_{ki} \) of the original variables in the principal components.
+  - High absolute values of loadings indicate that the corresponding variable significantly contributes to that principal component.
+- **Identifying Influential Variables**:
+  - Variables with large positive or negative loadings on a principal component are the primary drivers of that component.
+  - These variables help in interpreting the underlying structure captured by the component.
+- **Directionality**:
+  - The sign of the loadings indicates the direction of the relationship between the variable and the principal component.
+  - Positive loadings suggest a direct relationship, while negative loadings indicate an inverse relationship.
+- **Practical Example**:
+  - *Component 1* might have high positive loadings for variables related to size (e.g., height, weight), indicating it represents a general size factor.
+  - *Component 2* could have high positive loadings for specific traits and negative for others, distinguishing different patterns (e.g., speed vs. endurance).
+
+#### Rationale for Maximizing Variance
+- **Capturing Maximum Information**:
+  - Maximizing variance ensures that each principal component captures the largest possible amount of information (variation) from the data.
+  - This leads to a more efficient representation of the data with fewer components.
+- **Data Representation**:
+  - By focusing on components with the highest variance, PCA emphasizes the most significant patterns and relationships in the data.
+  - Less important variations, which might be due to noise or less relevant factors, are minimized.
+- **Mathematical Justification**:
+  - The eigenvectors corresponding to the largest eigenvalues point in the directions where the data varies the most.
+  - Aligning principal components with these directions ensures that the transformed data retains the most critical information.
+- **Practical Benefits**:
+  - **Simplification**: Reduces complexity without substantial loss of information, making subsequent analyses more manageable.
+  - **Noise Reduction**: Diminishes the impact of minor variations that may obscure meaningful patterns.
+  - **Enhanced Interpretability**: Focuses on the most influential factors, aiding in clearer insights and decision-making.
+
+#### Additional Notes
+- **Interpretation of Components**: Not covered in detail beyond identification of influential variables.
+- **Rationale for Maximizing Variance**: Now provided as per the expanded requirements.
+
+---
+
+# Q&A
+
+- What are the purposes of PCA:
+  - First?
+    - Dimensionality Reduction
+  - Second?
+    - Pattern Recognition
+  - Third?
+    - Data Visualization
+  - Fourth?
+    - Noise Reduction
+- What is a principal component:
+  - A linear combination of the original variables
+- How is a principal component score calculated:
+  - Multiplying each original variable by its corresponding coefficient and summing the results
+- How are principal components related to each other:
+  - They are uncorrelated
+- What are the coefficient vectors in PCA:
+  - Eigenvectors of the covariance matrix
+- What are the coefficient vectors associated with:
+  - Largest eigenvalues
+- What is the variance of each principal component equal to:
+  - Its corresponding eigenvalue
+- What is the sum of variances of all principal components equal to:
+  - The sum of variances of the original variables
+- How is the proportion of variance captured by the first component calculated:
+  - Its eigenvalue divided by the sum of all eigenvalues
+- How is the proportion of variance captured by the first k components calculated:
+  - Sum of their eigenvalues divided by the sum of all eigenvalues
+- How do we choose the number of principal components:
+  - By examining eigenvalues and using the scree plot
+- What method involves identifying the "elbow" in the scree plot:
+  - Elbow method
+- What does the elbow in the scree plot indicate:
+  - The number of principal components to retain
+- How many eigenvalues does a variance-covariance matrix have:
+  - Same as the number of original variables
+- What happens if the covariance matrix is not full rank:
+  - Some eigenvalues will be zero
+- What are the loadings in PCA:
+  - Coefficients of the original variables in the principal components
+- What indicates that a variable significantly contributes to a principal component:
+  - High absolute value of its loading
+- What do positive loadings suggest:
+  - A direct relationship with the principal component
+- What do negative loadings indicate:
+  - An inverse relationship with the principal component
+- What does maximizing variance ensure:
+  - Each principal component captures the largest possible amount of information
+- Why is maximizing variance important:
+  - It leads to a more efficient data representation with fewer components
+- What does maximizing variance minimize:
+  - The distance from the original data to the projection
+- What does focusing on components with the highest variance emphasize:
+  - The most significant patterns and relationships in the data
+- What is one practical benefit of PCA:
+  - Simplification of data
+- What is another practical benefit of PCA:
+  - Noise reduction
+- What is another practical benefit of PCA:
+  - Enhanced interpretability
+

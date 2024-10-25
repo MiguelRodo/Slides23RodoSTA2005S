@@ -1,0 +1,5912 @@
+---
+title: "Regression Prequisites"
+subtitle: "Slide deck 1: Linear algebra and statistical prerequisites"
+author: "Miguel Rodo (with credit to Prof Francesca Little and Yovna Junglee)"
+institute: University of Cape Town
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+# Prerequisites
+
+- This course will rely heavily on two areas you would have covered at some point:
+  - Statistical distributions
+  - Linear algebra
+
+# Univariate distributions related to the normal distribution
+
+- Since the response is normally distributed (and univariate), related univarite distributions arise frequently.
+
+- For example, squaring a standard normal random variable creates a $\chi^2_1$ random variable.
+
+<!-- \pause !-->
+
+- The image below summarises these relationships:
+
+\centering
+
+![](_data_raw/img/distributions.pdf){width=90%}
+
+
+# Relevance to later sections
+
+- The one-page document `NotesRegW1L3StatDbn` under `0. Prerequisites` contains more detail, and knowing its contents well is essential. We won't cover it here, though, as they're just facts you need to learn and have (at least partially) covered already.
+
+<!-- \pause !-->
+
+- Knowing immediately the distribution of a random variable that is a function of other random variable(s) will make the proofs and theory later much easier (if not easy).
+
+<!-- \pause !-->
+
+- The notes do describe how to derive the PDF of the multivariate normal distribution, but I won't ask that. Just know the PDF.
+
+# Linear algebra recap
+
+- Pages 1-20 of the notes cover a lot of mathematical ground.
+
+- I know everyone will have done linear algebra in MAM2000W, but we'll briefly recap some of the key concepts and facts, and point you to what is most important in the notes.
+
+# Overview of what's important
+
+- Key concepts
+  - Properties of vectors/matrices
+    - Idempotence
+    - Orthogonality
+    - Rank
+    - Invertability
+  - Function of matrices
+    - Trace
+  - Eigenvectors and eigenvalues
+    - The concept, rather than calculating them
+  - Special matrices
+    - Symmetric matrix
+    - Positive definite matrix
+
+# Less relevant sections of the notes
+
+- You won't typically have to calculate things by hand (e.g. the trace, eigenvalues or inverse), so focus simply on understanding the concepts and being able to make use of the properties.
+
+<!-- \pause !-->
+
+- Unless I'm much mistaken, determinants do not particularly come up. 
+
+<!-- \pause !-->
+
+- We also won't go through every single fact in the notes, but the ones that are most important. We'll mention any others as need be.
+
+# Employing linear algebra in \texttt{R}
+
+- The document `DemRegW1L3LinearAlgebra.html` (in `0. Prerequisites` on Vula) covers some of the key concepts above and shows you to perform the linear algebra in \texttt{R}.
+- You can kill two birds with one stone and improve both your coding and your linear algebra at the same time.
+
+# Notation for row and column vectors
+
+- Firstly, a brief point re notation: $\symbf{a}_{[i]}$ refers to the $i$-th **row** of $\symbf{A}$, whereas $\symbf{a}_{i}$ refers to the $i$-th ***column** of $\symbf{A}$.
+- For example, if $\symbf{A}=\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$, then $\symbf{a}_{[1]}=\begin{bmatrix} 1 \\ 2\end{bmatrix}$ and $\symbf{a}_1=\begin{bmatrix} 1 \\ 3 \end{bmatrix}$.
+- Note that, despite that $\symbf{a}_{[1]}$ is from a row, it's still written as a column vector. This is just a convention that whether we talk about a row/column of a matrix from a matrix (i.e. it's now considered on its own, outside the matrix structure), then we think of it as a column vector.
+- There are likely deviations from the above conventions in the notes and slides, but we'll point those out when we come across them (if they're not fixed beforehand).
+
+# Matrix multiplication
+
+- In $\symbf{AB}$, the $ij$-th element is the dot product of $i$-th row of $\symbf{A}$ and the the $j$-th column of $\symbf{B}$, i.e. $(\symbf{AB})_{ij} = \symbf{a}_{[i]}'\symbf{b}_{j}$. We can also write $\symbf{a}_{[i]}'\symbf{b}_{j}$ as $\symbf{a}_{[i]}\cdot\symbf{b}_{j}$
+
+- For example, if both $\symbf{A}$ and $\symbf{B}$ are $3\times 3$, then 
+
+
+$$
+\symbf{AB}=
+\begin{bmatrix}
+\symbf{a}_{[1]}'\symbf{b}_{1} & \symbf{a}_{[1]}'\symbf{b}_{2} & \symbf{a}_{[1]}'\symbf{b}_{3} \\
+\symbf{a}_{[2]}'\symbf{b}_{1} & \symbf{a}_{[2]}'\symbf{b}_{2} & \symbf{a}_{[2]}'\symbf{b}_{3} \\
+\symbf{a}_{[3]}'\symbf{b}_{1} & \symbf{a}_{[3]}'\symbf{b}_{2} & \symbf{a}_{[3]}'\symbf{b}_{3}
+\end{bmatrix}
+$$
+
+
+# Block matrix multiplication I
+
+- Sometimes certain sub-matrices within the matrices we're multipling ($\symbf{A}$ or $\symbf{B}$) have particular structures.
+- For example, suppose
+
+$$
+\symbf{A}_{3\times 3} =
+\begin{bmatrix}
+\symbf{I}_2 & \symbf{0}_{2\times1} \\
+\symbf{0}_{1\times2} & 4
+\end{bmatrix}
+$$
+
+# Block matrix multiplication II
+
+- Then, if we calculate $\symbf{B}$, we might want to partition $\symbf{B}$ in a way to allow use to simply use the sub-matrices of $\symbf{A}$ rather than working out all the dot products. So, let's then then set
+
+$$
+\symbf{B}_{3\times2} =
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+$$
+
+- Then we essentially treat each sub-matrix as elements in a dot product - the same thing we do in standard matrix multiplication. The matrices must then just be conformable (i.e. line up so that the multiplication works out).
+
+# Block matrix multiplication III
+
+- Continuing the previous example, we calculate $\symbf{AB}$ as follows:
+
+$$
+\symbf{AB} =
+\begin{bmatrix}
+\symbf{I}_2 & \symbf{0}_{2\times1} \\
+\symbf{0}_{1\times2} & 4
+\end{bmatrix}
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+=
+\begin{bmatrix}
+\symbf{I}_2\symbf{B}^1_{2\times 2} + \symbf{0}_{2\times1} \symbf{B}^2_{1\times 2}\\
+\symbf{0}_{1\times2}\symbf{B}^1_{2\times 2}  + 4\symbf{B}^2_{1\times 2}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\symbf{B}^1_{2\times 2} \\
+4\symbf{B}^2_{1\times 2} 
+\end{bmatrix}
+$$
+
+- This was significantly easier to write out by hand than all those dot products as we made use of the identity matrix and zero matrices returning the multipled matrix or a zero matrix.
+- This comes up later on, for example, when we consider idempotent matrices, as the factorisation of an idempotent matrix involves a block matrix.
+
+# Orthogonality
+
+- Two vectors, $\symbf{x}, \symbf{y}$ are orthogonal if:
+  - Their dot product is equal to zero, i.e. $\symbf{x}^T \symbf{y} = \sum x_iy_i = 0$
+  - Or equivalently, the angle between the vectors is 90 degrees.
+  - For example, $\begin{bmatrix} 1 \\ 2 \end{bmatrix}$ and $\begin{bmatrix} -2 \\ 1 \end{bmatrix}$ are orthogonal.
+
+<!-- \pause !-->
+
+- A matrix is orthogonal if it is:
+  - Square and every column is orthogonal to every other column
+  - For example:
+    - All diagonal matrices are orthogonal.
+    - The matrix $\begin{bmatrix} 1 & -2 & 0 \\ -2 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ is orthogonal.
+
+<!-- \pause !-->
+
+- A matrix is orthonormal if it is:
+  - Orthogonal and every column has unit length. 
+  - For example, the identify matrix is orthonormal.
+  - Any orthogonal matrix is orthonormal if you divide each column by its length.
+  <!-- \pause !-->
+
+  - For orthonormal matrices, the inverse is the transpose, i.e. $\symbf{A}^{-1}=\symbf{A}'$.
+
+# Where does orthonormality factor in?
+
+- Well, later on we have that any square symmetric matrix can be written as
+
+$$
+\symbf{P}\symbf{\Lambda}\symbf{P}'
+$$
+
+- where $\symbf{P}$ is an orthonormal matrix and $\symbf{\Lambda}$ is a diagonal matrix.
+
+<!-- \pause !-->
+
+- Similar result holds for idempotent matrices, i.e. a matrix which when squared equals itself ($\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$). 
+
+<!-- \pause !-->
+
+- A final example is that the residual vector ($\symbf{e}=\symbf{y}-\hat{\symbf{y}}$) is orthogonal to the vector of fitted values ($\hat{\symbf{y}}$) as well as the columns of the model matrix ($\symbf{X}$).
+
+# Trace
+
+- The trace is the sum of diagonal elements of a matrix, i.e. $\mathrm{tr}(\begin{bmatrix}a & b \\ c & d \end{bmatrix}) = a + d$.
+
+<!-- \pause !-->
+
+- It's a simple calculation, but the following properties are useful. For any two matrices $\symbf{A}:p\times q$ and $\symbf{B}:q\times p$:
+  - $\mathrm{tr}(\symbf{A}\symbf{B})= \mathrm{tr}(\symbf{B}\symbf{A})$
+
+  <!-- \pause !-->
+
+  - Since matrix multiplication is associative ($\symbf{A}(\symbf{B}\symbf{C})=(\symbf{A}\symbf{B})\symbf{C}$), the above implies that (when the dimensions match between the matrices, i.e. that they're conformable again) $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$. This is known as the cyclic property of traces.
+
+# Cyclic trace property I
+
+- To repeat, the cyclic trace property is that for conformable matrices $\symbf{A}$, $\symbf{B}$ and $\symbf{C}$ we have that $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$.
+- Note that it is the *cyclic* trace property, not the *any-order* trace property. So, we don't have (in general) that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BAC})$.
+
+# Cyclic trace property II
+
+- The reason we have that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{CAB})=\mathrm{tr}(\symbf{BCA})$ is because $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ (just to change the lettering). We can just group two matrices in $\symbf{ABC}$ as we like, e.g. $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}((\symbf{AB})\symbf{C})$, to which we then apply $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ to get $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{CAB})$. We then can re-apply this to get $\mathrm{tr}(\symbf{CAB})=\mathrm{tr}(\symbf{BCA})$.
+
+# Cyclic trace property III
+
+- Now, we could group the second two matrices rather than the first, i.e. use $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{A}(\symbf{BC}))$. Doing so and applying the same steps as above, we get $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BCA})=\mathrm{tr}(\symbf{CAB})$. So we get nothing new, and re-applying  $\mathrm{tr}(\symbf{EF})=\mathrm{tr}(\symbf{FE})$ in either case gets us back to  $\mathrm{tr}(\symbf{ABC})$, meaning we're out of options.
+- So, it's less that we prove that $\mathrm{tr}(\symbf{ABC})=\mathrm{tr}(\symbf{BAC})$ is generally false (it's sometimes true, e.g. if the matrices are all diagonal) than that it doesn't follow from the line of reasoning we used to get the cyclic trace property. 
+
+# Rank I
+
+- Rank can be thought of in various ways:
+<!-- \pause !-->
+
+  - The size of a basis of the columns (or rows). 
+    - A basis is the minimal set of vectors that span the column (or row) space.
+    - For example, a basis of the column space of $\symbf{A}=\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix}$ is $\left\{\begin{bmatrix} 1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \end{bmatrix}\right\}$. So the rank is 2.
+    <!-- \pause !-->
+
+  - The number of linearly independent columns (or rows).
+    - For example, in $\symbf{A}$ above clearly the first two columns are independent, i.e. one is not a multiple of the other. However, the third column is equal to the sum of the first two columns. So the rank is 2. 
+
+<!-- \pause !-->
+
+- A matrix is full rank when it is square and its rank is equal to the number of columns/rows. 
+  - The key part here is then that the inverse exists, i.e. if $\symbf{A}$ is full rank then $\symbf{A}^{-1}$ exists where $\symbf{A}\symbf{A}^{-1} = \symbf{I}$.
+  
+# Rank II
+
+- The rank cannot be any higher than the smaller of the number of columns or rows (i.e. maximum possible rank of a rectangular matrix is its "shorter" dimension).
+  - Where the rank of a matrix is equal to the number of columns, we say that it is full column rank. Similarly for rows. 
+  - For example, $\symbf{A}=\begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 1 \end{bmatrix}$ is full row rank but not full column rank.
+  <!-- \pause !-->
+
+- We have that $\mathrm{rank}(A)=\mathrm{rank}(A')$. In addition, it can be shown that $\mathrm{rank}(A)=\mathrm{rank}(AA')=\mathrm{rank}(A'A)$.
+  - This comes into the course, as for a centred matrix $\symbf{Xc}$ the covariance matrix is (up until a factor) $\symbf{X}'\symbf{X}$.
+
+# Eigenvectors and eigenvalues
+
+- For a given matrix $\symbf{A}$, an eigenvector $\symbf{x}$ is a unit-length (by convention) vector such that $\symbf{A}\symbf{x}=\lambda\symbf{x}$.
+<!-- \pause !-->
+
+- Eigenvectors and eigenvalues are central to linear algebra, but the main way they come into the course is in appearing in useful properties of covariance matrices.
+
+<!-- \pause !-->
+
+- You won't need to calculate them by hand (apart from the very first question in the first tutorial).
+
+# Symmetric and positive-definite matrices
+
+- A matrix $\symbf{A}$ is symmetric if $\symbf{A}=\symbf{A}'$.
+- Clearly, it can only apply to square matrices.
+
+<!-- \pause !-->
+
+- A very useful factorisation of a square matrix is as follows. Any symmetric matrix can be written as 
+
+$$
+\symbf{A}=\symbf{P}\symbf{\Lambda}\symbf{P}',
+$$
+
+- where the columns of $\symbf{P}$ are an orthonormal set of eigenvectors and $\symbf{\Lambda}$ is a diagonal matrix of the ordered eigenvalues. 
+
+- For example, the matrix $\symbf{A}=\begin{bmatrix} 1 & 2 \\ 2 & 3 \end{bmatrix}= \begin{bmatrix} 0.53 & -0.85 \\ 0.85 & 0.53 \end{bmatrix} \begin{bmatrix} 4.32 & 0 \\ 0 & -0.24 \end{bmatrix}  \begin{bmatrix} 0.53 & 0.85 \\ -0.85 & 0.53 \end{bmatrix}$ (up to rounding). 
+
+# Positive definite matrices
+
+- A positive definite matrix is a symmetric matrix where all the eigenvalues are positive.
+<!-- \pause !-->
+
+- This is equivalent to the statement that there for any vector $\symbf{x}$, we have that $\symbf{x}'\symbf{A}\symbf{x}>0$. 
+
+<!-- \pause !-->
+
+- The way this ties into the course is that the covariance matrix is positive definite. 
+
+<!-- \pause !-->
+
+- You can see this intuitively by considering the variance of a linear combination of some random vector, $\symbf{X}$ with variance covariance matrix $\symbf{\Sigma}$. The variance of the linear combination $\symbf{a}'\symbf{X}$ is $\symbf{a}'\symbf{\Sigma}\symbf{a}$. Clearly this cannot be 0 or less, since it is the sum of squared numbers, and so this always exceeds 0. Thus $\symbf{\Sigma}$ is positive definite.
+
+# Idempotency 
+
+- As stated earlier, a matrix is idempotent if it is equal to itself when squared ($\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$). 
+
+<!-- \pause !-->
+
+- The eigenvalues of an idempotent matrix are always 0 and 1 (why?).
+
+<!-- \pause !-->
+
+- It can be shown that (similarly to symmetric matrices) idempotent matrices can be factored in the form
+
+$$
+\symbf{P}\symbf{\Lambda}\symbf{P}'
+$$
+
+- where $\symbf{P}$ is an orthonormal matrix and $\symbf{\Lambda}$ is a diagonal matrix. In this case, 
+
+$$
+\mathbf{\Lambda}=\begin{bmatrix} \symbf{I}_r & 0 \\ 0 & 0 \end{bmatrix}.
+$$
+
+- where $r$ is the rank and $\symbf{I}_r$ is an identity matrix of rank $r$, as we already know the eigenvalues.
+
+<!-- \pause !-->
+
+- In addition, if a matrix $\mathbf{A}$ is idempotent, then $\symbf{I} - \symbf{A}$ is also idempotent.
+
+# Idempotent matrices in the course
+
+- Idempotent matrices arise as the matrix $\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ is idempotent, and $\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ is the matrix we use to calculate fitted values ($\hat{\symbf{y}}_i$). 
+- This will imply that residuals are calculated using $\symbf{I}-\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$, which leads to the result that residuals are orthogonal to fitted values. ---
+title: "Regression Week I: Introduction and foundations to GLMs"
+subtitle: "Slide deck I: Course introduction and motivation"
+author: Miguel Rodo
+institute: University of Cape Town
+date: 22 July 2024
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+```
+
+# What is the purpose of the regression section?
+
+<!-- \pause !-->
+
+- To make you a useful statistician!
+
+<!-- \pause !-->
+
+- Well, to really get you on your way
+  - First year (STA1006S) is useful, but easily replicable by non-statisticans
+  - STA2004F is (despite all the effort you put in) not immediately of great practical use
+  - The practical skills and mathematical understanding you'll gain here are not easily replicable and can actually be used to assist decision-making
+
+<!-- \pause !-->
+
+## Key outcomes
+
+- Mathematical understanding of simplest regression model
+- Ability to code up an end-to-end modelling analysis
+  - Reading in data
+  - Analysing data
+  - Displaying and interpreting results
+
+# Lecture schedule
+
+```{r }
+#| echo: false
+#| results: asis
+#| label: tab-schedule
+schedule_tbl <- tibble::tibble(
+  Weeks = c("1", "2-6", "Vac", "7-11", "12"),
+  `Start date` = c("22 Jul", "29 Jul", "30 Jul", "9 Sep", "14 Oct"),
+  `End date` = c("26 Jul", "30 Aug", "8 Sep", "11 Oct", "18 Oct"),
+  Section = c("Regression", "Experimental design", "")[
+    c(1, 2, 3, 1, 2)
+  ]
+)
+```
+
+```{r}
+#| echo: false
+#| results: asis
+#| label: tab-schedule-latex
+#| eval: true
+# Create and display the table
+knitr::kable(schedule_tbl, format = "latex", booktabs = TRUE) |>
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+# Contributions to regression section mark
+
+```{r}
+#| include: false
+# Create the data frame
+plot_tbl <- data.frame(
+  pos = 1:3 |> rev(),
+  percentage = c(70, 15, 15) |> rev(),
+  category = 1:3 |> rev() |> as.character()
+)
+
+plot_tbl_txt <- tibble::tibble(
+  x = 1:3,
+  y = c(7.5, 7.5, 35) |> rev(),
+  txt = c("70%", "15%", "15%")
+)
+
+plot_tbl_date <- tibble::tibble(
+  x = 2:3,
+  y = c(17, 17),
+  txt = c("10 October", "30 September")
+)
+
+cat_lab_vec <- c("Assignment", "Test", "Exam") |> rev()
+
+# Create the plot
+p <- ggplot(plot_tbl, aes(x = pos, y = percentage, fill = category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_x_continuous(
+    labels = cat_lab_vec,
+    breaks = 1:3
+  ) +
+  # geom_hline(yintercept = c(15, 70), linetype = "dashed") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1) # ,
+    # breaks = seq(0, 100, 10)
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+     axis.title.y = element_blank(),
+     axis.title.x = element_blank(),
+    # axis.ticks.y = element_blank(),
+    # axis.text.y = element_blank(),
+    legend.position = "none"
+  ) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) + #+
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) +
+  geom_text(
+    data = plot_tbl_txt, aes(x = x, y = y, label = txt),
+    size = 5, inherit.aes = FALSE
+    ) +
+  geom_text(
+    data = plot_tbl_date, aes(x = x, y = y, label = txt),
+    size = 5, inherit.aes = FALSE, hjust = 0
+    )
+
+path_p <- projr::projr_path_get(
+  "cache", "fig", "w1s1", "p-assessment.png"
+)
+cowplot::ggsave2(
+  path_p, p,
+  width = 15, height = 8, units = "cm"
+)
+```
+
+```{r}
+#| results: asis
+#| label: p-assessment
+knitr::include_graphics(path_p)
+```
+
+
+# Learning resources: content
+
+- Regression notes:
+  - Location: `Module 1: Regression/More regression resources/Notes/NotesReg.pdf`
+  - Printed copies available at stats reception later this week
+- Slides:
+  - Location: in `Slides` folder under each week's tab
+- Lecture recordings:
+  - Automatically uploaded to `Lecture Videos/Lecture Videos 2024` tab
+
+# Learning resources: testing I
+
+::::{.columns}
+
+:::{.column width=50%}
+
+- Q&A docs:
+  - Comprehensive set of short questions on each slide deck's content
+  - A review of all the facts, essentially
+  - Will be in the `Slides` folder for each week's content
+    - For example, `QARegSlidesW0S1PrereqLA.pdf` is in `Introduction/Slides` folder alongside `SlidesRegW0S1PrereqLA.pdf`
+  - *Note*: these are not exam-style questions, but rather a way to a) remember the content, and b) check your understanding
+
+
+:::
+
+
+\pause
+
+:::{.column width=50%}
+
+
+- Tutorials
+  - On Amathuba (`Module 1: Regression/More regression resources/Tutorials`)
+
+\pause
+
+- Question bank:
+  - Appropriate questions over and above the tutorials
+  - Aim to progress from simpler to harder questions within each section
+  - On Amathuba (`Module 1: Regression/More regression resources/Question bank`)
+  - Will be updated throughout the term
+
+:::
+
+::::
+
+# Advised learning/revision route for exam and test
+
+- Attend lectures
+- After each lecture, do relevant Q&A content
+- Do tutorials (and attend them)
+- Do question bank questions
+
+# Introduction to `R`
+
+- Online lecture:
+  - Day: Wednesday 24 July
+  - Time: 2pm
+  - Link: [MS Teams](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NjhjYTBlYjgtNDk3Ni00MGUxLWEyYmQtZGM4YTM5NjljNjUy%40thread.v2/0?context=%7b%22Tid%22%3a%2292454335-564e-4ccf-b0b0-24445b8c03f7%22%2c%22Oid%22%3a%22f479858a-bdb3-4e57-9ee4-f624b487e11f%22%7d)
+
+\pause
+
+- Practicals:
+  - Days: Thursday and Friday, 25 and 26 July
+  - Times: 2-3pm and 3-4pm
+  - Category: `Week 1 Computer Lab Session - Intro to R`
+
+# Practicals
+
+- In a computer lab, with a tutor, who will walk through coding up part of a regression analysis
+- For example:
+  - Fitting a regression model
+  - Validating a regression model
+
+# Sign up for tutorials and practicals
+
+- Frequency: weekly
+- Start: week 2
+- Signup:
+  - `Amathuba` >> `Course info` >> `Groups`
+  - Categories;
+    - Practical: `Computer Lab Session` and `STA2005SLabSession 5`
+    - Tutorial: `STA2005S Tutorials`
+
+# Office hours
+
+- Room: 5.52 PD Hahn (fifth floor, down the corridor from stats reception)
+- Time: 10-12
+- Day: Thursday
+- Purpose: any content-related questions
+- May also email for other times, if need be
+
+\pause
+
+- Email:
+  - Address: `miguel.rodo@uct.ac.za`
+  - Purpose: any admin-related issues
+
+
+# What is regression? {.smaller}
+
+::::{.columns}
+
+:::{.column width=50%}
+
+- $Y\sim f(X,\epsilon)$:
+  - $Y$ is the response variable (dependent variable)
+  - $X$ contains the explanatory variable(s) (or independent variables) 
+  - $\epsilon$ is the random variable
+  - The function `f` describes how they relate
+  - $Y$ cannot be categorical
+
+:::
+
+:::{.column width=50%}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{_data_raw/img/reg_img.png}
+\end{figure}
+:::
+
+::::
+
+# Regression versus the correlation coefficient: round one
+
+- Image we work out what the correlation is between advertising spending and revenue.
+- In what way might the correlation coefficient be deficient?
+
+# Regression versus the correlation coefficient round two
+
+- Now, suppose a doctor wants to decide whether a six-month old baby has a healthy weight.
+- Why would the correlation coefficient not be useful?
+
+# Regression versus the $t$-test: round one
+
+- Let's say you want to understand the relationship between blood pressure (the dependent variable) and taking a drug (the independent variable).
+- Also assert that more males took the drug than females.
+- Suppose we perform a $t$-test. How might someone object?
+
+# Regression versus the $t$-test: round two
+
+- Suppose that we want to model blood pressure against BMI.
+- What's the problem with the $t$-test in this case?
+
+# Toolbox
+
+\centering
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{_data_raw/img/toolbox-wide-edit-removebg.png}
+\end{figure}
+
+<!--
+- Points: simply adding to your statistical toolbox
+- Have to deal with real life, so need multiple approaches with their own pros and cons
+!-->
+
+# Assumptions
+
+::::{.columns}
+:::{.column width=70%}
+```{r}
+# ==========================
+# distribution
+# ==========================
+# density
+set.seed(3)
+# generate data from a normal distrbution from a range of x values
+p_normal <- ggplot(
+  tibble::tibble(x = rnorm(1000, 200, 5)),
+  aes(x = x)
+) +
+  geom_density(fill = "#a6cee3", adjust = 3, col = "gray65") +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_normal_non <- ggplot(
+  tibble::tibble(x = rpois(1000, 200)^6),
+  aes(x = x)
+) +
+  geom_density(fill = "#b2df8a", adjust = 3, col = "gray65") +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+# ==========================
+# relationship
+# ==========================
+
+set.seed(5)
+n_elem <- 1e2
+plot_tbl <- tibble::tibble(
+  x = c(1, runif(n_elem, 1, 10), 10)
+) |>
+  dplyr::mutate(
+    y = 2 + 3 * x + rnorm(n_elem + 2, 0, 2),
+    y2 = 2 + 3 * x^3 + rnorm(n_elem + 2, 0, 300),
+    fit = 2 + 3 * x,
+    fit2 = 2 + 3 * x^3
+  )
+
+p_rel_linear <- ggplot(plot_tbl, aes(x = x, y = y)) +
+  geom_point(col = "#a6cee3") +
+  geom_line(aes(y = fit), color = "gray15", size = 1) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_rel_quad <- ggplot(plot_tbl, aes(x = x, y = y2)) +
+  geom_point(col = "#b2df8a") +
+  geom_line(aes(y = fit2), color = "gray15", size = 1) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+# ==========================
+# variance
+# ==========================
+
+set.seed(6)
+n_elem <- 3e2
+plot_tbl <- tibble::tibble(
+  x = c(1, runif(n_elem, 1, 10), 10)
+) |>
+  dplyr::mutate(
+    y = 1 * x + rnorm(n_elem + 2, 0, 2),
+    y2 = (1 * x + rpois(n_elem + 2, x)^2)^0.9,
+    y2 = y2 + rnorm(n_elem + 2, 0, 2)
+  )
+
+p_var_constant <- ggplot(plot_tbl, aes(x = x, y = y)) +
+  geom_point(col = "#a6cee3") +
+  geom_smooth(
+    method = "lm", se = FALSE, col = "gray15", size = 1,
+    formula = y ~ x
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+p_var_increasing <- ggplot(plot_tbl, aes(x = x, y = y2)) +
+  geom_point(col = "#b2df8a") +
+ geom_smooth(
+    method = "lm", se = FALSE, col = "gray15", size = 1,
+    formula = y ~ x
+  ) +
+  cowplot::theme_cowplot() +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+
+
+p_grid <- cowplot::plot_grid(
+  p_normal, p_rel_linear, p_var_constant,
+p_normal_non, p_rel_quad, p_var_increasing,
+  ncol = 3,
+  labels = c("Distribution", "Relationship", "Variance"),
+  label_size = 18
+)
+path_p_grid <- projr::projr_path_get(
+  "cache", "fig", "w1s1", "p-assumptions.png"
+)
+cowplot::ggsave2(
+  path_p_grid, p_grid,
+  width = 19, height = 14, units = "cm"
+)
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_grid)
+```
+:::
+
+:::{.column width=30%}
+
+\vskip 1cm
+
+- In our course, we consider **linear regression** only:
+  - Normally distributed response
+  - Linear relationship with response variables
+  - Constant variance
+
+:::
+
+::::
+
+# Regression becomes highly flexible
+
+- Non-constant variance: mean-variance relationship, dependent on predictor variables, etc.
+- Correlated errors:
+  - within subsets of observations, e.g. measurements from the same individual, or
+  - between "nearby" observations, e.g. time-series or spatial data
+- Non-normally distributed data, e.g. count data
+- Categorial dependent vairables, e.g. disease status
+
+# Mathematical foundations to linear regression
+
+::::{.columns}
+
+:::{.column width=50%}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{_data_raw/img/iceberg.png}
+\end{figure}
+
+:::
+
+:::{.column width=50%}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth]{_data_raw/img/lm_output.png}
+\end{figure}
+
+:::
+
+::::
+
+# Linear algebra and statistical theory prerequisites
+
+- Under `Module 1: Regression/Introduction/Prerequisites`:
+  - `NotesRegW0StatDbn.pdf`
+    - Facts about normal, $t$ and $F$ distributions
+  - `SlidesRegW0S1PrereqLA.pdf`
+    - Essential linear algebra 
+  - `QARegSlidesW0S1PrereqLA.pdf`
+    - Questions and answers on the linear algebra content
+  - Pre-recorded lecture video
+    - Will upload one in the next day or two
+  - `DemRegW0LinearAlgebra.html`
+    - Implementing linear algebra in `R`
+  - `TutReg1IntroMVNQuestions.pdf`
+    - The first few questions in this tutorial are about linear algebra
+  
+
+---
+title: "Regression Week I: Introduction and foundations to GLMs"
+subtitle: "Lecture II: General course advice and coding example"
+author: "Miguel Rodo (with credit to Prof Francesca Little and Yovna Junglee)"
+institute: University of Cape Town
+date: 23 July 2024
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+# Notes from last year's tutors 
+
+- Learning to code up analyses is perhaps the most useful part of the course.
+- Don't underestimate the course - passing STA2004F is great, but this is a lot of content. Marks are often terrible. 
+- Be wary of the assignments - they count as much as the tests, and take a long time. 
+- The exam counts 70%, so don't presume that assignments and tests will carry you through. Focus on understanding the content.
+- Questions to rehearse proofs are free marks. 
+- Experimental design in term four tends to be more difficult, so bank regression marks.
+
+# For the remainder of this lecture
+
+- Introductory code example of a linear regression
+
+# Regression section outline
+
+- **Week one**: statistical and mathematical prerequisites (statistical distributions and linear algebra), and useful proofs regarding the multivariate normal distribution
+- **Week two**: General linear model introduction (formulation, estimation and parameter distributions)
+- **Week three**: General linear model inference (confidence intervals and hypothesis testing)
+- **Week four**: ANOVA and model checking
+- **Week five**: Variable selection, Gauss-Markov theorem and data transformation
+- **Week six**: PCA and bootstrapping
+
+---
+title: "Regression Week I: Introduction and foundations to GLMs"
+subtitle: "Lecture IV: The normal distribution and related theorems"
+author: "Yovna Junglee (edited by Miguel Rodo)"
+institute: University of Cape Town
+aspectratio: 169
+theme: Boadilla
+format:
+  beamer:
+    embed-resources: true
+    colorlinks: true
+    include-in-header:
+      file: preamble.tex
+    classoption: "aspectratio=169"
+---
+
+# The centrality of the normal distribution
+
+- As mentioned in the demonstration linear regression analysis, we typically assume that the errors are normally distributed.
+
+<!-- \pause !-->
+
+- This assumption leads to our parameters of interest (i.e. $\beta_0$, $\beta_1$, $\beta_2$, $\ldots$) having a normal distribution (which we'll show next week). 
+- Therefore both our criterion for estimating the parameters as well as our inference regarding the parameters strongly depend on the normal distribution:
+
+```{r, include = FALSE}
+library(tibble)
+library(dplyr)
+
+data_raw_ad <- read.csv("_data_raw/Advertising.csv", header = TRUE)
+
+# Convert the raw data to a tibble for easier manipulation
+data_raw_ad <- as_tibble(data_raw_ad)
+
+data_tidy_ad <- data_raw_ad |>
+  dplyr::select(-X)
+data_tidy_ad[1, ]
+
+fit_tv <- lm(sales ~ TV, data = data_tidy_ad)
+```
+
+```{r , eval = FALSE, echo = FALSE}
+summary(fit_tv)
+```
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{_data_raw/img/lm_output.png}
+\end{figure}
+
+
+# Lecture outline
+
+- Describe the PDFs and MGFs of the univariate and multivariate normal distributions
+- Prove several results regarding the multivariate normal (MVN) distributions:
+  - Linear combination of a MVN random variable is MVN
+  - MVN composed of MVNs
+  - Relationship between MVN and a $\chi^2$ random variable
+
+# Exclusions compared to to previous years' courses
+
+- The following appear in previous years' slides and tests (and in some cases, the notes), but won't be examined here:
+  - Deriving MVN distribution
+  - Deriving MVN MGF
+  - Determining mean and variance of an MVN distribution given the exponent
+
+<!-- \pause !-->
+
+- The reasons are as follows:
+  - Later results complete without them
+  - Learning them well does not particularly help with other course content
+  - Overlap with STA2004F
+  - Adds significantly heavier calculus component
+
+<!-- \pause !-->
+
+- Note that being apply to make use of the MGF is still important.
+- In general, however, the foundational mathematical facts and ideas of the coure are in linear algebra and the statistical distributions connected to the normal.
+
+
+# The univariate normal distribution
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+\vspace{1.15cm}
+
+::: {.def-univ_normal_dbn}
+
+## Definition
+
+If $X \sim \mathcal{N}(\mu,\sigma^2)$, then the probability density function is given as:
+
+$$f(x)= \frac{1}{\sqrt{2 \pi \sigma^2}}\exp\left( -\frac{(x-\mu)^2}{2 \sigma^2} \right)$$
+where $E(X)= \mu$ and $\textrm{Var}(X)=\sigma^2$ for $x\in\mathbb{R}$.
+:::
+
+:::
+
+:::{.column width="50%"}
+
+\vspace{0cm}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{_data_raw/img/rnorm_0_1.pdf}
+    \caption{$X \sim \mathcal{N}(0,1)$}
+    \label{fig:sims_rnorm}
+\end{figure}
+
+
+:::
+
+::::---
+title: "Regression Week III: Inference"
+subtitle: "Additional Proofs"
+author: "Miguel Rodo (with credit to Prof Francesca Little and the class notes)"
+institute: "University of Cape Town"
+format:
+  pdf:
+    embed-resources: true
+    include-in-header:
+      text: |
+        \usepackage{graphicx}
+        \usepackage{booktabs}
+        \usepackage{amsmath}
+        \usepackage{url}
+        \usepackage{subfigure}
+        \usepackage{xcolor}
+        \usepackage{amsthm,amsfonts,amssymb,amscd,amsxtra}
+        \usepackage{pgfpages}
+        \usepackage{animate}
+        \usepackage{mathpazo}
+        \usepackage{unicode-math}
+---
+
+# Theorem 6
+
+**Statement:**
+
+Let $\symbf{Y} \in \mathbb{R}^n$ be a random vector with $\symbf{Y} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$. Let $\symbf{A}$ be an $n \times n$ symmetric idempotent matrix of rank $r$, and let $\symbf{B}$ be a $k \times n$ matrix such that $\symbf{B} \symbf{A} = \symbf{0}$. Then the linear form $\symbf{B} \symbf{Y}$ is independent of the quadratic form $\symbf{Y}' \symbf{A} \symbf{Y}$.
+
+## Proof
+
+**1. Diagonalization of $\symbf{A}$:**
+
+Since $\symbf{A}$ is symmetric and idempotent, it can be diagonalized by an orthogonal matrix $\symbf{P}$:
+
+$$
+\symbf{P}' \symbf{A} \symbf{P} = \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix},
+$$
+
+where $r = \operatorname{rank}(\symbf{A})$.
+
+**2. Transformation of $\symbf{Y}$:**
+
+Define $\symbf{Z} = \symbf{P}' \symbf{Y}$. Since $\symbf{P}$ is orthogonal and $\symbf{Y} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, it follows that $\symbf{Z} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$.
+
+**3. Expression of the Quadratic Form:**
+
+Compute the quadratic form using $\symbf{Z}$:
+
+$$
+\symbf{Y}' \symbf{A} \symbf{Y} = \symbf{Z}' \symbf{P}' \symbf{A} \symbf{P} \symbf{Z} = \symbf{Z}' \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} \symbf{Z}.
+$$
+
+Partition $\symbf{Z}$ accordingly:
+
+$$
+\symbf{Z} = \begin{bmatrix}
+\symbf{Z}_1 \\
+\symbf{Z}_2
+\end{bmatrix},
+$$
+
+where $\symbf{Z}_1 \in \mathbb{R}^r$ and $\symbf{Z}_2 \in \mathbb{R}^{n - r}$.
+
+Thus, the quadratic form simplifies to:
+
+$$
+\symbf{Y}' \symbf{A} \symbf{Y} = \symbf{Z}_1' \symbf{I}_r \symbf{Z}_1 = \symbf{Z}_1' \symbf{Z}_1 = \sum_{i=1}^r Z_i^2.
+$$
+
+**Conclusion:** The quadratic form $\symbf{Y}' \symbf{A} \symbf{Y}$ depends only on $\symbf{Z}_1$.
+
+**4. Expression of the Linear Form:**
+
+We have $\symbf{B} \symbf{A} = \symbf{0}$, so:
+
+$$
+\symbf{B} \symbf{A} \symbf{P} = \symbf{0}.
+$$
+
+Since $\symbf{P}' \symbf{A} \symbf{P} = \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix}$, it follows that:
+
+$$
+\symbf{B} \symbf{A} \symbf{P} = \symbf{B} \symbf{P} \symbf{P}' \symbf{A} \symbf{P} = \symbf{B} \symbf{P} \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} = \symbf{0}.
+$$
+
+Define $\symbf{C} = \symbf{B} \symbf{P}$. Then:
+
+$$
+\symbf{C} \begin{bmatrix}
+\symbf{I}_r & \symbf{0} \\
+\symbf{0} & \symbf{0}
+\end{bmatrix} = \symbf{0}.
+$$
+
+This implies that $\symbf{C}$ has the form:
+
+$$
+\symbf{C} = \left[ \symbf{0}_{k \times r} \ \ \symbf{C}_2 \right],
+$$
+
+where $\symbf{C}_2$ is a $k \times (n - r)$ matrix.
+
+**5. Dependency of the Linear Form:**
+
+Compute the linear form:
+
+$$
+\symbf{B} \symbf{Y} = \symbf{B} \symbf{P} \symbf{P}' \symbf{Y} = \symbf{C} \symbf{Z} = \left[ \symbf{0}_{k \times r} \ \ \symbf{C}_2 \right] \begin{bmatrix}
+\symbf{Z}_1 \\
+\symbf{Z}_2
+\end{bmatrix} = \symbf{C}_2 \symbf{Z}_2.
+$$
+
+**Conclusion:** The linear form $\symbf{B} \symbf{Y}$ depends only on $\symbf{Z}_2$.
+
+**6. Independence of $\symbf{Z}_1$ and $\symbf{Z}_2$:**
+
+Since $\symbf{Z} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, the subvectors $\symbf{Z}_1$ and $\symbf{Z}_2$ are independent.
+
+**7. Final Conclusion:**
+
+Because $\symbf{Y}' \symbf{A} \symbf{Y}$ depends only on $\symbf{Z}_1$ and $\symbf{B} \symbf{Y}$ depends only on $\symbf{Z}_2$, and since $\symbf{Z}_1$ and $\symbf{Z}_2$ are independent, it follows that $\symbf{Y}' \symbf{A} \symbf{Y}$ and $\symbf{B} \symbf{Y}$ are independent.
+
+# Theorem 10: Independence of Estimators of $\symbf{\beta}$ and $\sigma^2$
+
+**Statement:**
+
+Assuming $\symbf{Y} = \symbf{X} \symbf{\beta} + \symbf{e}$, where $\symbf{e} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_n)$, the least squares estimator $\hat{\symbf{\beta}} = (\symbf{X}' \symbf{X})^{-1} \symbf{X}' \symbf{Y}$ and the unbiased estimator of variance $s^2 = \frac{1}{n - p} (\symbf{Y} - \symbf{X} \hat{\symbf{\beta}})' (\symbf{Y} - \symbf{X} \hat{\symbf{\beta}})$ are independent.
+
+## Proof
+
+First, we define a useful multivariate standard normal random variable. Since $\symbf{Y} = \symbf{X}\symbf{\beta} + \symbf{e}$ where $\symbf{e} \sim \mathcal{N}(\symbf{0}, \sigma^2\symbf{I}_n)$, it follows that $\symbf{Z} = \frac{\symbf{Y} - \symbf{X}\symbf{\beta}}{\sigma} = \frac{\symbf{e}}{\sigma} \sim \mathcal{N}(\symbf{0}, \symbf{I}_n)$.
+
+Now, we wish to relate our estimators, $\hat{\symbf{\beta}}$ and $s^2$, to the forms $\symbf{B}\symbf{Z}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$, for $\symbf{A}$ idempotent.
+
+Since $\hat{\symbf{\beta}}=(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y}$, we have that
+
+$$
+\begin{aligned}
+\hat{\symbf{\beta}} - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta}
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y} - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta}, \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'(\symbf{Y} - \symbf{X}\symbf{\beta}), \\
+\frac{\hat{\symbf{\beta}} - \symbf{\beta}}{\sigma} 
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\frac{(\symbf{Y} - \symbf{X}\symbf{\beta})}{\sigma}, \\
+&=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Z}, \\
+&=
+\symbf{B}\symbf{Z},
+\end{aligned}
+$$
+
+for $\symbf{B} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. Let $\hat{\symbf{\beta}}^{\ast} = \frac{\hat{\symbf{\beta}} - \symbf{\beta}}{\sigma}$.
+
+In the proof of the theorem showing that $\mathrm{E}[\hat{\sigma}^2_{\mathrm{MLE}}]\neq \sigma^2$, we found that
+
+$$
+n\hat{\sigma}^2_{\mathrm{MLE}} = \symbf{e}'\symbf{A}\symbf{e}
+$$
+
+for $\symbf{A}=\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. We also showed that $\symbf{A}$ is idempotent.
+
+From their definitions, we have that $\hat{\sigma}^2_{\mathrm{MLE}}=\frac{n-p}{n}s^2$. Substituting this into the above, it follows that 
+
+$$
+(n-p)s^2 = \symbf{e}'\symbf{A}\symbf{e}.
+$$
+
+Dividing through by $\sigma^2$, we then have that 
+
+$$
+\frac{n-p}{\sigma^2}s^2 = \left(\frac{\symbf{e}}{\sigma}\right)'\symbf{A}\left(\frac{\symbf{e}}{\sigma}\right) = \symbf{Z}'\symbf{A}\symbf{Z}.
+$$
+
+To show that $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are independent, we must show that $\symbf{B}\symbf{A} = \symbf{0}$ for $\symbf{B} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ and $\symbf{A}=\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$. Accordingly,
+
+$$
+\begin{aligned}
+\symbf{B}\symbf{A} &= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\left(\symbf{I}_n - \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\right), \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}' - (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}', \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}' - (\symbf{X}'\symbf{X})^{-1}\symbf{X}', \\
+&= \symbf{0}.
+\end{aligned}
+$$
+
+Therefore, applying Theorem 6, it follows that $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are independent. 
+
+Since $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ are linearly related to $\hat{\symbf{\beta}}$ and $s^2$ by constant scalars, i.e., $\hat{\symbf{\beta}}^{\ast} = \frac{1}{\sigma}(\hat{\symbf{\beta}} - \symbf{\beta})$ and  $\symbf{Z}'\symbf{A}\symbf{Z} = \frac{n - p}{\sigma^2} s^2$, the independence of $\hat{\symbf{\beta}}^{\ast}$ and $\symbf{Z}'\symbf{A}\symbf{Z}$ implies the independence of $\hat{\symbf{\beta}}$ and $s^2$. 
+---
+title: "Regression Week III: Inference"
+subtitle: "Confidence Intervals"
+author: "Miguel Rodo (with credit to Yovna Junglee)"
+institute: "Department of Statistical Sciences - University of Cape Town"
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Where are we?
+
+- Described general linear model
+- Derived estimators and their distributions
+  - $\hat{\symbf{\beta}} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y}$
+    - Distributed $\mathcal{N}(\symbf{\beta}, \sigma^2(\symbf{X}'\symbf{X})^{-1})$
+  - $\hat{\sigma}^2_{\mathrm{unbiased}}=s^2= \frac{1}{n - k} \sum_{i=1}^n (y_i - \hat{y}_i)^2$ (unbiased estimator)
+    - $\frac{(n - k)s^2}{\sigma^2} \sim \chi^2_{n-k}$
+
+# We therefore have estimates. What's the problem?
+
+# Problem: Uncertainty in Estimation
+
+- We have point estimates for the coefficients and $\sigma^2$.
+- However, they are merely estimates, and to make well-informed decisions, we need to quantify the uncertainty in these estimates.
+- There are two questions regarding uncertainty we can answer to aid decision-making:
+  - What are plausible values for the regression coefficients?
+    - Tool: Confidence intervals
+  - Is our data compatible with there being no effect of the explanatory variable(s)?
+    - Tool: Hypothesis tests
+
+# Note re running code
+
+- Run the following code chunk to load the necessary libraries and functions, if you want to run the code in the slides:
+
+```{r}
+#| eval: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# Example: Advertising dataset {.smaller}
+
+- Consider our simulated advertising dataset, where we want to know the effect of radio and tv advertising on revenue:
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+```{r}
+set.seed(201)
+spend_vec_radio <- runif(1e2, 0, 3)
+spend_vec_tv <- spend_vec_radio *
+  1.2 + runif(1e2, 0, 3)
+revenue_vec <- spend_vec_tv * 2 +
+  rnorm(1e2, mean = 10, sd = 2)
+ad_tbl <- tibble::tibble(
+  spend_radio = spend_vec_radio,
+  spend_tv = spend_vec_tv,
+  revenue = revenue_vec
+)
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+head(ad_tbl)
+```
+
+:::
+
+::::
+
+# Confidence intervals for individual coefficients {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+```{r}
+fit <- lm(
+  revenue ~ spend_tv + spend_radio,
+  data = ad_tbl
+  )
+confint_tbl <- fit |>
+  confint() |>
+  tibble::as_tibble(
+    rownames = "Variable"
+    ) |>
+  dplyr::mutate(
+    Estimate = coef(fit)
+  ) 
+confint_tbl[["Variable"]] <-
+  c("Intercept", "TV", "Radio")
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+#| echo: false
+confint_tbl |>
+  dplyr::mutate(
+    across(
+      where(is.numeric),
+      function(x) signif(x, 3)
+    )) |>
+  dplyr::select(
+    Variable, Estimate, `2.5 %`, `97.5 %`
+  )
+```
+
+:::
+
+::::
+
+# Visualising confidence intervals {.smaller}
+
+```{r}
+#| echo: false
+#| results: hide
+p <- ggplot(
+  confint_tbl, aes(x = Variable)
+  ) +
+  theme_cowplot_bg() +
+  geom_hline(yintercept = 0, linetype = "dashed", col = "gray10") +
+  cowplot::background_grid(major = "y") +
+  geom_errorbar(
+    aes(ymin = `2.5 %`, ymax = `97.5 %`),
+    width = 0.2, alpha = 0.8, col = "dodgerblue"
+  ) +
+  geom_point(
+    aes(y = Estimate),
+    col = "dodgerblue"
+    ) +
+  labs(x = "Variable", y = "Estimate")
+if (!dir.exists("_tmp/fig/w3/s1confint")) {
+  dir.create("_tmp/fig/w3/s1confint", recursive = TRUE)
+}
+path_fig <- "_tmp/fig/w3/s1confint/coef_ci.png"
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 13,
+  height = 8.5,
+  units = "cm"
+)
+```
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{`r path_fig`}
+\end{center}
+
+# Confidence intervals for fitted values {.smaller}
+
+- Now, let's obtain confidence interval for the fitted value $\hat{y}_i$ at a specific value of radio spend, across a range of TV spend values:
+
+```{r}
+#| echo: true
+tv_spend <- seq(min(ad_tbl$spend_tv),
+  max(ad_tbl$spend_tv), length.out = 1e3)
+confint_fitted <- predict(
+  fit,
+  newdata = data.frame(
+    spend_radio = mean(ad_tbl$spend_radio), spend_tv = tv_spend
+    ),
+  interval = "confidence"
+)
+head(cbind(tv_spend, confint_fitted) |> signif(4))
+```
+
+# Visualising confidence intervals for fitted values {.smaller}
+
+```{r}
+#| echo: false
+#| results: asis
+p <- ggplot(
+  data.frame(tv = tv_spend, confint_fitted),
+  aes(x = tv, y = fit)
+  ) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_ribbon(
+    aes(ymin = lwr, ymax = upr),
+    fill = "dodgerblue", alpha = 0.3
+  ) +
+  geom_line(col = "dodgerblue") +
+  geom_point(
+    data = ad_tbl,
+    aes(x = spend_tv, y = revenue),
+    col = "orange", alpha = 0.6, size = 0.75
+  ) +
+  labs(x = "TV spend", y = "Revenue")
+path_fig <- "_tmp/fig/w3/s1confint/fitted_ci.png"
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 13,
+  height = 8.5,
+  units = "cm"
+)
+```
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{`r path_fig`}
+\end{center}
+
+# Confidence intervals for linear combinations of the regression coefficients
+
+- Quantities of interest are often linear combinations of the regression coefficients.
+- For example, suppose that $\symbf{\beta}' = (\beta_0, \beta_1, \beta_2)'$ are the regression coefficients.
+- We might be interested in confidence intervals for the following two quantities, which can be represented as linear combinations of the regression coefficients:
+  - $\beta_1 = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix} \symbf{\beta}$
+  - Fitted value, given that $\symbf{x}_{[i]}' = \begin{pmatrix} 1 & x_{i1} & x_{i2} \end{pmatrix}'$:
+    - $\hat{y}_i = \begin{pmatrix} 1 & x_{i1} & x_{i2} \end{pmatrix} \symbf{\beta} = \symbf{x}_{[i]}'\symbf{\beta}$
+
+# We already know their distribution, right? {.smaller}
+
+- In general, we express such combinations as $\ell' \symbf{\beta}$, for $\ell$ a column vector with the same number of elements as $\symbf{\beta}$.
+- Since $\hat{\symbf{\beta}}$ is normally distributed, any linear combination of $\hat{\symbf{\beta}}$ is also normally distributed.
+- Then, we have that
+
+$$
+\ell' \hat{\symbf{\beta}} \sim \mathcal{N}(\ell' \symbf{\beta}, \sigma^2 \ell' (\symbf{X}'\symbf{X})^{-1} \ell)
+$$
+
+- From which we can get the $100(1-\alpha)\%$ confidence interval as
+
+$$
+\ell' \hat{\symbf{\beta}} \pm z_{\alpha/2} \sqrt{\sigma^2 \ell' (\symbf{X}'\symbf{X})^{-1} \ell}
+$$
+
+\pause
+
+- But we don't know $\sigma^2$! Simply plugging it in will lead to confidence intervals that are too narrow.
+
+# Simulation: coverage of confidence interval {.smaller}
+
+
+- In the advertising dataset, $\symbf{\beta}_{\mathrm{TV}}=2$ and $\sigma^2=4$.
+- Using the previous results, we can work out that $\hat{\beta}_{\mathrm{TV}} \sim \mathcal{N}(2, 0.16)$.
+- A 95% confidence interval is then given by $2 \pm 1.96 \times \sqrt{0.16} = \left(1.216, 2.874\right)$.
+
+- If our confidence intervals are valid, then they should contain the true value of $\beta_{\mathrm{TV}}$ 95% of the time.
+- However, if we estimate $\sigma^2$ from the data and simply plug that into the normal-distribution based confidence interval, we obtain a lower coverage than 95%.
+
+# Simulation: coverage of confidence interval {.smaller}
+
+- First we calculate $C_{33}=(\symbf{X}'\symbf{X})^{-1}_{33}$, which is a factor in the variance of $\hat{\beta}_{\mathrm{TV}}$.
+
+```{r}
+# use only first 10 rows to exaggerate the effect
+ad_tbl_few_x <- ad_tbl[1:10, 1:2]
+# get design matrix contribution to se of beta_tv
+design_matrix <- matrix(
+  c(rep(1, 10), ad_tbl_few_x |> unlist()), ncol = 3
+)
+C_mat <- solve(t(design_matrix) %*% design_matrix)
+C_mat_33 <- C_mat[3, 3]
+```
+
+# Simulation: coverage of confidence interval {.smaller}
+
+- Now, we simulate the coverage of the confidence interval for $\beta_{\mathrm{TV}}$:
+
+```{r}
+set.seed(3)
+beta_tv_contained_z <- replicate(1e4, {
+  # simulate response, and then fit model
+  sim_tbl <- ad_tbl_few_x |>
+    dplyr::mutate(
+      revenue = spend_tv * 2 + rnorm(10, mean = 10, sd = 2)
+    )
+  fit <- lm(revenue ~ spend_radio + spend_tv, data = sim_tbl)
+  # plug estimated sigma into standard normal-based confidence interval
+  confint_vec <- coef(fit)[[3]] +
+    c(-1, 1) * qnorm(0.975) * summary(fit)$sigma * sqrt(C_mat_33)
+  # check if true value is contained
+  2 > confint_vec[1] & 2 < confint_vec[2]
+})
+```
+
+# Simulation: coverage of confidence interval {.smaller}
+
+We find that the coverage is...
+
+```{r}
+signif(mean(beta_tv_contained_z) * 1e2, 4)
+```
+
+# Obtaining a valid confidence interval
+
+- To obtain a valid confidence interval, we need to adjust for the uncertainty in estimating $\sigma^2$.
+- We obtain a test statistic that does not include $\sigma^2$, and find its distribution.
+- To do so, we divide by $\sqrt{\frac{(n - k)s^2}{\sigma^2}}$ to obtain what looks like a $t$-distributed random variable.
+- First, we note that a $t_f$-distributed random variable can be expressed as
+
+$$
+\frac{Z}{\sqrt{V/f}}
+$$
+
+where $Z \sim \mathcal{N}(0, 1)$ and $V \sim \chi^2_{f}$ are independent.
+
+# Obtaining a valid confidence interval
+
+- We then have that
+
+$$
+\frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{\sigma \sqrt{\ell' \symbf{C} \ell}} \sim \mathcal{N}(0, \symbf{I})
+$$
+
+- Since $\frac{(n - k)s^2}{\sigma^2} \sim \chi^2_{n-k}$, we have that
+
+$$
+\frac{\frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{\sigma \sqrt{\ell' \symbf{C} \ell}}}{\sqrt{\frac{(n - k)s^2}{\sigma^2(n-k)}}} 
+=
+\frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{s\sqrt{\ell' \symbf{C} \ell}}
+$$
+
+- appears to be $t_{n-k}$-distributed.
+- However, we need to show that the numerator and denominator are independent.
+
+# Independence of $\hat{\symbf{\beta}}$ and $s^2$
+
+- See theorems 6 and 10 in `SlidesRegW3S1AdditionalProofs.qmd` for the proof.
+
+# Example highlighting the importance of independence
+
+- Suppose we construct the following silly attempt at a $t$ statistic:
+  - Let $Z \sim \mathcal{N}(0, 1)$
+  - We then need some $V \sim \chi^2_1$. $Z^2$ is $\chi^2_1$-distributed, so let's pick it!
+  - Then we have that $T = \frac{Z}{\sqrt{Z^2}} = \frac{Z}{|Z|} = \text{sign}(Z)$, which takes values -1 or 1 and is clearly not $\chi^2_1$ distributed.
+
+# Confidence intervals for quantities of interest
+
+- We can now obtain confidence intervals for $\hat{\beta}_i$ and $\hat{y}_i$:
+  - $\hat{\beta}_i: \beta_i \in \hat{\beta}_i \pm t_{\alpha/2} s \sqrt{C_{(i+1)(i+1)}}$
+    - Set $\ell = \begin{pmatrix} 0 & 0 & \ldots & 1 & \ldots & 0 \end{pmatrix}$, where $i+1$th entry is 1.
+    - Note: We use i+1 instead of i as typically the first index corresponds to the intercept, $\beta_0$. 
+  - $\hat{y}_i: y_i \in \hat{y}_i \pm t_{\alpha/2} s \sqrt{\symbf{x}_{[i]}' \symbf{C} \symbf{x}_{[i]}}$
+    - Set $\ell = \symbf{x}_{[i]}$, for $\symbf{x}_{[i]}'$ the $i$th row of the design matrix.
+
+# Simulation: coverage of confidence interval {.smaller}
+
+- To demonstrate the improved coverage of the confidence interval for $\beta_{\mathrm{TV}}$, we re-simulate:
+
+```{r}
+set.seed(3)
+beta_tv_contained_t <- replicate(1e3, {
+  # simulate response, and then fit model
+  sim_tbl <- ad_tbl_few_x |>
+    dplyr::mutate(
+      revenue = spend_tv * 2 + rnorm(10, mean = 10, sd = 2)
+    )
+  fit <- lm(revenue ~ spend_tv + spend_radio, data = sim_tbl)
+  # plug estimated sigma into standard normal-based confidence interval
+  confint_vec <- coef(fit)[[2]] +
+    c(-1, 1) * qt(0.975, 10 - 3) * summary(fit)$sigma * sqrt(C_mat_33)
+  # check if true value is contained
+  2 > confint_vec[1] & 2 < confint_vec[2]
+})
+```
+
+# Simulation: coverage of confidence interval {.smaller}
+
+- We find that the coverage is...
+
+```{r}
+signif(mean(beta_tv_contained_t) * 1e2, 4)
+```
+
+- It would get closer and closer to 95 as the number of samples taken increased.
+
+# Exact calculation: coverage of confidence interval {.smaller}
+
+- Of course, the confidence interval using the $t$-statistic is exact.
+- However, we can now calculate the coverage of the $z$-statistic.
+- Now that we know the distribution of $\frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{s\sqrt{\ell' \symbf{C} \ell}}$, we can work out the actual coverage of the incorrect confidence interval:
+- The coverage is given by
+
+$$
+P(z^{\alpha/2} < \frac{\ell' \hat{\symbf{\beta}} - \ell' \symbf{\beta}}{s\sqrt{\ell' \symbf{C} \ell}} < z^{1-\alpha/2}) = P(z^{\alpha/2} < t_{n-k} < z^{1-\alpha/2}).
+$$
+
+# Exact calculation: coverage of confidence interval {.smaller}
+
+- Using `R` to compute this when $n=10$, $k=3$ and $\alpha = 0.05$:
+
+```{r}
+# probability of being less than z^{0.975}:
+p_lt_0975 <- pt(qnorm(0.975), 10 - 3)
+# probability of being less than z^0.025:
+p_lt_0025 <- pt(qnorm(0.025), 10 - 3)
+# differnce between the two
+((p_lt_0975 - p_lt_0025) * 1e2) |> signif(3)
+```
+
+- This is similar to the simulated value (`r signif(mean(beta_tv_contained_z) * 1e2, 4)`).
+
+# Interpreting Confidence Interval
+
+- A confidence interval provides a range of plausible values for the parameter being estimated (e.g., regression coefficients).
+- *Individual regression parameters*: If the confidence interval includes zero, it means that no relationship is plausible
+- *Fited values*: Confidence interval represents uncertainty in predicting the average response for given predictor values.
+- One may comment on whether the confidence interval is narrow or wide, with exactly what this means depending on the context.
+
+# Reporting Confidence Intervals
+
+- When discussing the estimated effect of a parameter in the text of your report, include the confidence interval, e.g. "The estimated effect of TV advertising on sales is 0.6 (95% CI: 0.4, 0.8), suggesting a positive impact".
+- Often, the level ("95%") is omitted if it is the standard 95% level. In addition, if you specify somewhere in the text that the values in brackets are the confidence interval, you can omit the "CI" part, too.
+
+# Limitations
+
+- Confidence intervals do not imply the probability that the true parameter lies within the interval (i.e., it's not "the probability that $\beta$ is in the interval").
+  - $\beta$ is fixed, so it either lies in the interval or it doesn't!
+- The inference is only as good as the model assumptions, so always check the validity of the underlying assumptions (we'll get to this).
+
+---
+title: "Regression Week III: Inference"
+subtitle: "Hypothesis Testing"
+author: "Miguel Rodo (with credit to Yovna Junglee)"
+institute: "Department of Statistical Sciences - University of Cape Town"
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Contrast hypothesis testing with confidence intervals {.smaller}
+
+- **Confidence Intervals:**
+  - Provide a range of plausible values for the parameter.
+  - Focus on estimating the precision of the effect.
+  
+- **Hypothesis Testing:**
+  - Determine whether an effect exists.
+  - Primary concern is whether to reject a state of no effect, not the precision of the estimate.
+  
+- **Example Scenario:**
+  - In genetic testing, identifying whether a particular gene is associated with a trait is crucial.
+  - Precision of the effect (confidence interval) is secondary to determining the existence of the association.
+
+
+# Introduction to hypothesis testing {.smaller}
+
+- **Definition:**
+  - A statistical method to decide whether to reject a null hypothesis based on sample data.
+  
+- **Key Concepts:**
+  - *Null Hypothesis ($H_0$):* Represents a statement of no effect or no difference. Typically, $H_0: \beta = 0$.
+  - *Alternative Hypothesis ($H_1$):* Represents a statement of an effect or difference. Typically, $H_1: \beta \neq 0$.
+  
+- **Objective:**
+  - Assess whether there is sufficient evidence in the data to reject the null hypothesis in favor of the alternative.
+
+# Note re coding {.smaller}
+
+Attach the following packages to run the `R` code snippets:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# Advertising dataset: Fit linear model {.smaller}
+
+```{r}
+#| results: hide
+# Simulate Advertising Dataset
+set.seed(201)
+spend_radio <- runif(100, 0, 3)
+spend_tv <- spend_radio * 1.2 + runif(100, 0, 3)
+revenue <- spend_tv * 2 + rnorm(100, mean = 10, sd = 2)
+ad_data <- tibble(
+  spend_radio = spend_radio,
+  spend_tv = spend_tv,
+  revenue = revenue
+)
+
+# Fit Linear Model
+fit_ad <- lm(revenue ~ spend_tv + spend_radio, data = ad_data)
+summary(fit_ad)
+```
+
+# Advertising dataset: Inference from fit {.smaller}
+
+\begin{center}
+\includegraphics[width=0.95\textwidth]{_data_raw/img/summary.png}
+\end{center}
+
+
+# Deriving hypothesis tests used by `summary` {.smaller}
+
+- **Objective:**
+  - Derive hypothesis tests that correspond to the coefficients in the linear model.
+  
+- **Approach:**
+  - Use the t-test for individual regression coefficients or linear combinations.
+  - Extend to F-tests for multiple coefficients or linear combinations.
+
+# Hypothesis test regarding linear combinations of the regression coefficients
+
+- As before, we note that quantities of interest are often linear combinations of the regressinon coefficients.
+- For example, suppose that $\symbf{\beta}' = (\beta_0, \beta_1, \beta_2)'$ are the regression coefficients.
+- We may be interested in the following hypothesis tests:
+  - $H_0: \beta_1 = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix} \symbf{\beta} = 0$
+  - $H_0: \beta_1 - \beta_2 = \begin{pmatrix} 0 & 1 & -1 \end{pmatrix} \symbf{\beta} = 0$
+
+
+# T-tests for quantities of interest {.smaller}
+
+- As before, let $\ell$ be a column vector of coefficients.
+- Suppose that we have the following null hypothesis:
+  - $H_0: \ell'\symbf{\beta} = \ell'\symbf{{\beta}}^{(0)}$
+    - For example, if $\ell = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix}$ and $\symbf{{\beta}}^{(0)'} = \begin{pmatrix} \beta_0 & 1 & \beta_2 \end{pmatrix}'$ then the null hypothesis is that $\beta_1 = 0$.
+  - $H_1: \ell'\symbf{\beta} \neq \ell'\symbf{{\beta}}^{(0)}$
+- If the null hypothesis is true, then
+
+$$
+\ell'\hat{\symbf{\beta}} \sim \mathcal{N}(\ell'\symbf{{\beta}}^{(0)}, \sigma^2 \ell'\symbf{C}\ell)
+$$
+
+# T-tests for quantities of interest {.smaller}
+
+- If the null hypothesis is true, then
+
+$$
+\frac{\ell'\hat{\symbf{\beta}} - \ell'\symbf{{\beta}}^{(0)}}{s\sqrt{\ell'\symbf{C}\ell}} \sim t_{n-k}
+$$
+
+- For example, if $\ell = \begin{pmatrix} 0 & 1 & 0 \end{pmatrix}$ and $\symbf{{\beta}}^{(0)'} = \begin{pmatrix} \beta_0 & 1 & \beta_2 \end{pmatrix}'$ then
+
+$$
+\frac{\hat{\beta}_1-0}{s\sqrt{C_{22}}} = \frac{\hat{\beta}_1}{s\sqrt{C_{22}}}  \sim t_{n-k}
+$$
+
+- We then calculate the p-value as
+
+$$
+2 * \mathrm{Pr}(T_{n-k} > |t|)
+$$
+
+
+# Implementing the t-test in R {.smaller}
+
+- Suppose we wish to test the hypothesis $H_0: \beta_{\mathrm{TV}}= 0$.
+- Again, we fit the linear model to the advertising dataset:
+
+```{r}
+fit <- lm(revenue ~ spend_tv + spend_radio, data = ad_data)
+design_matrix <- model.matrix(fit)
+C_22 <- solve(t(design_matrix) %*% design_matrix)[2, 2]
+se_beta_tv <- summary(fit)$sigma * sqrt(C_22)
+t_stat <- coef(fit)[2] / se_beta_tv
+p_value <- 2 * (1 - pt(abs(t_stat), df = fit$df.residual))
+c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
+```
+
+# Reporting hypothesis test results {.smaller}
+
+\begin{center}
+\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\end{center}
+
+- Each one unit increase in TV spend increased average revenue by $2.01$ units ($p < 0.001$; 95% CI: $1.95$ to $2.07$), holding radio spend constant.
+  - In a real-world report, you would usually be less pecise and not specify "*average* revenue" or "holding radio spend constant". But for academic purposes, please rather state these.
+  - Very small p-values are usually better reported as "<0.001" (or "<0.0001").
+  - Do not use many significant digits (use `signif` or `round` in `R`).
+
+# Reporting hypothesis test results {.smaller}
+
+\begin{center}
+\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\end{center}
+
+- No effect of radio spend on average revenue was detected (p = 0.79; 95% CI: $1.95$ to $2.07$), when controlling for TV spend.
+  - When no effect was detected, you may omit the estimate.
+  - "When controlling for TV spend" is another way of saying "holding TV spend constant".
+  - When discussing the results, if there is no effect you may wish to discuss whether the sample size was sufficient to detect an effect.
+
+# Interpreting hypothesis tests {.smaller}
+
+- **p-values:**
+  - You may regard $p < 0.05$ as statistically significant.
+    - Note that the evidence against the null hypothesis increases dramatically as $p$ decreases.
+  - Do not interpret p-values as the probability that the null hypothesis is true.
+  - If the p-value is larger than 0.05, then consider whether the sample size was sufficient to detect an effect.
+
+- **Effect Size:**
+  - Consider the magnitude of the effect, not just statistical significance.
+  - A statistically significant result may have a negligible practical impact.
+
+- **Assumptions:**
+  - Ensure that model assumptions (linearity, independence, homoscedasticity, normality) are satisfied before interpreting results.
+
+# Testing linear combinations of coefficients {.smaller}
+
+- **Example Question:**
+  - Is there a statistically significant difference between the effects of TV and Radio advertising?
+  
+- **Formulating the Hypothesis:**
+  - **Null Hypothesis ($H_0$):** $\beta_{\text{TV}} - \beta_{\text{Radio}} = 0$
+  - **Alternative Hypothesis ($H_1$):** $\beta_{\text{TV}} - \beta_{\text{Radio}} \neq 0$
+  
+- **Test Statistic:**
+  - Setting $\ell = \begin{pmatrix} 0 & 1 & -1 \end{pmatrix}$, we have
+  
+$$
+t = \frac{\hat{\beta}_{\text{TV}} - \hat{\beta}_{\text{Radio}}}{\sqrt{s^2 (c_{\text{TV,TV}} + c_{\text{Radio,Radio}} - 2c_{\text{TV,Radio}})}} \sim t_{n - k}
+$$
+
+# Implementation in R {.smaller}
+
+```{r}
+# Define contrast matrix for testing beta_TV - beta_Radio = 0
+l <- c(0, 1, -1)  # Assuming intercept is the first coefficient
+
+# Compute the test statistic
+contrast <- sum(l * coef(fit_ad))
+vcov_beta <- summary(fit)$sigma^2 * solve(t(design_matrix) %*% design_matrix)
+se_contrast <- sqrt(l %*% vcov_beta %*% l)
+t_contrast <- contrast / se_contrast
+
+# Compute p-value
+p_value_contrast <- 2 * (1 - pt(abs(t_contrast), df = fit_ad$df.residual))
+
+# Display the results
+c("t-statistic" = t_contrast, "p-value" = p_value_contrast) |> signif(3)
+```
+
+# Testing multiple regression coefficients simultaneously {.smaller}
+
+- Sometimes, we want to test whether multiple coefficients are zero simultaneously.
+- **Example:**
+  - $H_0: \beta_1 = \beta_2 = 0$ (Both TV and Radio have no effect)
+  
+- This cannot be tested using a single t-test, but requires an F-test.
+
+# Multiple linear combinations
+
+- This can be viewed as testing multiple linear combinations of the coefficients.
+- Supposing that $\symbf{\beta}:3\times 1$, the null hypothesis $\beta_1 = \beta_2 = 0$ can be written as
+
+$$
+\symbf{L}\symbf{\beta} = \symbf{0}
+$$
+
+- for $\symbf{L}:q\times k = \symbf{L}:2\times 3 = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$ and $\symbf{0} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}$.
+- As with $\ell$, $\symbf{L}$ can take any form, but the rows must be linearly independent.
+
+# Deriving the F-statistic {.smaller}
+
+- **Distribution of $\mathbf{L}\hat{\boldsymbol{\beta}}$:**
+  - Under the general linear model, we have:
+
+  $$
+  \mathbf{L}\hat{\boldsymbol{\beta}} \sim \mathcal{N}(\mathbf{L}\boldsymbol{\beta}, \sigma^2 \mathbf{L} \mathbf{C} \mathbf{L}^T)
+  $$
+
+- **Quadratic Form:**
+  - Under $H_0: \mathbf{L}\boldsymbol{\beta} = \mathbf{L}\boldsymbol{\beta}^{(0)}$, the quadratic form:
+  
+    $$
+    Q = (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta}^{(0)})^\top (\sigma^2 \mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}}- \mathbf{L}\boldsymbol{\beta}^{(0)})
+    $$
+    
+    follows a $\chi^2_q$ distribution, where $q$ is the number of rows of $\mathbf{L}$.
+
+# Deriving the F-statistic {.smaller}
+
+- **Standardizing without $\sigma^2$:**
+  - Since we don't know $\sigma^2$, we use the unbiased estimator $s^2$.
+  - Also, recall that:
+  
+    $$
+    \frac{(n - k) s^2}{\sigma^2} \sim \chi^2_{n - k}
+    $$
+  
+- **Constructing the F-statistic:**
+  - The ratio of two independent chi-squared variables divided by their degrees of freedom follows an F-distribution:
+  
+    $$
+    F = \frac{\chi^2_m / m}{\chi^2_{n - k} / (n - k)} \sim F_{m, n - k}
+    $$
+
+# Deriving the F-statistic {.smaller} 
+  
+- **Our Test Statistic:**
+  
+  $$
+  F = \frac{Q / q}{(n - k) s^2 / \sigma^2 / (n - k)} = \frac{(\mathbf{L}\hat{\boldsymbol{\beta}}- \mathbf{L}\boldsymbol{\beta}^{(0)})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}} - \mathbf{L}\boldsymbol{\beta}^{(0)})}{m s^2} \sim F_{q, n - k}
+  $$
+
+# Typical case: testing all coefficients are zero {.smaller}
+
+- Here, we have that $\mathbf{L}\boldsymbol{\beta}^{(0)}=\symbf{0}$, where the $i$-th row of $\symbf{L}$ has a 1 in the $i+1$-th position and zeros elsewhere, e.g.
+
+$$
+\symbf{L} = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}
+$$
+
+  where $\symbf{\beta}:3\times 1$.
+
+- In this case, the $F$ statistic simplifies to
+
+$$
+F = \frac{(\mathbf{L}\hat{\boldsymbol{\beta}})^\top (\mathbf{L} \mathbf{C} \mathbf{L}^T)^{-1} (\mathbf{L}\hat{\boldsymbol{\beta}})}{2 s^2} \sim F_{2, n - k}
+$$
+
+# Applying the F-test to the advertising dataset {.smaller}
+
+- **Testing $H_0: \beta_{\text{TV}} = \beta_{\text{Radio}} = 0$**
+
+```{r}
+# Define L matrix for the hypotheses
+L <- matrix(c(0, 1, 0,
+              0, 0, 1), nrow = 2, byrow = TRUE)
+
+# Compute the contrast estimates
+contrast <- L %*% coef(fit)
+
+# Compute the covariance matrix of the contrasts
+se_contrast <- L %*% vcov_beta %*% t(L)
+
+# Compute the F-statistic
+F_stat <- t(contrast) %*% solve(se_contrast) %*% contrast / nrow(L) / summary(fit)$sigma^2
+```
+
+# Applying the F-test to the advertising dataset {.smaller}
+
+```{r}
+# Get the p-value
+p_value_F <- 1 - pf(F_stat, df1 = nrow(L), df2 = fit$df.residual)
+
+# Display the results
+c("F-statistic" = F_stat, "p-value" = p_value_F) |> signif(3)
+```
+
+- **Interpretation:**
+  - TV and radio have different effects on average revenue ($p<0.001$).
+
+# Advice on interpreting hypothesis tests {.smaller}
+
+- **p-values:**
+  - You may regard $p < 0.05$ as statistically significant.
+    - Note that the evidence against the null hypothesis increases dramatically as $p$ decreases.
+  - Do not interpret p-values as the probability that the null hypothesis is true.
+  - If the p-value is larger than 0.05, then consider whether the sample size was sufficient to detect an effect.
+
+- **Effect size:**
+  - Consider the magnitude of the effect, not just statistical significance.
+  - A statistically significant result may have a negligible practical impact.
+
+- **Assumptions:**
+  - Ensure that model assumptions (linearity, independence, homoscedasticity, normality) are satisfied before interpreting results.
+
+# Advice on reporting hypothesis tests {.smaller}
+
+- **Include p-values in text:**
+  - Example: "TV advertising has a significant effect on revenue ($\beta_{\text{TV}} = 2.01$, $p < 0.001$)."
+
+- **Avoid using asterisks:**
+  - Instead of using stars to denote significance levels, report the exact p-values.
+
+- **Visual representation:**
+  - Include p-values or significance levels in plots where appropriate.
+
+# Including p-values in coefficient plot {.smaller}
+
+```{r}
+#| echo: false
+# Prepare data for plotting
+confint_tbl <- confint(fit) |> as_tibble(rownames = "Coefficient")
+confint_tbl <- confint_tbl |>
+  dplyr::mutate(
+    Estimate = coef(fit),
+    p_value = summary(fit)$coefficients[, "Pr(>|t|)"]
+  )
+
+# Create the plot
+p <- ggplot(confint_tbl, aes(x = Coefficient)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  geom_text(aes(y = `97.5 %`, label = paste0("p = ", signif(p_value, 2))), vjust = -1, size = 3) +
+  geom_point(aes(y = Estimate), color = "dodgerblue") +
+  geom_errorbar(aes(ymin = `2.5 %`, ymax = `97.5 %`), width = 0.2, color = "dodgerblue") +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") + 
+  labs(title = "Regression Coefficients with p-values",
+       y = "Estimate",
+       x = "Coefficient") +
+  expand_limits(y = 13)  +
+  scale_y_continuous(breaks = seq(0, 12, 4))
+
+# Save and display the plot
+if (!dir.exists("_tmp/fig/w3/hypothesis_testing")) {
+  dir.create("_tmp/fig/w3/hypothesis_testing", recursive = TRUE)
+}
+path_fig <- "_tmp/fig/w3/hypothesis_testing/coefs_pvalues.png"
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 13,
+  height = 8.5,
+  units = "cm"
+)
+```
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{`r path_fig`}
+\end{center}
+---
+title: "Regression Week IV: ANOVA and Model Validation"
+subtitle: "ANOVA"
+author: "Miguel Rodo (with credit to Yovna Junglee)"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+---
+
+
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Where we are in the course
+
+- **Previous Topics Covered:**
+  - Estimation of regression coefficients
+  - Construction of confidence intervals
+  - Hypothesis testing for linear combinations of coefficients
+  - Simultaneous hypothesis tests
+- **Next Steps:**
+  - Describing ANOVA in the context of linear regression
+
+# ANOVA: Analysis of Variance
+
+- ANOVA is a statistical technique used to compare the means of two or more groups.
+- **Historical Context:**
+  - Developed by Ronald Fisher in the early 20th century.
+  - Served as a foundational method before the development of general linear models.
+- **Directly Considers Sums of Squares:**
+  - ANOVA focuses on partitioning total variability into components.
+  - Emphasizes understanding the sources of variation in data.
+
+# Note re running code
+
+- Run the following code chunk to load the necessary libraries and functions, if you want to run the code in the slides:
+
+```{r}
+#| eval: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+```
+
+# One-way ANOVA example
+
+- Suppose individuals are given a placebo or one of two treatments to lower their blood pressure:
+
+```{r}
+set.seed(1811)
+n <- 10
+placebo <- rnorm(n, mean = 120, sd = 10)
+trt_a <- rnorm(n, mean = 110, sd = 10)
+trt_b <- rnorm(n, mean = 120, sd = 10)
+trt_tbl <- tibble(
+  group = rep(c("Placebo", "Treatment A", "Treatment B"), each = n),
+  bp = c(placebo, trt_a, trt_b)
+)
+```
+
+# One-way ANOVA example
+
+- The data looks like this:
+
+```{r}
+trt_tbl[c(1, 11, 21), ]
+```
+
+# Blood pressure by treatment category
+
+```{r}
+#| echo: false
+drug_col_vec <- stats::setNames(
+  c("#b2df8a", "#a6cee3", "#1f78b4"),
+  c("Placebo", "Treatment A", "Treatment B")
+)
+p <- ggplot(
+  trt_tbl |>
+    dplyr::mutate(
+      group = factor(group, levels = c("Placebo", "Treatment A", "Treatment B"))
+    ),
+  aes(x = group, y = bp, fill = group)
+) +
+  theme_cowplot_bg() +
+  geom_boxplot() +
+  cowplot::background_grid(major = "xy") +
+  ggforce::geom_sina(alpha = 0.75) +
+  labs(
+    x = "Treatment Group",
+    y = "Blood Pressure"
+  ) +
+  theme(
+    legend.position = "none"
+  ) +
+  scale_fill_manual(
+    values = drug_col_vec
+  )
+path_fig <- "_tmp/fig/w4/s1anova/simple_anova_example-boxplot.pdf"
+if (!dir.exists(dirname(path_fig))) {
+  dir.create(dirname(path_fig), recursive = TRUE)
+}
+cowplot::ggsave2(
+  path_fig,
+  p,
+  width = 9,
+  height = 4.5,
+  dpi = 300
+)
+```
+
+\begin{center}
+\includegraphics[width=\textwidth]{`r path_fig`}
+\end{center}
+
+# One-way ANOVA model specification
+
+Here is the model for a one-way ANOVA with $a$ groups.
+
+- *ANOVA Model:*
+
+  $$
+  Y_{ij} = \mu + \alpha_i + e_{ij}
+  $$
+
+  - $\mu$ is the overall mean.
+  - $\alpha_i$ is the effect of group $i$.
+  - $e_{ij}$ is the random error term for the $j$-th observation from the $i$-th group.
+
+- *Assumptions:*
+  - The observations are normally distributed
+    - Or, less strictly, the sample size is large
+  - The observations are independent
+  - Variance is equal across groups
+  - $\sum \alpha_i = 0$
+
+# Hypothesis testing using the one-way ANOVA model
+
+- **Null Hypothesis:**
+  - $H_0: \alpha_1 = \alpha_2 = \ldots = \alpha_a = 0$
+  - In our example, $a = 3$.
+  - There is no difference in means across groups.
+- **Alternative Hypothesis:**
+  - $H_1: \text{At least one } \alpha_i \neq 0$
+  - In our example, $H_1: \text{At least one of } \alpha_1,\;\alpha_2 \text{ and } \alpha_3 \neq 0$
+  - There is a difference in means across groups.
+
+# Formulae for $SS_A$ and $SSE$
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- **$SS_A$ (between-group sum of squares):**
+
+  $$
+  SS_A = \sum_{i=1}^{a} n_i (\bar{Y}_{i\cdot} - \bar{Y}_{\cdot\cdot})^2
+  $$
+
+  - $n_i$ is the number of observations in group $i$.
+  - $\bar{Y}_{i\cdot}$ is the mean of group $i$.
+  - $\bar{Y}_{\cdot\cdot}$ is the overall mean.
+
+:::
+
+:::{.column width="50%"}
+
+- **$SSE$ (within-group sum of squares):**
+
+  $$
+  SSE = \sum_{i=1}^{a} \sum_{j=1}^{n_i} (Y_{ij} - \bar{Y}_{i\cdot})^2
+  $$
+
+:::
+
+::::
+
+# Test statistic for one-way ANOVA
+
+- The test statistic for ANOVA is the $F$-statistic:
+
+  $$
+  F = \frac{SS_A / (a - 1)}{SSE / (n - a)} = \frac{MS_A}{MSE}
+  $$
+
+  - $SS_A$ is the sum of squares between groups.
+  - $SSE$ is the sum of squares within groups.
+  - $a$ is the number of groups.
+  - $n$ is the total number of observations.
+  - $MS_A$ is the mean square between groups.
+  - $MSE$ is the mean square within groups.
+
+- Under the null hypothesis, $F \sim F(a - 1, n - a)$.
+
+# Calculating the above from first principles
+
+```{r}
+y_bar <- mean(trt_tbl$bp)
+n_i <- table(trt_tbl$group)
+y_j_bar <- tapply(trt_tbl$bp, trt_tbl$group, mean)
+ssa <- sum(n_i * (y_j_bar - y_bar)^2)
+sse <- sum(tapply(
+  trt_tbl$bp, trt_tbl$group, function(x) sum((x - mean(x))^2)
+  ))
+ssa |> signif(3)
+sse |> signif(3)
+```
+
+# Obtaining the p-value
+
+We first calculate the F-statistic:
+
+```{r}
+a <- length(n_i)
+n <- nrow(trt_tbl)
+f_stat <- (ssa / (a - 1)) / (sse / (n - a))
+f_stat |> signif(3)
+```
+
+We now calculate the p-value:
+
+```{r}
+1 - pf(f_stat, a - 1, n - a)
+```
+
+# ANOVA as a subset of linear regression
+
+::::{.callout-tip appearance="minimal"}
+"Analysis of variance is a special case of regression, and both are special cases of the
+GLM ["(generalised linear model)"]. All ANOVA problems can be solved through regression, but the reverse is not
+true: Not all regression problems can be solved using traditional ANOVA."
+[@tabachnick07]
+::::
+
+
+- ANOVA is a special case of linear regression:
+  - When all predictors are categorical variables represented by dummy variables, the linear regression model becomes equivalent to an ANOVA model.
+
+# ANOVA as a subset of linear regression
+
+- For this reason, the `anova` function accepts a linear model object as an argument:
+
+```{r}
+fit <- lm(bp ~ group, data = trt_tbl)
+anova(fit)
+```
+
+- This yields the same results as the "direct" ANOVA test.
+
+# Why bother describing ANOVA then?
+
+- Statistical methodology is often described in terms of ANOVA.
+  - Even though ANOVA is a subset of linear regression.
+- Collaborators may be familiar with ANOVA rather than regression.
+  - This is largely a result of their training:
+    - ANOVA is essentially an hypothesis-testing approach, which by focusing on one statistic (the p-value) is easier to understand.
+    - Regression adds in additional elements: estimation and prediction.
+  - To work with them, we need to be able to communicate in their language.
+
+# Handling multi-level categorical explanatory variables in regression
+
+- One-way ANOVA, at this stage, is in fact beyond what we've recovered in regression thus far.
+- To bring regression up to speed, we need to consider how to handle multi-level categorical variables.
+- The key is to use dummy variables, but we need to be careful about how we do this.
+
+# An approach that won't work: the model
+
+- Imagine that we used the following model, where each level of a categorical variable got its own regression parameter:
+
+$$
+Y = \beta_0 + I(\text{group} = 1)\beta_1 + I(\text{group} = 2)\beta_2 + \ldots + I(\text{group} = a)\beta_a + e
+$$
+
+- Note that $I(\text{group} = i)$ is an indicator function that is 1 if the group is $i$ and 0 otherwise.
+- For example, if an individual belongs to group 2, the model becomes:
+
+$$
+Y = \beta_0 + 0\beta_1 + 1\beta_2 + 0\beta_3 + \ldots + 0\beta_r + e  = \beta_0 + \beta_2 + e
+$$
+
+# An approach that won't work: the design matrix
+
+- In this design matrix, we have $n$ rows and, importantly, $a+1$ columns: one for the intercept and one for each level of the categorical variable.
+- Suppose that, for the sake of illustration, the first row of the design matrix belongs to category 1, the second row to category 2, and so on until the $a$-th row to category $a$:
+
+$$
+\symbf{X}_{1:r,:} = \begin{bmatrix}
+1 & 1 & 0 & \ldots & 0 \\
+1 & 0 & 1 & \ldots & 0 \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+1 & 0 & 0 & \ldots & 1
+\end{bmatrix}
+$$
+
+# An approach that won't work: the design matrix
+
+- If $a=3$, the first two rows of the design matrix would be:
+
+$$
+\symbf{X}_{1:3,:} = \begin{bmatrix}
+1 & 1 & 0 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+- All the rows below repeat one of these first three rows.
+- Clearly, therefore, the columns are linearly dependent, as the first column is the sum of the other columns.
+
+# An approach that won't work: the estimator
+
+- The linear dependence of the estimator makes $\symbf{X}'\symbf{X}$ non-invertible, and therefore
+
+  $$
+  \hat{\symbf{\beta}} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y}
+  $$
+
+  does not exist.
+
+# Adopting a reference level
+
+- When each level of categorical variable got its own parameter, we would tend to think of $\beta_0$ as the overall mean, like $\mu$ in ANOVA.
+- However, in ANOVA this is achieved by constraining the group effects to sum to zero ($\sum \alpha_i = 0$).
+- In regression, we could do that, but typically we adopt a reference level.
+- The reference level is the level for which $\beta_0$ is the mean (assuming all other explanatory variables are zero).
+
+# Adopting a reference level
+
+- We achieve a reference level by creating dummy variables for all but one level.
+- If we drop the $a$-th level, the model then becomes
+
+$$
+Y = \beta_0 + I(\text{group} = 1)\beta_1 + I(\text{group} = 2)\beta_2 + \ldots + I(\text{group} = a-1)\beta_{a-1} + e
+$$
+
+- The mean of group $a$ is then $\beta_0$.
+- The mean of group $i$ is $\beta_0 + \beta_i$.
+- The interpretation of $\beta_i$ is therefore the difference in means between group $i$ and group $a$.
+  - Hence the term "reference" level.
+
+# The design matrix used by `lm` for our drug example
+
+- Let's view the rows of the design matrix ($\symbf{X}$) of our `group` variable, corresponding to the three groups:
+
+```{r}
+model.matrix(fit)[c(1, 11, 21), ]
+```
+
+- The first row corresponds to the reference level (placebo).
+- The second row corresponds to treatment A.
+- The third row corresponds to treatment B.
+
+# Translation of one-way ANOVA to the regression: the null hypothesis
+
+- The null hypothesis in ANOVA is equivalent to the following null hypothesis in regression:
+
+  $$
+  H_0: \symbf{L}\symbf{\beta} = \symbf{L}\symbf{\beta}^{(0)} = \symbf{0}
+  $$
+
+- where:
+  - $\symbf{L}$ is an $(a-1)\times k$ with one 1 per row and 0s otherwise, e.g. $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$
+  - The non-zero column indices in $\symbf{L}$ correspond to the positions of the categorical variable's regression parameters in $\symbf{\beta}$.
+  - For example, in our drug example, $\symbf{L} = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ as $\symbf{\beta}' = \left(\beta_0, \beta_{A}, \beta_B\right)$
+  - $\symbf{\beta}^{(0)} = \symbf{0}$
+
+# Translation of one-way ANOVA to the regression: the null hypothesis
+
+- Alternatively, 
+
+  $$
+  H_0: \beta_i = 0 \text{ for all } i \in \mathbb{A}
+  $$
+
+  for $\mathbb{A}$ the positions in $\symbf{\beta}$ corresponding to the categorical variable's effects.
+
+# Translation of one-way ANOVA to regression: the $F$-test
+
+- The one-way ANOVA $F$-statistic is equivalent to the following $F$-statistic in regression:
+
+$$
+F = \frac{(\symbf{L}\symbf{\beta} - \symbf{L}\symbf{\beta}^{(0)})'(s^2\symbf{L}\symbf{C}\symbf{L}^T)^{-1}(\symbf{L}\symbf{\beta} - \symbf{L}\symbf{\beta}^{(0)})}{a-1} = \frac{(\symbf{L}\symbf{\beta})'(s^2\symbf{L}\symbf{C}\symbf{L}^T)^{-1}(\symbf{L}\symbf{\beta})}{a-1} 
+$$
+
+- where:
+  - $\symbf{L}$ is an $(a-1)\times k$ matrix of zeros and ones, e.g. $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$,
+  - implicitly, $\symbf{\beta}^{(0)} = \symbf{0}$
+- Under the null, $F \sim F(a - 1, n - a)$.
+
+# The $F$-test for our drug example
+
+- We can calculate the $F$-statistic for our drug example:
+
+```{r}
+L <- matrix(c(0, 1, 0, 0, 0, 1), nrow = 2, byrow = TRUE)
+C <- solve(t(model.matrix(fit)) %*% model.matrix(fit))
+s2 <- summary(fit)$sigma^2
+coef_mat <- matrix(coef(fit), ncol = 1)
+f_stat <- (t(L %*% coef_mat) %*% solve(L %*% C %*% t(L)) %*% (L %*% coef_mat)) / s2 / nrow(L)
+1 - pf(f_stat, nrow(L), nrow(model.matrix(fit)) - ncol(model.matrix(fit)))
+```
+
+# Multi-way ANOVA and regression
+
+- Two-way ANOVA and beyond:
+  - Includes two (two-way) or more (multiple) categorical variables.
+  - May include interaction terms (i.e. the effect of one variable depends on the level of another variable).
+- We have not covered interaction terms yet (next week), but we note that regression can handle multi-way ANOVA.
+
+# Multi-way ANOVA and regression
+
+- However, the relationship between ANOVA and regression becomes more complicated at this point:
+  - *Order of entry of variables*:
+    - In regression, the effect of each variable is calculated after all other variables have been accounted for.
+    - In ANOVA, this is flexible.
+  - *Interaction terms*:
+    - In ANOVA, interaction terms can be handled in different ways, e.g. type I, II, or III sum of squares.
+    - In regression, we typically take the approach of type III sum of squares.
+- You can take approaches to regression that correspond directly to the ANOVA approaches, but these are more than simply fitting one model.
+  - For example, to mimick sequential ANOVA, you could fit a series of models, each with one more variable than the last.
+  - To mimick type II ANOVA testing, you would test main effects using a model without interaction terms.
+
+# Reduced and full models
+
+- The $F$-test for a subset of coefficients being zero can be calculated in an alternative fashion using two model fits.
+- Suppose that we have a reduced model, $M_0$, and a full model, $M_1$:
+  - Under $M_1$:
+    - Suppose that $Y=\symbf{X}\symbf{\beta} + \symbf{\epsilon}$.
+  - Under $M_0$:
+    - Let $\symbf{X}^{(0)}$ be a subset of the columns of $\symbf{X}$ (after excluding the columns corresponding to coefficients that are zero), and $\symbf{\beta}^{(0)}$ be the corresponding estimates.
+    - Then $Y=\symbf{X}^{(0)}\symbf{\beta}^{(0)} + e$.
+
+# Sums of squares for the reduced and full models
+
+- Let $\hat{\symbf{Y}}$ and $\hat{\symbf{Y}}^{(0)}$ be the predicted values under the full and reduced models, respectively.
+- Let $SSE_{UR}$ be the sum of squared errors under the unrestricted (full) model and $SSE_{R}$ be the sum of squared errors under the restricted (reduced) model.
+- Suppose that the number of parameters in the full and reduced models are $k_{UR}$ (just $k$, really) and $k_{R}$ (some value less than $k$), respectively.
+- Then
+
+  $$
+  SSE_{UR} = \sum_{i=1}^{n} (Y_i - \hat{Y}_i)^2, \quad SSE_{R} = \sum_{i=1}^{n} (Y_i - \hat{Y}_i^{(0)})^2.
+  $$
+
+# The $F$-test using the reduced and full models
+
+- The $F$-statistic is then
+
+  $$
+  F = \frac{(SSE_{R} - SSE_{UR}) / (k_{UR} - k_{R})}{SSE_{UR} / (n - k_{UR})}
+  $$
+
+- Under the null hypothesis, $F \sim F(k_{UR} - k_{R}, n - k_{UR})$.
+
+# Application of this $F$-test calculation to our drug example
+
+- We can calculate the $F$-statistic for the full and reduced models in our drug example:
+
+```{r}
+fit_reduced <- lm(bp ~ 1, data = trt_tbl)
+fit_full <- lm(bp ~ group, data = trt_tbl)
+sse_ur <- sum(residuals(fit_full)^2)
+sse_r <- sum(residuals(fit_reduced)^2)
+k_ur <- length(coef(fit_full))
+k_r <- length(coef(fit_reduced))
+f_stat <- ((sse_r - sse_ur) / (k_ur - k_r)) / (sse_ur / (n - k_ur))
+1 - pf(f_stat, k_ur - k_r, nrow(trt_tbl) - k_ur)
+```
+
+# F-statistic in the output of `summary(lm(...))`
+
+- The $F$-statistic in the output of `summary(lm(...))` tests the null hypothesis that all non-intercept coefficients are zero.
+- In other words, it tests the following null hypothesis:
+
+  $$
+  H_0: \beta_1 = \beta_2 = \ldots = \beta_k = 0
+  $$
+- It is useful for testing whether the explanatory variablles provide any information at all.
+
+# F-statistic in the output of `summary(lm(...))`
+
+- As the $F$ tests above assessed whether either drugs were different from placebo, they are equivalent to the $F$-statistic in the output of `summary(lm(...))`:
+
+```{r}
+#| results: hide
+summary(lm(bp ~ group, data = trt_tbl))
+```
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{_data_raw/img/f_stat.png}
+\end{center}
+
+# Extensions of ANOVA
+
+- **ANCOVA (Analysis of Covariance):**
+  - Combines ANOVA and regression by including both categorical and continuous predictors.
+  - *Regression Equivalent:* Regression models with both categorical and continuous variables.
+
+- **Repeated Measures ANOVA:**
+  - Used when the same subjects are measured multiple times.
+  - *Regression Equivalent:* Mixed-effects models.
+
+- **MANOVA (Multivariate ANOVA):**
+  - Extends ANOVA when there are multiple dependent variables.
+  - *Regression Equivalent:* Multivariate regression models.
+
+# Take-aways
+
+- ANOVA is a statistical technique used to compare the means of two or more groups.
+  - It can handle multiple groups and multiple levels of categorical variables.
+- ANOVA is a special case of linear regression.
+  - The $F$-statistic in ANOVA is equivalent to the $F$-statistic in regression for a subset of coefficients being zero.
+    - This equivalency always holds in one-way ANOVA, but becomes more complicated in multi-way ANOVA.
+- Regression uses dummy variables to handle categorical variables.
+  - The reference level is the level for which the intercept is the mean.
+  - The effect of each level is the difference in means between that level and the reference level.
+  - For a categorical variable with $a$ levels, $a-1$ dummy variables (and therefore $a-1$ regression coefficients) are needed.
+- The $F$-test can be calculated in three different ways:
+  - Directly from the sums of squares (i.e. using $SS_A$ and $SSE$).
+  - Using the full and reduced models (i.e. using $SSE_{UR}$ and $SSE_{R}$).
+  - Using the linear regression model (i.e. using $\symbf{L}$ and $\symbf{C}$).
+
+# Works cited
+
+---
+title: "Regression Week IV: Model Checking"
+subtitle: "Model Checking"
+author: "Yovna Junglee"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+```{r}
+library(tibble)
+library(ggplot2)
+```
+
+# So far...
+
+1. **Formulated** a linear model.
+2. **Parameter estimation** using least squares.
+3. Constructed **confidence intervals** for the parameters.
+4. Performed **hypothesis testing** and **ANOVA**.
+
+**Next:** **Model checking** to validate our model assumptions.
+
+# Proportion of variation explained by the model
+
+- The proportion of variation explained by the model is given by the **coefficient of determination**, $R^2$:
+
+  $$
+  R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST},
+  $$
+
+  where
+
+  - $SSR$: Regression sum of squares
+    - $\sum_{i=1}^n (\hat{Y}_i - \bar{Y})^2$
+  - $SSE$: Error sum of squares
+    - $\sum_{i=1}^n (Y_i - \hat{Y}_i)^2$
+  - $SST$: Total sum of squares
+    - $\sum_{i=1}^n (Y_i - \bar{Y})^2$
+
+- It is a sensible formula as $SST = SSR + SSE$.
+- It is also known as the coefficient of determination.
+
+
+# Coefficient of Determination - Example
+
+To understand the **coefficient of determination ($R^2$)**, let's consider an example where we fit models with an increasing number of predictors.
+
+```{r}
+# Simulate data
+set.seed(123)
+n <- 100
+X1 <- rnorm(n)
+X2 <- rnorm(n)
+X3 <- rnorm(n)
+epsilon <- rnorm(n, sd = 2)
+Y <- 3 + 2 * X1 + epsilon
+
+# Fit models with increasing predictors
+model1 <- lm(Y ~ 1)           # Intercept only
+model2 <- lm(Y ~ X1)          # One predictor
+model3 <- lm(Y ~ X1 + X2)     # Two predictors
+model4 <- lm(Y ~ X1 + X2 + X3) # Three predictors
+mod_list <- list(model1, model2, model3, model4)
+```
+
+# Coefficient of Determination - Example
+
+- The $R^2$ value tends to increase as we add more predictors:
+
+```{r}
+# Compute R-squared values
+R2_values <- lapply(mod_list, function(x) summary(x)$r.squared)
+R2_values |> sapply(function(x) signif(x, 4))
+```
+
+```{r}
+# Compute predicted values
+Y_hat <- lapply(mod_list, function(x) predict(x))
+# Compute overall mean
+```
+
+# Coefficient of Determination - Example
+
+```{r}
+plot(1:4, R2_values, type = "b", pch = 19,
+     xlab = "Model", ylab = expression(R^2),
+     main = expression("R"^2 * " Values for Models with Increasing Predictors"),
+     xaxt = "n", ylim = c(0, 1))
+axis(1, at = 1:4, labels = c("Intercept Only", "X1", "X1 + X2", "X1 + X2 + X3"))
+```
+
+**Observation:** $R^2$ increases as we add more variables, indicating an improved fit.
+
+# Coefficient of Determination
+
+1. The example demonstrates that adding variables improves the model fit.
+2. Measuring the fit via the correlation between fitted and true $Y$ values is sensible.
+3. The correlation coefficient $R$ is:
+
+   $$
+   R = \sqrt{\frac{\sum_{j=1}^n \hat{Y}_j^2 - n\bar{Y}^2}{\sum_{j=1}^n Y_j^2 - n\bar{Y}^2}} = \sqrt{\frac{\hat{\beta}'X'Y - n\bar{Y}^2}{Y'Y - n\bar{Y}^2}}
+   $$
+   
+4. $R$ ranges between $-1$ and $1$.
+
+# Coefficient of Determination Continued
+
+1. We often use the square of $R$, the **coefficient of determination ($R^2$)**:
+
+   $$
+   R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST}
+   $$
+   
+   - $SSR$: Regression sum of squares.
+   - $SSE$: Error sum of squares.
+   - $SST$: Total sum of squares.
+
+2. $R^2$ ranges from 0 to 1.
+3. An $R^2$ close to 1 indicates a good fit.
+4. An $R^2$ close to 0 suggests a poor fit.
+5. A higher $R^2$ does not guarantee significant $\beta$ estimates.
+6. $R^2$ is a valid measure primarily for linear models.
+
+**Interpretation:** $R^2$ represents the proportion of variance in $Y$ explained by the model.
+
+# Some More Comments
+
+1. **Adding variables increases $R^2$**, even if they are not significant—this can be misleading.
+2. Use the **Adjusted $R^2$** ($R^2_{\text{adj}}$) to account for the number of predictors:
+
+   $$
+   R^2_{\text{adj}} = 1 - \frac{SSE/(n - k)}{SST/(n - 1)} = 1 - (1 - R^2)\left(\frac{n - 1}{n - k}\right)
+   $$
+   
+   - $n$: Number of observations.
+   - $k$: Number of parameters (including the intercept).
+
+3. $R^2_{\text{adj}} \leq R^2$.
+4. When comparing models, choose the one with the highest $R^2_{\text{adj}}$.
+
+# Example
+
+Calculate $R^2$ and $R^2_{\text{adj}}$ for our models:
+
+```{r}
+# Compute Adjusted R-squared values
+adj_R2_values <- c(
+  summary(model1)$adj.r.squared,
+  summary(model2)$adj.r.squared,
+  summary(model3)$adj.r.squared,
+  summary(model4)$adj.r.squared
+)
+
+# Combine results
+R2_results <- data.frame(
+  Model = c("Intercept Only", "X1", "X1 + X2", "X1 + X2 + X3"),
+  R_squared = round(R2_values, 4),
+  Adjusted_R_squared = round(adj_R2_values, 4)
+)
+
+print(R2_results)
+```
+
+**Observation:** Adjusted $R^2$ may decrease if added predictors do not improve the model significantly.
+
+# Model Checking
+
+## Model Assumptions
+
+For our linear regression model, we assume:
+
+1. **Linearity**: $E(e_j) = 0$ for all $j$.
+2. **Homoscedasticity**: $E(e_j^2) = \sigma^2$ for all $j$.
+3. **Independence**: $E(e_j e_k) = 0$ for $j \neq k$.
+4. **Normality**: $e_j \sim N(0, \sigma^2)$ for all $j$.
+
+**Goal:** Validate these assumptions through residual analysis.
+
+# Model Checking Plots (Using the `mtcars` Dataset)
+
+We will use the `mtcars` dataset to perform model checking.
+
+```{r}
+# Load dataset
+data(mtcars)
+
+# Fit multiple linear regression model
+fit <- lm(mpg ~ wt + hp + disp + drat, data = mtcars)
+```
+
+### Residuals vs Fitted Plot
+
+```{r}
+# Residuals vs Fitted
+plot(fit$fitted.values, fit$residuals,
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted Values")
+abline(h = 0, col = "red")
+```
+
+- **Analysis**: Check for patterns. A funnel shape suggests heteroscedasticity.
+- **Observation**: Residuals appear randomly scattered around zero.
+
+# Analysis of Residuals
+
+## Outliers vs Influential Observations
+
+- **Outlier**: An observation not well fitted by the model (large residual).
+- **Influential Observation**: Significantly affects model estimates (high leverage).
+
+We use statistical measures to detect them.
+
+# Estimated Residuals
+
+Residuals are calculated as:
+
+$$
+\hat{e} = Y - \hat{Y} = (I - H)Y = MY
+$$
+
+- $M = I - H$ is idempotent and symmetric.
+- $H = X(X'X)^{-1}X'$ is the hat matrix.
+
+# Analysis of Residuals - Outliers
+
+Variance of residuals:
+
+$$
+\text{Var}(\hat{e}_i) = \sigma^2(1 - h_i)
+$$
+
+Standardized residuals:
+
+$$
+r_i = \frac{\hat{e}_i}{s\sqrt{1 - h_i}}
+$$
+
+- $s^2 = \frac{\hat{e}'\hat{e}}{n - k}$
+- $h_i$: Leverage of observation $i$
+
+**Rule of Thumb:** $|r_i| > 2$ indicates potential outliers.
+
+```{r}
+# Standardized residuals
+std_residuals <- rstandard(fit)
+
+# Plot
+plot(fit$fitted.values, std_residuals,
+     xlab = "Fitted Values", ylab = "Standardized Residuals",
+     main = "Standardized Residuals vs Fitted Values")
+abline(h = c(-2, 0, 2), col = "red", lty = 2)
+```
+
+# Analysis of Residuals - Externally Studentized Residuals
+
+Externally studentized residuals:
+
+$$
+t_i = \frac{\hat{e}_i}{s_{(i)}\sqrt{1 - h_i}}
+$$
+
+- $s_{(i)}$: Standard error without observation $i$
+
+**Use:** Detect outliers more accurately.
+
+```{r}
+# Externally studentized residuals
+stud_residuals <- rstudent(fit)
+
+# Plot
+plot(fit$fitted.values, stud_residuals,
+     xlab = "Fitted Values", ylab = "Studentized Residuals",
+     main = "Externally Studentized Residuals vs Fitted Values")
+abline(h = c(-2, 0, 2), col = "red", lty = 2)
+```
+
+**Observation:** Points beyond $\pm2$ are potential outliers.
+
+# Analysis of Residuals - Influential Points
+
+Leverage ($h_i$):
+
+$$
+h_i = \text{Diagonal of } H
+$$
+
+- Average $h_i$: $\frac{k}{n}$
+- **Rule of Thumb:** $h_i > \frac{2k}{n}$ indicates high leverage.
+
+```{r}
+# Leverage values
+leverages <- hatvalues(fit)
+
+# Plot
+plot(leverages, type = "h",
+     xlab = "Observation", ylab = "Leverage",
+     main = "Leverage Values")
+abline(h = 2 * length(coef(fit)) / nrow(mtcars), col = "red", lty = 2)
+```
+
+**Observation:** Identify observations with high leverage.
+
+# Cook's Distance and Modified Cook's Statistic
+
+**Cook's Distance ($D_i$)**:
+
+$$
+D_i = \left( \frac{t_i^2}{k} \right) \frac{h_i}{1 - h_i}
+$$
+
+- Measures influence of observation $i$.
+- **Cut-off:** $D_i > \frac{4}{n - k - 1}$
+
+```{r}
+# Cook's Distance
+cooks_d <- cooks.distance(fit)
+
+# Plot
+plot(cooks_d, type = "h",
+     xlab = "Observation", ylab = "Cook's Distance",
+     main = "Cook's Distance Plot")
+abline(h = 4 / (nrow(mtcars) - length(coef(fit))), col = "red", lty = 2)
+```
+
+**Observation:** Points above the red line are influential.
+
+# Modified Cook's Distance (Atkinson's Method)
+
+**Atkinson's Statistic ($A_i$)**:
+
+$$
+A_i = \sqrt{(n - k)D_i} = \sqrt{\left( \frac{n - k}{k} \right) \frac{h_i}{1 - h_i}} |t_i|
+$$
+
+- **Cut-off values:** 2 or 3.
+
+```{r}
+# Atkinson's Statistic
+A_i <- sqrt((nrow(mtcars) - length(coef(fit))) * cooks_d)
+
+# Plot
+plot(A_i, type = "h",
+     xlab = "Observation", ylab = "Atkinson's Statistic",
+     main = "Atkinson's Plot")
+abline(h = c(2, 3), col = c("blue", "red"), lty = 2)
+legend("topright", legend = c("Cut-off at 2", "Cut-off at 3"),
+       col = c("blue", "red"), lty = 2)
+```
+
+**Observation:** Points above the lines are potentially influential.
+
+# Summary
+
+- **Outliers**: Large residuals; do not fit well.
+- **Influential Points**: Significantly impact model parameters.
+- **Leverage**: Indicates potential influence based on predictor values.
+- **Studentized Residuals**: Detect outliers.
+- **Cook's Distance**: Identifies influential observations.
+- **Atkinson's Statistic**: Alternative measure for influence.
+---
+title: "Regression Week V: Matching the model to the data"
+author: Miguel Rodo
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+In general models, we have several key assumptions:
+
+- Linear relationship
+- Independence of errors
+- Homoscedasticity
+- Normality of residuals
+
+However, the datasets we're given are not interested in our assumptions!
+
+We will discuss how to adjust our model such that the assumptions are (more closely) met.
+
+# Initial example
+
+Let's consider a dataset where the relationship between the dependent variable $Y$ and the independent variable $X$ is not linear:
+
+```{r}
+set.seed(10)
+x_vec <- runif(30, 1, 10)
+y_vec <- x_vec^4 
+example_tbl_quad <- tibble(
+  x = x_vec / sd(x_vec),
+  y = y_vec / sd(y_vec) + rnorm(30, 0, 0.15)
+)
+```
+
+# Initial example
+
+```{r}
+#| include: false
+p_init <- ggplot(example_tbl_quad, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "initial_example-nonlinear_relationship.pdf"
+  )
+ggsave(path_fig, plot = p_init, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# We can already deal with this! If imperfectly
+
+Let us discretise the $X$ variable and fit a linear model:
+
+```{r}
+example_tbl_quad <- example_tbl_quad |>
+  dplyr::mutate(
+    x_cut = cut(x, breaks = 4)
+  )
+example_tbl_quad
+unique(example_tbl_quad$x_cut)
+```
+
+# Fit the model {.smaller}
+
+```{r}
+fit <- lm(y ~ x_cut, data = example_tbl_quad)
+```
+
+```{r}
+#| echo: false
+est_vec <- coef(fit)
+confint_tbl <- confint(fit)
+confint_tbl |>
+  tibble::as_tibble(
+    rownames = "Variable"
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec
+  ) |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    across(where(is.numeric), function(x) signif(x, 2))
+  ) |>
+  dplyr::select(
+    Variable, Estimate, Lower, Upper
+  )
+```
+
+# Plot the model: actual vs. predicted (discrete x-axis)
+
+```{r}
+#| echo: false
+pred_tbl <- example_tbl_quad |>
+  dplyr::group_by(
+    x_cut
+  ) |>
+  dplyr::slice(1) |>
+  dplyr::ungroup()
+pred_tbl$y_hat <- predict(fit, newdata = pred_tbl)
+pred_tbl <- pred_tbl |>
+  dplyr::mutate(
+    # Extract lower and upper bounds using stringr
+    x_low = as.numeric(stringr::str_extract(x_cut, "(?<=\\().*?(?=,)")),
+    x_high = as.numeric(stringr::str_extract(x_cut, "(?<=,).*?(?=\\])")),
+    x_mid = (x_low + x_high) / 2,
+    width = min(x_high - x_low) / 2
+  )
+# boxplots, with mean overlaid
+p_disc_actual <- ggplot(
+  example_tbl_quad, aes(x = x_cut, y = y)
+) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_boxplot(fill = "dodgerblue", alpha = 0.8) +
+  geom_point(
+    data = pred_tbl,
+    mapping = aes(x = x_mid, y = y_hat),
+    color = "red", inherit.aes = FALSE
+  ) +
+  labs(x = "X", y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "discretized_x_variable_actual.pdf"
+  )
+ggsave(path_fig, plot = p_disc_actual, width = 12, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Plot the model: actual vs. predicted (continuous x-axis)
+
+```{r}
+#| echo: false
+p_disc <- ggplot(example_tbl_quad, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(
+    aes(x = x, y = y),
+    method = "lm", se = FALSE, color = "orange"
+  ) +
+  geom_errorbarh(
+    data = pred_tbl,
+    mapping = aes(
+      y = y_hat, xmin = x_low, xmax = x_high),
+    color = "red", inherit.aes = FALSE, alpha = 0.8
+  ) +
+  geom_point(
+    data = pred_tbl,
+    mapping = aes(x = x_mid, y = y_hat),
+    color = "red", inherit.aes = FALSE
+  ) +
+  labs(x = "X", y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "discretized_x_variable.pdf"
+  )
+ggsave(path_fig, plot = p_disc, width = 12, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Suite of tactics
+
+We have the following tactics to deal with non-linear relationships:
+
+- Transform the dependent variable $Y$
+- Transform the independent variables $X_i$
+- Introduce new explanatory variables (e.g., polynomials, interaction terms)
+
+Which of these three did we do previously?
+
+# Transformed the independent variable and introduced new explanatory variables
+
+When fitting the continuous model, we had:
+
+```{r}
+model.matrix(lm(y ~ x, data = example_tbl_quad))[1:2, ]
+```
+
+After discretizing the $X$ variable, we had:
+
+```{r}
+model.matrix(lm(y ~ x_cut, data = example_tbl_quad))[1:2, ]
+```
+
+# Transforming the dependent variable $Y$: why do it?
+
+1. Linearize relationships:
+    - Transform non-linear relationships into linear ones.
+2. Stabilize variance:
+    - Address heteroscedasticity by equalizing the spread of residuals.
+3. Reduce skewness:
+    - Address skewed distributions of $Y$ to meet model assumptions.
+4. Handle outliers:
+    - Reduce the impact of extreme values on the model.
+
+# Example: Transforming the dependent variable
+
+Suppose we observe increasing variance with the mean of $Y$:
+
+```{r}
+set.seed(11)
+n <- 1000
+x_vec <- runif(n, 1, 10)
+y_vec <- x_vec + rpois(n, x_vec)^1.5 + runif(n, 0, 3)
+example_tbl_non_constant_var <- tibble(
+  x = x_vec, y = y_vec
+)
+```
+
+# Variance of $Y$ increases with the mean
+
+```{r}
+#| include: false
+p_init <- ggplot(example_tbl_non_constant_var, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "Y")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "example_transform_y-nonlinear_relationship.pdf"
+  )
+ggsave(path_fig, plot = p_init, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Taking the square root of $Y$
+
+```{r}
+example_tbl_non_constant_var$y_sqrt <-
+  sqrt(example_tbl_non_constant_var$y)
+``` 
+
+```{r}
+#| echo: false
+p <- ggplot(example_tbl_non_constant_var, aes(x = x, y = y_sqrt)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.8, colour = "dodgerblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X",
+       y = "sqrt(Y)")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "example_transform_y-sqrt_relationship.pdf"
+  )
+ggsave(path_fig, plot = p, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.7\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Benefits of Transforming $Y$
+
+- Less biased predictions and estimates
+  - Particularly when the relationship is non-linear.
+- More reliable inference
+- Occasionally, better interpretability
+
+# Common Transformations of $Y$
+
+1. **Logarithmic Transformation ($Y' = \log(Y)$)**
+   - Useful when $Y$ grows exponentially with $X$.
+   - Stabilizes variance and linearizes multiplicative relationships.
+   - Pulls in extreme values.
+   $$
+   Y = \exp\{\beta_0 + \beta_1 X\} \Rightarrow \log{Y} = \beta_0 + \beta_1 X
+   $$
+   - Note: undefined for $Y=0$ (if appropriate, use $\log(Y + 1)$).
+2. **Square Root Transformation ($Y' = \sqrt{Y}$)**
+   - Applied when variance increases with the mean of $Y$.
+   - Appropriate for count data and moderate heteroscedasticity.
+3. **Reciprocal Transformation ($Y' = 1/Y$)**
+   - Suitable when large values of $Y$ correspond to small variances.
+
+# Effect on interpretation
+
+- Coefficients retain the same interpretation as before - but on the transformed scale.
+  - For example, after logging the response, $\beta_1$ represents the increase in $\log{Y}$ for a unit change in $X$.
+- However, this is not the case on the transformed scale:
+  - *Logging*:
+    - When logging the response, $\exp{\beta_1}$ represents the multiplicative change in $Y$ for a unit change in $X$.
+    - However, it is no longer the increase in the *average* of $Y$, but rather the *median*.
+  - *Square root*: 
+    - When taking the square root of the response, $\beta_1$ represents the change in $\sqrt{Y}$ for a unit change in $X$.
+    - However, there is no direct interpretation for the change in the distribution of $Y$.
+
+# Practical Steps for Transforming $Y$
+
+1. *Explore the Data*:
+   - Use plots to detect non-linearity, heteroscedasticity, and skewness.
+2. *Choose an Appropriate Transformation*:
+   - Based on observed patterns (e.g., log for exponential growth).
+3. *Apply the Transformation and Re-fit the Model*:
+   - Transform $Y$ and assess the new model fit.
+4. *Evaluate Model Diagnostics*:
+   - Check residual plots, normality, and variance.
+5. *Interpret Results Carefully*:
+   - Adjust interpretations to account for the transformation.
+
+# Transforming Individual Explanatory Variables
+
+- In some cases, the relationship between the dependent variable $Y$ and one of the explanatory variables $X_i$ is non-linear, while the relationship with other variables is linear.
+- Transforming $Y$ may not be desirable, as it would alter the relationship with all explanatory variables.
+- Instead, we can transform the specific $X_i$ that has a non-linear relationship with $Y$.
+
+# Example: Non-linear Relationship with One Explanatory Variable
+
+Suppose we have a dataset with two explanatory variables, $X_1$ and $X_2$, where $Y$ has a linear relationship with $X_1$ but an exponential relationship with $X_2$.
+
+```{r}
+set.seed(123)
+n <- 100
+x1 <- runif(n, 0, 10)
+x2 <- runif(n, 1, 5)
+y <- 2 + 3 * x1 + 5 * exp(0.7 * x2) + rnorm(n, 0, 2)
+example_tbl <- tibble(
+  x1 = x1,
+  x2 = x2,
+  y = y
+)
+```
+
+# Plotting $Y$ against $X_1$ and $X_2$
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "Y", title = "Y vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = x2, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X2", y = "Y", title = "Y vs X2")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{`r path_fig`}
+\end{center}
+
+# Observations
+
+- **Plot A (Y vs X1)**: The relationship appears linear.
+- **Plot B (Y vs X2)**: The relationship is clearly non-linear (exponential).
+
+If we transform $Y$, for example by taking the square root or logarithm, we:
+
+- change its relationship with both $X_1$ and $X_2$
+- affect the variance
+
+# Logging $Y$ alters both relationships and renders variance non-constant
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = log(y))) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "log(Y)", title = "Log(Y) vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = x2, y = log(y))) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X2", y = "Y", title = "Log(Y) vs X2")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables-log_y.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.9\linewidth]{`r path_fig`}
+\end{center}
+
+# Transforming $X_2$
+
+To linearise the relationship between $Y$ and the variable relating to $X_2$, we can exponentiate $X_2$:
+
+```{r}
+example_tbl <- example_tbl |>
+  dplyr::mutate(
+    x2_exp = exp(x2) # Add 1 to avoid log(0)
+  )
+```
+
+# Plotting $Y$ against Transformed $X_2$
+
+```{r}
+#| include: false
+# Plot Y vs X1 (linear relationship)
+p1 <- ggplot(example_tbl, aes(x = x1, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "X1", y = "Y", title = "Y vs X1")
+
+# Plot Y vs X2 (non-linear relationship)
+p2 <- ggplot(example_tbl, aes(x = exp(x2), y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(x = "exp(X2)", y = "Y", title = "Y vs exp(X2)")
+
+# Arrange plots side by side
+p_combined <- cowplot::plot_grid(p1, p2, labels = c("A", "B"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_x_variables-exp_x2.pdf"
+)
+ggsave(path_fig, plot = p_combined, width = 16, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{`r path_fig`}
+\end{center}
+
+# Observations
+
+- The transformation of $X$ ($X^2$) has a linear relationship relationship with $Y$.
+- Now we can proceed with fitting a linear model without affecting the relationship between $Y$ and $X_1$, or the variance of the residuals.
+
+# Comparing model outputs {.smaller}
+
+::::{.columns}
+
+:::{.column width="80%"}
+
+
+```{r}
+#| eval: false
+lm(y ~ x1 + x2, data = example_tbl)
+```
+
+```{r}
+#| echo: false
+fit <- lm(y ~ x1 + x2, data = example_tbl[1:10, ])
+sd_lin <- summary(fit)$sigma |> signif(2)
+est_vec <- coef(fit) |> stats::setNames(NULL)
+coef_tbl <- confint(fit) |>
+  as.data.frame() |>
+  rownames_to_column("Variable") |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec,
+    `P-value` = broom::tidy(fit)$p.value,
+    across(where(is.numeric), function(x) signif(x, 2)),
+  ) |>
+  dplyr::select(
+    Variable, Estimate, `P-value`, Lower, Upper
+  )
+coef_tbl
+```
+
+```{r}
+#| eval: false
+lm(y ~ x1 + x2_exp, data = example_tbl)
+```
+
+```{r}
+#| echo: false
+fit <- lm(y ~ x1 + x2_exp, data = example_tbl[1:10, ])
+est_vec <- coef(fit) |> stats::setNames(NULL)
+sd_quad <- summary(fit)$sigma |> signif(2)
+coef_tbl <- confint(fit) |>
+  as.data.frame() |>
+  rownames_to_column("Variable") |>
+  dplyr::rename(
+    Lower = `2.5 %`,
+    Upper = `97.5 %`
+  ) |>
+  dplyr::mutate(
+    Estimate = est_vec,
+    `P-value` = broom::tidy(fit)$p.value,
+    across(where(is.numeric), function(x) signif(x, 2)),
+  ) |>
+  dplyr::select(
+    Variable, Estimate, `P-value`, Lower, Upper
+  )
+coef_tbl
+```
+
+:::
+
+:::{.column width="20%"}
+
+$\hat{\sigma}^2$:
+
+- Linear: `r sd_lin`
+- Exponential: `r sd_quad`
+
+
+:::
+
+::::
+
+# Common non-linear relationships: logarithmic, exponential, square root and square
+
+```{r}
+#| include: false
+set.seed(123)
+n <- 100
+
+example_tbl_trans <- tibble(
+  x_log = runif(n, 1, 1e2),
+  x_exp = runif(n, 1, 4),
+  x_sqrt = runif(n, 1, 100),
+  x_quad = runif(n, 1, 10)
+) |>
+  dplyr::mutate(
+    y_log = log(x_log) + rnorm(n, 0, 0.2),
+    y_exp = exp(x_exp) + rnorm(n, 0, 1),
+    y_sqrt = sqrt(x_sqrt) + rnorm(n, 0, 0.2),
+    y_quad = x_quad^2 + rnorm(n, 0, 2)
+  )
+
+p11 <- ggplot(example_tbl_trans, aes(x = x_log, y = y_log)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == log(X) + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p12 <- ggplot(example_tbl_trans, aes(x = x_exp, y = y_exp)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == e^{X} + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p21 <- ggplot(example_tbl_trans, aes(x = x_sqrt, y = y_sqrt)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == sqrt(X) + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p22 <- ggplot(example_tbl_trans, aes(x = x_quad, y = y_quad)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(color = "dodgerblue", alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") +
+  labs(
+    x = "X", y = "Y",
+    title = expression(Y == X^2 + epsilon)
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p_grid <- cowplot::plot_grid(
+  p11, p12, p21, p22, nrow = 2, ncol = 2
+)
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "transformation_explanatory_variables.pdf"
+)
+ggsave(path_fig, plot = p_grid, width = 16, height = 12, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.65\linewidth]{`r path_fig`}
+\end{center}
+
+# Transformations to correct common-linear relationship
+
+- In this case, you simply apply the function to $X$ that describes the relationship between $X$ and $Y$, and then fit the model.
+- For example:
+  - If $Y = \log(X) + \epsilon$, then:
+    - Do not fit the model $Y = \beta_0 + \beta_1 X$.
+    - Instead, fit this model: $Y = \beta_0 + \beta_1 \log(X)$.
+  - Example R code: `lm(y ~ log(x), data = data)`
+
+# Effect on Interpretation
+
+- **Coefficients represent the change in $Y$ for a unit change in the transformed $X$**.
+- Interpretations should be made in terms of the transformed variable.
+  - For example, with $X' = \log(X)$, $\beta_1$ represents the change in $Y$ for a one-unit increase in $\log(X)$.
+
+# Additional multiple variables corresponding to a single variable
+
+- The final tactic is to introduce new explanatory variables that correspond to a single explanatory variable.
+- This is particularly useful when the relationship between the dependent variable $Y$ and the explanatory variable $X$ is non-linear.
+
+# Example: Discretizing the $X$ variable {.smaller}
+
+This is precisely what we did when we discretised the $X$ variable:
+
+- *Continuous X*:
+  - Model formulation: $Y = \beta_0 + \beta_1 X + \epsilon$
+  - Single row of design matrix: $\begin{bmatrix}1 & X\end{bmatrix}$
+- *Discrete X*:
+  - Break $X$ into intervals and create dummy variables for each interval. Denote interval $i$ by $I_i$ (e.g. $I_1 = [0, 2)$, $I_2 = [2, 4)$, etc.).
+  - Model formulation: $Y = \beta_0 + \beta_{G_2}I(X \in I_2) + \ldots + \beta_{G_a}I(X \in I_a) + \epsilon$
+  - Single row of design matrix: $\begin{bmatrix}1 & I(X \in I_2) & \ldots & I(X \in I_a)\end{bmatrix}$
+
+# Additional example: Polynomial terms {.smaller}
+
+- Previously, we considered squaring the $X$ variable.
+- The design matrix went from this:
+  - $\begin{bmatrix}1 & X\end{bmatrix}$
+- To this:
+  - $\begin{bmatrix}1 & X^2\end{bmatrix}$.
+- However, we could retain the original $X$ term and add the squared term:
+  - $\begin{bmatrix}1 & X & X^2\end{bmatrix}$
+- Leading to the following model:
+  - $Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \epsilon$
+- This is useful when we're not sure of the relationship between $Y$ and $X$.
+  - For example, if the relationship is actually linear, the model will fit $\hat{\beta}_2 \approx 0$.
+
+# Introducing interaction terms
+
+Interaction terms allow us to model situations where the effect of one explanatory variable on the response variable depends on the level of another explanatory variable.
+
+# Example of interactions
+
+Suppose we have a dataset with two explanatory variables, $X$ and $Group$, where the effect of $X$ on $Y$ differs between groups.
+
+```{r}
+set.seed(456)
+n <- 100
+x <- runif(n, 0, 10)
+group <- sample(c("A", "B"), n, replace = TRUE)
+y <- ifelse(group == "A",
+            2 + 0.5 * x + rnorm(n, 0, 1),
+            2 + 1.5 * x + rnorm(n, 0, 1))
+example_interaction <- tibble(
+  x = x,
+  group = group,
+  y = y
+)
+```
+
+# Plotting the Interaction
+
+```{r}
+#| include: false
+p <- ggplot(example_interaction, aes(x = x, y = y, color = group)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy") +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "X", y = "Y") +
+  theme(legend.title = element_blank()) +
+  scale_colour_manual(values = c("dodgerblue", "orange"))
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "interaction_continuous_categorical.pdf"
+)
+ggsave(path_fig, plot = p, width = 10, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{`r path_fig`}
+\end{center}
+
+# Model formulation: two-level categorical variable
+
+To model the interaction between $X$ and $Group$, we fit the following linear model:
+
+$$
+Y = \beta_0 + \beta_1 X + \beta_G I(\text{Group} = B) + \beta_{X:G} X \times I(\text{Group} = B) + \epsilon
+$$
+
+We get one additional coefficient $\beta_{X:G}$ for the interaction term $X \times \text{Group}$.
+
+In `R`, this is done by including the interaction term `X * Group` in the formula:
+
+```{r}
+fit_interaction <- lm(y ~ x * group, data = example_interaction)
+```
+
+# Design matrix
+
+- To understand the effect of interactions, it is helpful to look at the design matrix:
+
+```{r}
+model.matrix(fit_interaction)[c(1, 4), ]
+```
+
+- Compared to a model with no interaction term, there is one additional column (`x:groupB`).
+  - When `group` is "A" (the reference category), the interaction variable value is 0.
+  - When `group` is "B", the interaction variable value is the same as `x`.
+  - The interaction term is the product of `x` and the dummy variable for `group` being "B".
+
+# Mean values of $Y$ for different groups {.smaller}
+
+- The general form of a row of the design matrix for a two-level categorical variable is:
+
+$$
+\begin{bmatrix}
+1 & x & I(\text{Group} = B) & x \times I(\text{Group} = B)
+\end{bmatrix}
+$$
+
+- This implies the following mean response values ($\mathrm{E}[Y] = \symbf{x}'\symbf{\beta}$):
+  - Group A: $\mathrm{E}[Y] = \begin{bmatrix}1 & x & 0& x \times 0 \end{bmatrix}\symbf{\beta}= \beta_0 + \beta_X x$
+  - Group B: $\mathrm{E}[Y] = \begin{bmatrix}1 & x & 1 & x \times 1 \end{bmatrix}\symbf{\beta}= \beta_0 + \beta_X x + \beta_G + \beta_{X:G} x$
+- If we group the terms, we get:
+  - Group A: $\beta_0 + \beta_X x$
+    - $\beta_X$ represents the effect of $X$ on $Y$ for group "A".
+  - Group B: $(\beta_0 + \beta_G) + (\beta_X + \beta_{X:G}) x$
+    - $\beta_X + \beta_{X:G}$ represents the effect of $X$ on $Y$ for group "B".
+    - $\beta_{X:G}$ represents the difference in the effect of $X$ between groups.
+
+# Model interpretation: two-level categorical variable {.smaller}
+
+```{r}
+#| echo: false
+coef_tbl <- broom::tidy(fit_interaction) |>
+  dplyr::mutate(
+    across(where(is.numeric), function(x) signif(x, 2))
+  ) |>
+  dplyr::select(
+    term, estimate, std.error, statistic, p.value
+  )
+coef_tbl
+```
+
+- As group $A$ is the reference group, the coefficient $\beta_{X}$ (`x`) represents the effect of $X$ on $Y$ for group $A$.
+  - In this case, a unit increase in $X$ increases $Y$ by $0.48$ units for group "A".
+- The interaction term $\beta_{X:G}$ represents the difference in the effect of $X$ between groups.
+  - In this case, a unit increase in $X$ increases $Y$ by $0.99$ units more for group "B" than for group "A".
+- The interaction term plus the main effect of $X$ gives the effect of $X$ for group "B".
+  - In this case, the effect of $X$ on $Y$ is $0.48 + 0.99 = 1.47$ units for group "B".
+
+# Hypothesis testing
+
+```{r}
+#| echo: false
+coef_tbl
+```
+
+- The first concern is whether the interaction term is significant.
+  - Clearly, the interaction term is significant in this case ($p < 0.0001$).
+  - Therefore, the effect of $X$ depends on the group.
+- The second concern is whether the main effect of $X$ is significant.
+  - Since the main effects for group $A$ and $B$ differ, they will have different hypothesis tests.
+  - As $\beta_{X}$ represents the effect of $X$ for group $A$, its p-value tells us whether $X$ has an effect on $Y$ for group "A". In this case, it does ($p < 0.0001$).
+
+# Hypothesis testing (cont.)
+
+```{r}
+#| echo: false
+coef_tbl
+```
+
+- However, the p-value for the effect of $X$ on $Y$ for group "B" is not actually available.
+  - For $X$ to have no effect for group "B", we need that $\beta_{X} + \beta_{X:G} = 0$.
+  - Here are the null and alternative hypotheses:
+    - $H_0: \beta_{X} + \beta_{X:G} = 0$
+    - $H_1: \beta_{X} + \beta_{X:G} \neq 0$
+- As $\symbf{\beta}'=\begin{pmatrix} \beta_0 & \beta_X & \beta_{G} & \beta_{X:G} \end{pmatrix}$, we can set $\ell = \begin{pmatrix} 0 & 1 & 0 & 1 \end{pmatrix}$ to test the hypothesis (using the $t$ or $F$ test):
+  - $H_0: \ell'\symbf{\beta} = \begin{pmatrix} 0 & 1 & 0 & 1 \end{pmatrix}\symbf{\beta} = \beta_X + \beta_{X:G} = 0$
+
+# Hypothesis testing (cont.)
+
+```{r}
+l_vec <- matrix(c(0, 1, 0, 1), ncol = 1)
+coef_vec <- matrix(coef(fit_interaction), ncol = 1)
+vcov_mat <- vcov(fit_interaction)
+se_lin_combn <- sqrt(t(l_vec) %*% vcov_mat %*% l_vec)
+t_stat <- (t(l_vec) %*% coef_vec) / se_lin_combn
+p_val <- 2 * pt(
+  -abs(t_stat),
+  df = nrow(example_interaction) - ncol(example_interaction)
+)
+p_val |> signif()
+```
+
+# Interactions involving $a$-level categorical variable
+
+*Model formulation*: In general, for an $a$-level categorical variable, we get $a-1$ additional coefficients for the interaction terms:
+
+$$
+\begin{aligned}
+Y &= \beta_0 + \beta_1 X + \beta_{G_2} I(\text{Group} = 2) + \ldots + \beta_{G_a} I(\text{Group} = B)_a \\
+  &\quad + \beta_{X:G_2} X \times \text{Group}_2 + \ldots + \beta_{X:G_a} X \times \text{Group}_a + \epsilon
+\end{aligned}
+$$
+
+*Interpretation*: The interpretation is similar to the two-level categorical variable case, but with $a-1$ additional interaction terms. Each interaction term represents the difference in the effect of $X$ between the reference group and the group corresponding to the interaction term.
+
+# Hypothesis testing: $a$-level categorical variable
+
+- *Does the effect of $X$ depend on group $i$?*:
+  - This tests whether the effect of $X$ differs between group $i$ and the reference group:
+    - $H_0: \beta_{X:G_i} = 0$
+    - $H_1: \beta_{X:G_i} \neq 0$
+  - We would use a $t$-test to assess the significance of the interaction term.
+- *Does the effect of $X$ depend on group?*:
+  - This tests whether the effect of $X$ is the same for all groups:
+    - $H_0: \beta_{X:G_2} = \ldots = \beta_{X:G_a} = 0$
+    - $H_1$: At least one of the interaction terms is non-zero.
+  - Accordingly, we would use an $F$-test to assess the significance of the interaction terms.
+
+# Hypothesis testing: $a$-level categorical variable
+
+- *Does $X$ affect Y for group $i$?*:
+  - This tests whether there is a non-zero slope for group $i$:
+    - $H_0: \beta_X + \beta_{X:G_i} = 0$ 
+    - $H_1: \beta_X + \beta_{X:G_i} \neq 0$
+  - We would use a $t$-test to assess the significance of the main effect of X for group $i$, with the appropriate linear combination.
+- *Does group $i$ affect $Y$?*:
+  - This is a test for whether group $i$ has a different slope or intercept than the reference group:
+    - $H_0: \beta_{G_i} = \beta_{X:G_i} = 0$
+    - $H_1: \beta_{G_i} \neq 0$ or $\beta_{X:G_i} \neq 0$
+
+# Types of interaction terms {.smaller}
+
+1. **Continuous x Categorical**: Interaction between a continuous and a categorical variable.
+  - What we have discussed so far.
+2. **Categorical x Categorical**: Interaction between two categorical variables.
+  - In this case, there are $(a_1-1) \times (a_2-1)$ interaction-term coefficients added to the model, where $a_1$ and $a_2$ are the number of levels of the two categorical variables.
+  - The additional columns (variables) added to the design matrix are still the product of the dummy variables for the two categorical variables.
+3. **Continuous x Continuous**: Interaction between two continuous variables.
+  - The interaction term is the product of the two continuous variables.
+  - In this case, only one additional coefficient is added to the model.
+---
+title: "Regression Week V: Prediction"
+author: "Miguel Rodo"
+institute: "University of Cape Town"
+aspectratio: 169
+theme: Boadilla
+format:
+  beamer:
+    embed-resources: true
+    colorlinks: true
+    include-in-header:
+      file: preamble.tex
+    classoption: "aspectratio=169"
+---
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
+}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Predicting Individual Values
+
+- Suppose we want to predict the range of individual future observations.
+- We fit a linear regression model to our data.
+- Then, we can obtain **prediction intervals** for new observations:
+  - The prediction interval is an interval that contains the new observation with a certain probability.
+
+# Confidence Intervals vs. Prediction Intervals
+
+- **Confidence intervals** estimate the mean response at a given predictor value.
+  - Source of variability: Uncertainty in estimating $\beta$.
+- **Prediction intervals** estimate the range of individual future observations.
+  - Sources of variability: Uncertainty in estimating $\beta$ and random variation in future observations.
+
+# Example (ten observations)
+
+```{r}
+#| echo: false
+n <- 10
+x_vec <- runif(n, 0, 10)
+y_vec <- 2 * x_vec + rnorm(n, 0, 2)
+example_tbl <- tibble(x = x_vec, y = y_vec)
+fit_vec <- lm(y ~ x, data = example_tbl)
+x_vec_seq <- seq(min(x_vec), max(x_vec), length.out = 1e3)
+y_vec_seq_pred <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "prediction")
+y_vec_seq_conf <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "confidence")
+plot_tbl_int <- tibble(
+  x = rep(x_vec_seq, 2),
+  lower = c(y_vec_seq_pred[, 2], y_vec_seq_conf[, 2]),
+  upper = c(y_vec_seq_pred[, 3], y_vec_seq_conf[, 3]),
+  interval_type = rep(c("Prediction", "Confidence"), each = length(x_vec_seq))
+)
+
+p <- ggplot(example_tbl, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  geom_point(col = "dodgerblue", alpha = 0.8) +
+  geom_smooth(col = "orange", method = "lm", se = FALSE, size = 1.5) +
+  geom_ribbon(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Confidence"),
+     aes(x = x, ymin = lower, ymax = upper, fill = interval_type),
+     alpha = 0.5,
+    inherit.aes = FALSE) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = lower, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = upper, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  scale_colour_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  scale_fill_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  labs(
+    x = "Predictor",
+    y = "Response"
+  ) +
+  theme(
+    legend.title = element_blank()
+  )
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "ci_vs_pred.pdf"
+  )
+ggsave(path_fig, plot = p, width = 14, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+# Confidence intervals shrink to zero as sample size increases, but prediction intervals do not (100 observations)
+
+```{r}
+#| echo: false
+n <- 200
+x_vec <- runif(n, 0, 10)
+y_vec <- 2 * x_vec + rnorm(n, 0, 2)
+example_tbl <- tibble(x = x_vec, y = y_vec)
+fit_vec <- lm(y ~ x, data = example_tbl)
+x_vec_seq <- seq(min(x_vec), max(x_vec), length.out = 1e3)
+y_vec_seq_pred <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "prediction")
+y_vec_seq_conf <- predict(fit_vec, newdata = tibble(x = x_vec_seq), interval = "confidence")
+plot_tbl_int <- tibble(
+  x = rep(x_vec_seq, 2),
+  lower = c(y_vec_seq_pred[, 2], y_vec_seq_conf[, 2]),
+  upper = c(y_vec_seq_pred[, 3], y_vec_seq_conf[, 3]),
+  interval_type = rep(c("Prediction", "Confidence"), each = length(x_vec_seq))
+)
+
+p <- ggplot(example_tbl, aes(x = x, y = y)) +
+  theme_cowplot_bg() +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  geom_point(col = "dodgerblue", alpha = 0.1) +
+  geom_smooth(col = "orange", method = "lm", se = FALSE, size = 0.01) +
+  geom_ribbon(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Confidence"),
+     aes(x = x, ymin = lower, ymax = upper, fill = interval_type),
+     alpha = 0.5,
+    inherit.aes = FALSE) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = lower, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  geom_line(
+    data = plot_tbl_int |>
+      dplyr::filter(interval_type == "Prediction"),
+    aes(x = x, y = upper, col = interval_type),
+    linetype = "11",
+    size = 1
+  ) +
+  scale_colour_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  scale_fill_manual(values = c("Prediction" = "#e78ac3", "Confidence" = "#66c2a5")) +
+  labs(
+    x = "Predictor",
+    y = "Response"
+  ) +
+  theme(
+    legend.title = element_blank()
+  )
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w5", "ci_vs_pred_n.pdf"
+  )
+ggsave(path_fig, plot = p, width = 14, height = 8, units = "cm")
+```
+
+\begin{center}
+\includegraphics[width=0.8\linewidth  ]{`r path_fig`}
+\end{center}
+
+
+# Prediction Intervals: Derivation
+
+- **Goal:** Obtain a prediction interval for a new response $Y_f$ at predictor values $X_f$.
+
+- **Predicted value:**
+  $$
+  \hat{Y}_f = X_f' \hat{\beta}
+  $$
+
+- **Actual value:** $Y_f = X_f' \beta + \epsilon_f$, where $\epsilon_f \sim N(0, \sigma^2)$.
+
+
+
+# Prediction Intervals: Derivation
+
+- **Difference between actual and predicted values:**
+  $$
+  Z = Y_f - \hat{Y}_f
+  $$
+
+- **Expected value of $Z$:**
+  $$
+  E(Z) = E(Y_f - \hat{Y}_f) = X_f' \beta - X_f' E(\hat{\beta}) = 0
+  $$
+
+- **Variance of $Z$:**
+  $$
+  \text{Var}(Z) = \text{Var}(Y_f - \hat{Y}_f) = \sigma^2 + \sigma^2 X_f' (X'X)^{-1} X_f = \sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)
+  $$
+
+
+
+# Prediction Intervals: Derivation
+
+- **Standardized variable:**
+  $$
+  \frac{Z}{\sqrt{\sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)}} \sim N(0,1)
+  $$
+
+- **Estimate $\sigma^2$ with $s^2$:**
+  $$
+  t = \frac{Y_f - \hat{Y}_f}{s \sqrt{1 + X_f' (X'X)^{-1} X_f}} \sim t_{n - k}
+  $$
+
+- **Prediction interval:**
+  $$
+  Y_f \in \hat{Y}_f \pm t_{\alpha/2, n - k} \cdot s \sqrt{1 + X_f' (X'X)^{-1} X_f}
+  $$
+
+# Variable Selection Motivation
+
+- We may want fewer variables in our model for:
+  - Interpretation purposes.
+  - Practical application
+  - Prediction accuracy:
+    - Bias-variance trade-off.
+
+- Aim: **Select the best subset of variables** that provides the optimal balance.
+
+# The Combinatorial Challenge
+
+- With $p$ predictors, there are $2^p$ possible models.
+
+- **Example:** For $p = 100$, $2^{100} \approx 1.27 \times 10^{30}$ models.
+
+- **Computationally infeasible** to evaluate all models.
+
+# Greedy Algorithms for Variable Selection
+
+- So, we adopt heuristic approaches to select variables.
+
+- **Iterative, greedy optimization algorithms:**
+  - *Iterative:* Start with a given solution and iteratively improve it.
+  - *Greedy:* Always make the best immediate move without reconsideration.
+
+- **Approaches:**
+  - *Forward Selection*
+  - *Backward Elimination*
+  - *Stepwise Selection*
+
+
+
+# Forward Selection
+
+- Start with the intercept-only model.
+
+- Iteratively add** the variable that provides the best improvement according to a criterion.
+
+- Stop when no further improvement is possible.
+
+
+# Model Selection Criteria
+
+- **$R^2$:** Not suitable (always increases with more variables).
+
+- **Adjusted $R^2$:** Adjusts for the number of predictors.
+
+- **Akaike Information Criterion (AIC):**
+  $$
+  \text{AIC} = n \ln(\text{RSS}/n) + 2k
+  $$
+
+- **Bayesian Information Criterion (BIC):**
+  $$
+  \text{BIC} = n \ln(\text{RSS}/n) + \ln(n)k
+  $$
+
+- **Objective:** Minimize AIC or BIC.
+
+# Example: Forward Selection in R
+
+- **Simulate data with four variables: A, B, C, D.**
+
+- **Variables A and B** are related to the response.
+
+- **Variables C and D** are not related.
+
+# R Code: Simulating Data
+
+```{r}
+set.seed(123)
+
+# Sample size
+n <- 100
+
+# Predictor variables
+A <- rnorm(n)
+B <- rnorm(n)
+C <- rnorm(n)
+D <- rnorm(n)
+
+# Response variable
+Y <- 3 * A + 2 * B + rnorm(n)
+
+# Data frame
+data <- tibble(Y, A, B, C, D)
+```
+
+# R Code: Forward Selection
+
+- **Load required package:**
+
+```{r}
+library(MASS) # For stepAIC function
+```
+
+- **Start with intercept-only model:**
+
+```{r}
+null_model <- lm(Y ~ 1, data = data)
+full_model <- lm(Y ~ A + B + C + D, data = data)
+```
+
+- **Apply forward selection:**
+
+```{r}
+#| results: "hide"
+forward_model <- stepAIC(null_model, scope = list(lower = null_model, upper = full_model), direction = "forward")
+```
+
+# Model fitting process
+
+\begin{center}
+\includegraphics[width=\linewidth]{_data_raw/img/forward_selection.png}
+\end{center}
+
+# Forward Selection: Results
+
+```{r}
+#| echo: false
+coef(forward_model) |> signif(2)
+```
+
+- **Output shows that variables A and B are included.**
+
+# Backward Elimination
+
+- Start with the full model containing all predictors.
+
+- Iteratively remove the variable that least contributes to the model.
+
+- Stop when removing additional variables worsens the model.
+
+# Stepwise Selection
+
+- Combination of forward and backward methods.
+
+- At each step:
+  - Add the best variable.
+  - Remove any variable that no longer improves the model.
+
+- Allows variables to be reconsidered. (so, it's less greedy)
+
+# R Code: Backward Elimination
+
+- **Apply backward elimination:**
+
+```{r}
+#| results: "hide"
+backward_model <- stepAIC(full_model, direction = "backward")
+```
+
+- **Selected variables:**
+
+```{r}
+coef(backward_model) |> signif(2)
+```
+
+- **Variables A and B remain in the model.**
+
+# R Code: Stepwise Selection
+
+- **Apply stepwise selection:**
+
+```{r}
+#| results: "hide"
+stepwise_model <- stepAIC(
+  null_model,
+  scope = list(lower = null_model, upper = full_model),
+  direction = "both"
+)
+```
+
+- **Selected variables:**
+
+```{r}
+coef(stepwise_model) |> signif(2)
+```
+
+- **Again, variables A and B are selected.**
+
+# Larger Example: Simulating High-Dimensional Data
+
+- **Simulate data with 100 predictors, only 10 related to the response.**
+
+```{r}
+set.seed(123)
+# Sample size
+n <- 200; p <- 100
+
+# Generate predictors
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+colnames(X) <- paste0("X", 1:p)
+
+# True coefficients
+beta <- c(rep(2, 5), rep(-2, 5), rep(0, p - 10))
+
+# Response variable
+Y <- X %*% beta + rnorm(n, sd = 0.05)
+
+data_hd <- data.frame(Y, X) |> as_tibble()
+```
+
+# Apply forward, backward, and stepwise selection
+
+```{r}
+forward_model_hd <- stepAIC(
+  lm(Y ~ 1, data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "forward", trace = FALSE)
+backward_model_hd <- stepAIC(
+  lm(Y ~ ., data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "backward", trace = FALSE
+)
+stepwise_model_hd <- stepAIC(
+  lm(Y ~ 1, data = data_hd),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "both", trace = FALSE
+)
+```
+
+# Procedure performance
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+fw_inc <- sum(names(coef(forward_model_hd)) %in% colnames(X))
+bw_inc <- sum(names(coef(backward_model_hd)) %in% colnames(X))
+sw_inc <- sum(names(coef(stepwise_model_hd)) %in% colnames(X))
+
+fw_correct <- sum(names(coef(forward_model_hd)) %in% colnames(X)[1:10])
+bw_correct <- sum(names(coef(backward_model_hd)) %in% colnames(X)[1:10])
+sw_correct <- sum(names(coef(stepwise_model_hd)) %in% colnames(X)[1:10])
+
+results_tbl <- tibble(
+  Method = c("Full", "Forward", "Backward", "Stepwise"),
+  `# Included` = c(100, fw_inc, bw_inc, sw_inc),
+  `# Correct` = c(10, fw_correct, bw_correct, sw_correct),
+  `R^2` = c(
+    summary(lm(Y ~ ., data = data_hd))$r.squared,
+    summary(forward_model_hd)$r.squared,
+    summary(backward_model_hd)$r.squared,
+    summary(stepwise_model_hd)$r.squared
+  ),
+  `R^2_adj` = c(
+    summary(lm(Y ~ ., data = data_hd))$adj.r.squared,
+    summary(forward_model_hd)$adj.r.squared,
+    summary(backward_model_hd)$adj.r.squared,
+    summary(stepwise_model_hd)$adj.r.squared
+  ),
+  AIC = c(
+    AIC(lm(Y ~ ., data = data_hd)),
+    AIC(forward_model_hd),
+    AIC(backward_model_hd),
+    AIC(stepwise_model_hd)
+  ),
+  BIC = c(
+    BIC(lm(Y ~ ., data = data_hd)),
+    BIC(forward_model_hd),
+    BIC(backward_model_hd),
+    BIC(stepwise_model_hd)
+  )
+)
+results_tbl
+```
+
+# Estimating True Prediction Error
+
+- **Simulate data where no predictors are related to the response.**
+
+```{r}
+set.seed(123)
+
+n <- 150
+p <- 100
+
+# Generate predictors
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+colnames(X) <- paste0("X", 1:p)
+
+# Response variable with no relation to predictors
+Y <- rnorm(n)
+
+# Data frame
+data_null <- data.frame(Y, X)
+```
+
+# Applying Forward Selection
+
+- **Use forward selection:**
+
+```{r}
+null_model <- lm(Y ~ 1, data = data_null)
+full_model <- lm(Y ~ ., data = data_null)
+
+forward_model <- stepAIC(
+  null_model, scope = list(lower = null_model, upper = full_model), direction = "forward", trace = FALSE
+)
+```
+
+We actually include `r sum(names(coef(forward_model)) != "(Intercept)")` variables in the model.
+The mean squared error is then `r mean((data_null$Y - predict(forward_model, newdata = data_null))^2) |> signif(2)`.
+
+# Observations on Forward Selection
+
+- Our estimated error is much lower than it should be (it should be close to 1, the variance).
+- Using the same data to evaluate the model as was used to select the model leads to under-estimating the error.
+
+# Training-Test Split
+
+- **Split data into training and test sets:**
+
+```{r}
+set.seed(123)
+train_indices <- sample(1:n, size = floor(0.8 * n))
+
+# Training data
+train_data <- data_null[train_indices, ]
+
+# Test data
+test_data <- data_null[-train_indices, ]
+```
+
+# Evaluating Model Performance
+
+- **Fit model on training data:**
+
+```{r}
+forward_model_cv <- stepAIC(
+  lm(Y ~ 1, data = train_data),
+  scope = list(lower = ~1, upper = ~.),
+  direction = "forward", trace = FALSE
+)
+```
+
+- **Predict on test data:**
+
+```{r}
+predictions <- predict(forward_model_cv, newdata = test_data)
+```
+
+- **Calculate Mean Squared Error (MSE):**
+
+```{r}
+mse_test <- mean((test_data$Y - predictions)^2)
+```
+
+The error is now `r mse_test |> signif(2)`, whereas when calculated on in-sample data it was `r mean((data_null$Y - predict(forward_model, newdata = data_null))^2) |> signif(2)`.
+
+
+# Observations on error rate estimation
+
+- Test MSE was closer to the true error than the in-sample error.
+
+# Summary
+
+- **Prediction intervals** account for uncertainty in both parameter estimation and future observations.
+
+- **Variable selection** helps in building parsimonious models.
+
+- **Selection criteria** like AIC and BIC balance model fit and complexity.
+
+- **Forward, backward, and stepwise selection** are practical methods for variable selection.
+
+- **Training-test split error estimation** helps in estimating true prediction error.---
+title: "Regression Week V: Gauss-Markov Theorem"
+author: "Miguel Rodo (rewrite of William Msemburi's slides)"
+institute: "University of Cape Town"
+theme: Boadilla
+format:
+  pdf:
+    embed-resources: true
+    colorlinks: true
+---
+
+# The Gauss-Markov Theorem
+
+**Theorem**: In the model $\symbf{Y} = \symbf{X}\symbf{\beta} + \symbf{e}$, where $\mathrm{E}(\symbf{e}) = \symbf{0}$ and $E(\symbf{e}\symbf{e}') = \sigma^2 \symbf{I}_n$, the OLS estimate $\hat{\symbf{\beta}}$ is the **BLUE** (Best Linear Unbiased Estimator) of $\symbf{\beta}$.
+
+## Assumptions:
+
+- The model is linear in the parameters, i.e., $\symbf{Y} =  \symbf{X}\symbf{\beta} + \symbf{e}$, where:
+  - $\symbf{Y}$ is an observed $n \times 1$ vector
+  - $\symbf{X}$ is an $n \times k$ observed, full column-rank matrix
+  - $\symbf{e}$ is an $n \times 1$ vector of unobserved errors
+- The errors satisfy:
+  - $E(\symbf{e} | \symbf{X}) = \symbf{0}$ (unbiased)
+  - $\text{Var}(\symbf{e} | \symbf{X}) = \sigma^2 \symbf{I}_n$ (homoskedasticity and no autocorrelation)
+
+# Proof
+
+Proof: Let $\tilde{\symbf{\beta}} = A\symbf{Y}$ for any matrix $A$. Choose $A$ to be
+
+$$
+A = (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B}
+$$
+
+where $\symbf{B}$ is arbitrary. To be unbiased, we need that $E(\tilde{\symbf{\beta}}) = \symbf{\beta}$. Taking the expectation of $\tilde{\symbf{\beta}}$, we have that:
+
+$$
+\begin{aligned}
+E(\tilde{\symbf{\beta}}) &= E(A\symbf{Y}) = A E(\symbf{Y}) = A \symbf{X}\symbf{\beta} \\
+&= \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{X}\symbf{\beta} \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} \\
+&= \symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta}.
+\end{aligned}
+$$
+
+Therefore, for $\tilde{\symbf{\beta}}$ to be unbiased, we need that $\symbf{B}\symbf{X} = \symbf{0}$.
+
+Now, we consider the variance of $\tilde{\symbf{\beta}}$.
+
+As $E(\tilde{\symbf{\beta}}) = \symbf{\beta}$, the covariance of $\tilde{\symbf{\beta}}$ is:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}})
+&= E\left[(\tilde{\symbf{\beta}} - \symbf{\beta})(\tilde{\symbf{\beta}} - \symbf{\beta})'\right] \\
+\end{aligned}
+$$
+
+Substituting in the expression for $\tilde{\symbf{\beta}}$, we have:
+
+$$
+\tilde{\symbf{\beta}} - \symbf{\beta} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{Y} - \symbf{\beta} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)(\symbf{X}\symbf{\beta} + \symbf{e}) - \symbf{\beta}
+$$
+
+Simplifying:
+
+$$
+\begin{aligned}
+\tilde{\symbf{\beta}} - \symbf{\beta} &= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} - \symbf{\beta} \\
+&= \symbf{\beta} + \symbf{B}\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} - \symbf{\beta} \\
+&= (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \quad \text{(since } \symbf{B}\symbf{X} = \symbf{0}).
+\end{aligned}
+$$
+
+Therefore, the covariance is:
+
+$$
+\text{cov}(\tilde{\symbf{\beta}}) = E\left[ \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \right) \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{e} + \symbf{B}\symbf{e} \right)' \right].
+$$
+
+Simplify:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) E[\symbf{e}\symbf{e}'] \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)' \\
+&= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right)'.
+\end{aligned}
+$$
+
+Expanding the product:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}(\symbf{X}'\symbf{X})^{-1} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{B}' + \symbf{B}\symbf{X}(\symbf{X}'\symbf{X})^{-1} + \symbf{B}\symbf{B}' \right).
+\end{aligned}
+$$
+
+Since $\symbf{B}\symbf{X} = \symbf{0}$ and $\symbf{X}'\symbf{B}' = (\symbf{B}\symbf{X})' = \symbf{0}'$, the middle terms vanish:
+
+$$
+\begin{aligned}
+\text{cov}(\tilde{\symbf{\beta}}) &= \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1} + \symbf{B}\symbf{B}' \right).
+\end{aligned}
+$$
+
+Let $\symbf{G} = \symbf{B}\symbf{B}'$, then we have:
+
+$$
+\text{cov}(\tilde{\symbf{\beta}}) = \sigma^2 \left( (\symbf{X}'\symbf{X})^{-1} + \symbf{G} \right).
+$$
+
+The variances of the individual elements of $\tilde{\symbf{\beta}}$ are the diagonal elements of $\text{cov}(\tilde{\symbf{\beta}})$. As $\symbf{X}$ is fixed, the diagonal elements of $\symbf{G}$ must be minimized. Since $\symbf{G} = \symbf{B}\symbf{B}'$, the diagonal elements of $\symbf{G}$ are sums of squares of the elements of $\symbf{B}$, which is minimized when $\symbf{B} = \symbf{0}$.
+
+Considering our original definition of $\tilde{\symbf{\beta}}$, we have that:
+
+$$
+\tilde{\symbf{\beta}} = A\symbf{Y} = \left( (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{B} \right) \symbf{Y} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{Y} = \hat{\symbf{\beta}}.
+$$
+
+Therefore, the OLS estimator is the BLUE.
+
+# Importance of the Gauss-Markov Theorem
+
+- **Optimal Estimation**: Establishes OLS as the most efficient linear unbiased estimator under the specified conditions.
+- **Foundation for Regression Analysis**: Provides a theoretical backbone for the widespread use of OLS in statistical modeling.
+- **Guidance on Model Assumptions**: Highlights the critical assumptions needed for OLS to be optimal, informing model diagnostics and adjustments.---
+title: "Bootstrapping"
+author: "Miguel Rodo"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+nocite: |
+  @hesterberg14
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_set(
+  cowplot::theme_cowplot() + 
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white"),
+    )
+  )
+```
+
+# Introduction
+
+Suppose that we have skewed data
+
+```{r}
+x_vec <- seq(0.0001, 10, length.out = 1e3)
+skew_tbl <- tibble(
+  x = x_vec,
+  y = dexp(x_vec, rate = 0.1)^1.5
+)
+```
+
+```{r}
+#| include: false
+p <- ggplot(skew_tbl) +
+  geom_line(aes(x = x, y = y), color = "dodgerblue", size = 1) +
+  labs(x = "Value", y = "Frequency") +
+  cowplot::background_grid(major = "xy", minor = "none")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-init_example.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 10, height = 7, dpi = 150,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.4\textwidth]{`r path_fig`}
+\end{centering}
+
+# The distribution of the mean will tend to be skewed as well, especially at lower sample sizes
+
+```{r}
+set.seed(4)
+mean_tbl <- purrr::map_df(
+  c(5, 10, 20, 40, 100, 1e3), function(x) {
+    set.seed(3)
+    mean_vec <- replicate(1e3, {
+      x_vec <- rexp(x, rate = 0.1)^1.5
+      mean(x_vec)
+    })
+    tibble(
+      sample_size = x,
+      mean = mean_vec
+    )
+  }
+)
+```
+
+# The distribution of the mean will tend to be skewed as well, especially at lower sample sizes
+
+```{r}
+#| include: false
+mean_tbl_norm <- purrr::map_df(
+  c(5, 10, 20, 40, 100, 1e3), function(x) {
+    set.seed(3)
+    mean_vec <- mean_tbl |>
+      dplyr::filter(sample_size == x) |>
+      dplyr::pull(mean)
+    mean_norm <- mean(mean_vec)
+    sd_norm <- sd(mean_vec)
+    x_vec <- seq(min(mean_vec), max(mean_vec), length.out = 1e3)
+    y_vec <- dnorm(x_vec, mean = mean_norm, sd = sd_norm)
+    tibble(
+      sample_size = x,
+      x = x_vec,
+      y = y_vec
+    )
+  }
+)
+p <- ggplot(
+  mean_tbl, aes(x = mean, fill = factor(sample_size))
+) +
+  geom_line(
+    data = mean_tbl_norm,
+    aes(x = x, y = y, group = sample_size),
+    color = "black", size = 1,
+    inherit.aes = FALSE
+  ) +
+  geom_density(alpha = 0.7) +
+  labs(x = "Mean", y = "Density") +
+  scale_fill_viridis_d(option = "plasma", name = "Sample Size") +
+  facet_wrap(~ sample_size, scales = "free") +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  theme(legend.position = "none") +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(title = "Distribution of the Mean by Sample Size")
+
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-mean_example.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 16, height = 14,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.575\textwidth]{`r path_fig`}
+\end{centering}
+
+# Problematic for confidence intervals - all problems fixed?
+
+Suppose that we wish to estimate a confidence interval for the mean of some distritution.
+Then, assuming that the data is normally distributed, we can use the following formula:
+
+$$
+\bar{x} \pm z_{\alpha/2} \hat{se}(\bar{x})
+$$
+
+where:
+
+- $\bar{x}$ is the sample mean,
+- $s$ is the sample standard deviation,
+- $n$ is the sample size, and
+- $z_{\alpha/2}$ is the critical value for the desired confidence level.
+
+\pause
+
+- Problem? $s$ is estimated
+
+# We can improve this using the $t$-distribution
+
+$$
+\bar{x} \pm t_{\alpha/2, n-1} \hat{se}(\bar{x})
+$$
+
+where $t_{\alpha/2, n-1}$ is the critical value for the $t$-distribution with $n-1$ degrees of freedom.
+
+- Further problems?
+  - Assumes a symmetric sampling distribution
+  - Assumes that $s$ and $\bar{x}$ are independent
+
+# Bootstrapping
+
+- **Definition**
+  - A resampling technique used to perform inference sampling a dataset with replacement.
+
+# Sampling with replacement
+
+```{r}
+orig_vec <- rnorm(1:3) |> signif(2)
+boot_tbl <- tibble::tibble(
+  Original = orig_vec,
+  `Sample 1` = sample(orig_vec, replace = TRUE),
+  `Sample 2` = sample(orig_vec, replace = TRUE),
+  `Sample 3` = sample(orig_vec, replace = TRUE)
+)
+boot_tbl
+```
+
+- Mean for each boostrap sample: `r sapply(boot_tbl[, -1], mean) |> signif(2)`
+
+# "Ideal" way to estimate a sampling distribution
+
+- Repeatedly resample from the actual data generating process!
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{_data_raw/img/ideal_world.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Practical way to estimate a sampling distribution
+
+- Repeatedly resample from the *sample*
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{_data_raw/img/bootstrap_world.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Bootstrap alternatives to $t$ confidence intervals I: The percentile method
+
+1. Generate $B$ bootstrap samples.
+2. Calculate the sample mean for each sample.
+3. Set the (1-$\alpha$) confidence interval as the $\alpha/2$ and $1-\alpha/2$ percentiles of the bootstrap means.
+
+# Implementation in R
+
+- First, create our bootstrap sample:
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_vec_perc <- replicate(2e3, {
+  sample(sample_vec, replace = TRUE) |> mean()
+})
+```
+
+- Then, calculate our bounds:
+
+```{r}
+quantile(mean_vec_perc, c(0.025, 0.975)) |> signif(2)
+```
+
+```{r}
+#| include: false
+ci_vec_perc <- quantile(mean_vec_perc, c(0.025, 0.975))
+```
+
+# Bootstrap alternatives to $t$ confidence intervals I: Estimate se using the bootstrap
+
+This has the following formula:
+
+$$
+\bar{x} \pm t_{\alpha/2, n-1} \hat{se^{\ast}}(\bar{x})
+$$
+  
+  where $\hat{se^{\ast}}(\bar{x})$ is the standard deviation of the bootstrap means:
+
+$$
+\hat{se^{\ast}}(\bar{x}) = \sqrt{\frac{1}{B-1} \sum_{b=1}^{B} (\bar{x}^{(b)} - \bar{x})^2}
+$$
+
+# Bootstrap alternatives to $t$ confidence intervals II: Estimate se using the bootstrap
+
+1. Generate $B$ bootstrap samples.
+2. Calculate the sample mean for each sample.
+3. Calculate the standard deviation of the bootstrap means.
+4. Set the (1-$\alpha$) confidence interval as $\bar{x} \pm z_{\alpha/2} \hat{se}^{\ast}(\bar{x})$
+
+# Implementation in R
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+mean_vec_perc <- replicate(2e3, {
+  sample(sample_vec, replace = TRUE) |> mean()
+})
+se_boot <- sd(mean_vec_perc)
+ci_vec_se_boot <- mean_actual +
+  c(-1, 1) * se_boot * 
+  qt(0.975, df = length(mean_vec_perc) - 1)
+ci_vec_se_boot |> signif(2)
+```
+
+# Problem?
+
+- The t-stat is not $t$-distributed!
+- By $t$-test, we mean:
+
+$$
+\frac{\hat{\theta} - \theta}{\hat{se}(\hat{\theta})}
+$$
+
+- Why not?
+  - Observations not normally distributed
+  - Sample mean and sample standard deviation are not independent
+
+# Sample standard deviation and mean correlated
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+summ_stat_list <- replicate(2e3, {
+  boot_sample <- sample(sample_vec, replace = TRUE)
+  c("mean" = mean(boot_sample), "sd" = sd(boot_sample))
+})
+```
+
+```{r}
+#| include: false
+plot_tbl <- tibble(
+  mean = summ_stat_list[1, ],
+  sd = summ_stat_list[2, ]
+)
+p <- ggplot(
+  plot_tbl, aes(x = mean, y = sd)
+) +
+  geom_point(alpha = 0.25, colour = "dodgerblue") +
+  labs(x = "Mean", y = "Standard Deviation") +
+  cowplot::background_grid(major = "xy", minor = "none")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-mean_sd_corr.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 10, height = 7,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.5\textwidth]{`r path_fig`}
+\end{centering}
+
+# Bootstrap alternatives to $t$ confidence intervals III: bootstrap the t-statistic
+
+1. Generate $B$ bootstrap samples.
+2. For each bootstrap sample, calculate the t-statistic.
+3. Calcalate the $\alpha/2$ and $1-\alpha/2$ percentiles of the t-statistics.
+3. Set the (1-$\alpha$) confidence interval as 
+
+$$
+\hat{\theta} - q_{1-\alpha/2}\hat{se}(\hat{\theta}), \hat{\theta} - q_{\alpha/2}\hat{se}(\hat{\theta})
+$$
+
+# Implementation in R {.smaller}
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+sd_actual <- sd(sample_vec) / sqrt(length(sample_vec) - 1)
+t_stat_vec <- replicate(2e3, {
+  boot_sample <- sample(sample_vec, replace = TRUE)
+  mean_boot <- mean(boot_sample)
+  se_boot <- sd(boot_sample) / sqrt(length(boot_sample) - 1)
+  (mean_boot - mean_actual) / se_boot
+})
+quant_vec_t <- quantile(t_stat_vec, c(0.025, 0.975))
+lb <- mean_actual - quant_vec_t[2] * sd_actual
+ub <- mean_actual - quant_vec_t[1] * sd_actual
+c(lb, ub) |> signif(2)
+```
+
+```{r}
+#| include: false
+ci_vec_boot_t <- c(lb, ub)
+```
+
+# Comparison of confidence intervals
+
+```{r}
+#| include: false
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+sd_actual <- sd(sample_vec) / sqrt(length(sample_vec) - 1)
+ci_vec_t <- mean_actual +
+  c(-1, 1) * qt(0.975, df = length(sample_vec) - 1) * sd_actual
+```
+
+```{r}
+#| echo: false
+tibble(
+  Method = c("T", "Percentile", "Bootstrap SE", "Bootstrap t"),
+  `Lower bound` = c(ci_vec_t[1], ci_vec_perc[1], ci_vec_se_boot[1], ci_vec_boot_t[1]),
+  `Upper bound` = c(ci_vec_t[2], ci_vec_perc[2], ci_vec_se_boot[2], ci_vec_boot_t[2])
+)
+```
+
+# One-side non-coverage for normally distributed data
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{_data_raw/img/normal_sim.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# One-side non-coverage for exponentially-distributed data
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{_data_raw/img/exp_sim.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Take-home messages
+
+- Bootstrapping is a resampling technique for improved inference.
+- The choice of confidence interval method dramatically affects coverage probabilities:
+  - Small sample sizes: the percentile and bootstrap-se methods are too narrow. The percentile method performs atrociously at small sample sizes.
+  - Skew data: the $t$- and bootstrap-se methods are symmetric, and the percentile method is insufficiently skew.
+  - The bootstrap-$t$ method has good small sample performance and is more robust to skewness.
+- Estimating confidence intervals for skew data is hard, and takes more samples than typically thought.
+
+# References---
+title: Principal component analysis
+author: Miguel Rodo
+bibliography: zotero.bib
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+nocite: |
+    @johnson_wichern07
+---
+
+```{r }
+#| include: false
+library(tibble)
+library(ggplot2)
+library(DataTidy23RodoHonsMult)
+for (x in list.files("R", full.names = TRUE)) {
+  source(x)
+}
+```
+
+# Context
+
+- Multivariate analysis helps us uncover patterns and relationships within datasets containing multiple variables.
+- **Example**: Meteorologists analyze temperature, humidity, wind speed, and more to understand weather systems.
+  - Possible questions:
+    - What sets of variable(s) are correlated?
+    - Can we predict the likelihood of rain based on these variables?
+    - What variables most distinguish between different weather patterns?
+
+# Basis of approach
+
+- **Linear combinations**:
+
+$$
+\symbf{x}_1\symbf{u}_1 + \symbf{x}_2\symbf{u}_2 + \ldots + \symbf{x}_p\symbf{u}_p
+$$
+
+- Why linear combinations?
+  - Simplicity >> strong theoretical results >> robustness, speed and interpretability
+
+# Types of multivariate analysis
+
+- $\symbf{X} \sim \symbf{X}$: PCA, factor analysis, correspondence analysis (count data)
+  - **Examples**: identify correlates sets of variables
+- $\symbf{Y} \sim \symbf{X}$: Multiple/multivariate regression, canonical correlation analysis, discrimination and classification
+
+# Principal components analysis
+
+- Principal components analysis (PCA) identifies the directions of greatest variation, allowing you to:
+  - Represent data more compactly, and
+  - Interpret relationships between variables.
+
+- PCA is a linear technique with an algebraic solution, so it is fast to fit.
+
+# Example applications
+
+- **Market analysis**: Identify correlated stocks to ensure a diversified portfolio
+- **Image compression**: Represent images with fewer pixels while preserving accuracy
+- **Bioinformatics**: Identify sets of co-expressed genes responsible for different functions in the body
+
+# Two-variable example
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- Suppose we have a dataset with two correlated variables, perhaps weight and height.
+- Then, the scatterplot of these may look something like this:
+
+```{r}
+set.seed(2106)
+plot_tbl <- tibble::tibble(
+  height = rnorm(100, 160, 10)
+) |>
+  dplyr::mutate(
+    weight = height / 2.5 + rnorm(100, 0, 3.5 * height / 160)
+  ) |>
+  dplyr::mutate(
+    across(everything(), function(x) (x - mean(x)) / sd(x))
+  ) |>
+  dplyr::arrange(height)
+hw_tbl <- plot_tbl
+p <- ggplot(
+  aes(x = height, y = weight),
+  data = plot_tbl
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(alpha = 0.85, col = "dodgerblue")
+path_p_height_weight <- projr::projr_path_get("cache", "fig", "p-height-weight.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_height_weight,
+  units = "cm",
+  base_height = 5,
+  base_width = 5
+)
+```
+
+\centering
+
+```{r}
+knitr::include_graphics(path_p_height_weight)
+```
+
+:::
+
+::: {.column width="50%"}
+
+- We could combine these two variables into a single variable, representing size: $a_1 \times \text{height} + a_2 \times \text{weight}$.
+
+:::
+
+::::
+
+# Two-variable example (cont.) {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- The new variable is then the *length and sign of the projection*.
+- For example, suppose we have the point $[1.2, 0.3]$:
+
+```{r}
+set.seed(2106)
+plot_tbl <- tibble::tibble(
+  height = rnorm(100, 160, 10)
+) |>
+  dplyr::mutate(
+    weight = height / 2.5 + rnorm(100, 0, 3.5 * height / 160)
+  ) |>
+  dplyr::mutate(
+    across(everything(), function(x) (x - mean(x)) / sd(x))
+  ) |>
+  dplyr::arrange(height)
+proj_list <- list(c(1 / sqrt(2), 1 / sqrt(2)), c(1, 0), c(0, 1))[1]
+plot_tbl_ind <- tibble::tibble(
+  height = 1.2,
+  weight = 0.3
+)
+plot_tbl_proj_ind <- proj_list |>
+  purrr::map_df(~ mutate_proj(plot_tbl_ind, .x))
+
+p <- ggplot(
+  data = plot_tbl
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(aes(x = height, y = weight), alpha = 0.1, col = "dodgerblue") +
+  geom_point(
+    data = plot_tbl_proj_ind,
+    aes(x = height, y = weight), col = "mediumseagreen"
+  ) +
+  geom_segment(
+    data = plot_tbl_proj_ind,
+    aes(x = height, y = weight, xend = proj_x, yend = proj_y, group = proj),
+    col = "gray25", arrow = arrow(length = unit(0.3, "cm")), linetype = "solid"
+  ) +
+  geom_abline(
+    data = plot_tbl_proj_ind |>
+      dplyr::mutate(slope = a2 / a1) |>
+      dplyr::filter(slope %in% c(0,1)),
+    aes(intercept = 0, slope = slope),
+    col = "purple"
+  ) +
+  coord_cartesian(xlim = c(0, 2.5), ylim = c(0, 2.5)) +
+  ggrepel::geom_text_repel(
+    data = plot_tbl_proj_ind |>
+      dplyr::mutate(a1 = a1 |> signif(2), a2 = a2 |> signif(2)),
+    aes(x = a1, y = a2, label = proj),
+    nudge_x = 0.1, nudge_y = 0.1
+  )
+path_p_height_weight_ind <- projr::projr_path_get("cache", "fig", "p-height-weight-ind.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_height_weight_ind,
+  units = "cm",
+  base_height = 5,
+  base_width = 5
+)
+```
+
+\centering
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_height_weight_ind)
+```
+
+:::
+
+::: {.column width="50%"}
+
+- If we set $\symbf{a} = [1/\sqrt{2}, 1/\sqrt{2}]$, then the new variable is $1/\sqrt{2} \times 1.2 + 1/\sqrt{2} \times 0.3$.
+- We go from the matrix of vairables
+
+```{r}
+tibble::tibble(height = 1.2, weight = 0.3) |> as.data.frame()
+```
+
+- to
+
+```{r}
+tibble::tibble(size = 1.2 / sqrt(2) + 0.3 / sqrt(2)) |> as.data.frame()
+```
+
+:::
+
+::::
+
+# How do we choose $a_1$ and $a_2$? {.smaller}
+
+- Consider projecting onto the lines $[0.5, 2]$, $[1, -1]$ and $[1, 1]$:
+
+```{r}
+proj_list <- list(c(0.5, 2), c(1, 1), c(1, -1))
+plot_tbl_proj <- purrr::map_df(proj_list, ~mutate_proj(plot_tbl, .x))
+
+p <- ggplot(
+  data = plot_tbl_proj
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(aes(x = height, y = weight), alpha = 0.85, col = "dodgerblue") +
+  geom_segment(
+    data = plot_tbl_proj |>
+      dplyr::group_by(proj) |>
+      dplyr::slice(seq(1, 100, length.out = 5) |> round()) |>
+      dplyr::ungroup(),
+    aes(x = height, y = weight, xend = proj_x, yend = proj_y, group = proj),
+    col = "gray25", arrow = arrow(length = unit(0.3, "cm")), linetype = "solid"
+  ) +
+  geom_abline(
+    data = plot_tbl_proj |>
+      dplyr::group_by(proj) |>
+      dplyr::slice(1) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(slope = a2 / a1),
+    aes(intercept = 0, slope = slope),
+  ) +
+  facet_wrap(~proj, ncol = 3)
+path_p_proj <- projr::projr_path_get("cache", "fig", "p-proj.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_proj,
+  units = "cm",
+  base_height = 6,
+  base_width = 12
+)
+```
+
+\begin{figure}
+\centering
+\includegraphics[width=0.55\textwidth]{`r path_p_proj`}
+\end{figure}
+
+::::{.columns}
+
+::: {.column width="50%"}
+- Height and weight increase together, so $a_1$ and $a_2$ should both be positive.
+- Beyond that, we want to choose $a_1$ and $a_2$ so that the projection captures the most variation in the data.
+:::
+
+::: {.column width="50%"}
+- The variability of the (lengths of the) projections is 1.3 (0.5, 2), 0.3 (1, -1) and 1.7 (1, 1), respectively.
+- The projection onto $[1, 1]$ captures the most variation.
+:::
+
+::::
+
+# Further motivation for capturing variation
+
+- On its own grounds, imagine that you could retain only one of two variables: one has zero variance (all the observations are the same) and the other has some positive variance. Clearly, you would choose the latter.
+
+\pause
+
+- Later, we will see that capturing maximal variation:
+  - Minimises the distance from the original data to the projection.
+  - Allows us to reconstruct the original variables with minimal error.
+
+# Objective function: the first principal component
+
+- Assume that our data $\symbf{X} \in \mathcal{R}^p$ are distributed with mean $\symbf{\symbf{\mu}}$ and covariance matrix $\symbf{\Sigma}$.
+- We seek to find the linear combination of the variables that captures the most variation.
+- For the first principal component, we seek to find $\symbf{a}_1$ such that
+
+$$
+\text{Var}(\symbf{a}_1'\symbf{X}) = \symbf{a}_1^T\symbf{\Sigma}\symbf{a}_1
+$$
+
+- is maximized, subject to the constraint that $||\symbf{a}_1|| = 1$.
+  - This is necessary as otherwise we could meaninglessly increase the variation without bound by making $\symbf{a}_1$ longer.
+- Applied to the previous example, the first principal component would be a linear combination of height and weight that captures the most variation.
+
+# Objective function: the second principal component
+
+- The second principal component is the linear combination of the variables that captures the most variation, subject to the constraint that it is orthogonal to the first principal component.
+- In other words, for the second principal component we seek to find $\symbf{a}_2$ such that
+
+$$
+\text{Var}(\symbf{a}_2'\symbf{X}) = \symbf{a}_2^T\symbf{\Sigma}\symbf{a}_2
+$$
+
+- is maximized, subject to the constraints that $||\symbf{a}_2|| = 1$ and $\symbf{a}_2^T\symbf{a}_1 = 0$.
+
+
+# Objective function for all principal components
+
+- For the $k$-th principal component (for $k\leq p$), we seek to find $\symbf{a}_k$ such that
+
+$$
+\text{Var}(\symbf{a}_k'\symbf{X}) = \symbf{a}_k^T\symbf{\Sigma}\symbf{a}_k
+$$
+
+- is maximized, subject to the constraints that $||\symbf{a}_k|| = 1$ and $\symbf{a}_k^T\symbf{a}_j = 0$ for $j < k$.
+
+\pause
+
+- Up until this point, we've explored various options for $\symbf{a}_k$ without any method. We'll now discuss how to compute these principal components.
+- First, we'll discuss a more general result.
+
+# Weights for variance-maximising linear combinations {.smaller}
+
+Let $\symbf{X}:\symbf{p}\times 1$ be the random vector with variance-covariance matrix $\symbf{\Sigma}:p\times p$, which has the $i$-th largest eigenvalue as $\lambda_i$ and associated eigenvector $\symbf{e}_i$.
+
+Then the $i$-th principal component (defined as before) is given by 
+
+$$
+Y_i = \symbf{e}_i'\symbf{X},
+$$
+
+implying that
+
+\begin{align*}
+\mathrm{Var}[Y_i] &= \lambda_i \;\forall \; i \in \{1,2, \ldots, p\}, \; \mathrm{and} \\
+\mathrm{Cov}[Y_i, Y_j] &= 0 \; \mathrm{for} \; i\neq j.
+\end{align*}
+
+# A note on terminology
+
+- Principal components (the $\symbf{Y}_i$'s) may also be referred to as "scores".
+- The coefficient vectors $\symbf{a}_i$ may also be referred to as "loadings" (thinking algebraically) or as "principal axes"/"principal directions" (thinking geometrically).
+
+# Example {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+Suppose that we have the following variance-covariance matrix:
+
+```{r}
+#| echo: true
+vcov_mat <- matrix(
+  c(1, 0.9, 0.9, 0, 0, 0, 0,
+    0.9, 1, 0.9, 0, 0, 0, 0,
+    0.9, 0.9, 1, 0, 0, 0, 0,
+    0, 0, 0, 1, 0.9, 0.9, 0.9,
+    0, 0, 0, 0.9, 1, 0.9, 0.9,
+    0, 0, 0, 0.9, 0.9, 1, 0.9,
+    0, 0, 0, 0.9, 0.9, 0.9, 1),
+  byrow = TRUE,
+  nrow = 7
+)
+colnames(vcov_mat) <- paste0("V", 1:7)
+rownames(vcov_mat) <- paste0("V", 1:7)
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+vcov_mat
+```
+
+:::
+
+::::
+
+# Example (cont.) {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- We apply the eigen decomposition to the variance-covariance matrix:
+
+```{r}
+#| echo: true
+eig_obj <- eigen(vcov_mat)
+```
+
+- to obtain the following eigenvectors:
+
+```{r}
+#| echo: true
+eig_vec_mat <- eig_obj$vectors
+rownames(eig_vec_mat) <- paste0("V", 1:7)
+colnames(eig_vec_mat) <- paste0("PC", 1:7)
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+eig_vec_mat |> signif(2)
+```
+
+:::
+
+::::
+
+# Example (cont.) {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- By the variance formula, these linear combinations have the following variances:
+
+```{r}
+#| echo: true
+(eig_vec_mat |> t()) %*%
+  vcov_mat %*%
+  (eig_vec_mat) |>
+  diag() |>
+  signif(2)
+```
+
+:::
+
+:::{.column width="50%"}
+
+- These are the same as the eigenvalues:
+
+```{r}
+#| echo: true
+eig_obj$values |>
+  signif(2) |>
+  setNames(paste0("PC", 1:7))
+```
+
+- Clearly, due to the correlation structure, the orthogonality constraint implies that only two PCs have meaningful variance.
+
+:::
+
+::::
+
+# Total variance {.smaller}
+
+The sum of variances of the original variables is equal to the sum of the eigenvalues of $\symbf{\Sigma}$, which is also equal to the sum of variances of the principal components:
+
+$$
+\sum_{i=1}^{p} \sigma_{ii} = \sum_{i=1}^{p} \text{Var}(X_i) = \sum_{i=1}^{p} \lambda_i = \sum_{i=1}^{p} \text{Var}(Y_i).
+$$
+
+# Contribution per component
+
+We've seen before that
+
+$$
+\text{trace}(\symbf{\Sigma}) = \sum \lambda_i = \sum \text{Var}(Y_i).
+$$
+
+This implies that the proportion of the total variance due to the $k^{th}$ principal component is
+
+$$
+\frac{\lambda_k}{\sum \lambda_i },\quad k=1,...p,
+$$
+
+and (due to being uncorrelated) the proportion of variance accounted for by the first $r$ principal components is given by
+
+$$
+\frac{\sum_{i=1}^r \lambda_i }{\sum \lambda_i }.
+$$
+
+# The scree plot
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- The scree plot is a graphical representation of the proportion of variance accounted for by each principal component.
+- It plots $(i, \lambda_i/\sum_{j=1}^{p} \lambda_j)$ for $i = 1, \ldots, p$.
+- Typically, we look for the "elbow" in the plot, which indicates the number of principal components to retain.
+- Beyond this point, each additional principal component captures little additional variation.
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+plot_tbl <- tibble::tibble(
+  pc = 1:7,
+  prop_var = eig_obj$values / sum(eig_obj$values)
+)
+plot_tbl_point <- purrr::map_df(
+  seq(5.5, 5.502, length.out = 9), function(x) {
+    plot_tbl |>
+      dplyr::filter(pc == 2) |>
+      dplyr::mutate(size_point = x)
+  }
+)
+p <-  ggplot(
+  data = plot_tbl
+  ) +
+    geom_line(
+      aes(x = pc, y = prop_var),
+      stat = "identity",
+      colour = "dodgerblue"
+    ) +
+    geom_point(
+      data = plot_tbl_point |> dplyr::slice(5:9),
+      aes(x = pc, y = prop_var, size = size_point),
+      colour = "mediumseagreen",
+      alpha = 0.9,
+      shape = 1,
+      show.legend = FALSE
+    ) +
+    geom_point(
+      aes(x = pc, y = prop_var),
+      colour = "dodgerblue",
+      alpha = 0.9,
+      size = 1.5
+    ) +
+    labs(
+      x = "Principal component index",
+      y = "Proportion of variance"
+    ) +
+    cowplot::theme_cowplot() +
+    cowplot::background_grid(major = "xy") +
+    theme(
+      panel.background = element_rect(fill = "white"),
+      plot.background = element_rect(fill = "white")
+    ) +
+    scale_x_continuous(
+      breaks = 1:7
+    )
+path_p_scree <- projr::projr_path_get("cache", "fig", "p-scree.pdf")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_scree,
+  units = "cm",
+  base_height = 7,
+  base_width = 8 * (7/6)
+)
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_scree)
+```
+
+:::
+
+::::
+
+# Variance standardisation
+
+- Before applying PCA, one can standardise the variances to have unit variance.
+- This may be appropriate when:
+  - the variances have different units (e.g. weight in kg vs annual income in rands), or
+  - the variances have different scales (e.g. some genes are extremely rare whereas others are abundantly expressed), or
+  - we wish to eliminate any effect of differences in variance on downstream analyses, e.g. when applying penalised regression.
+- Similar comments go for logging the data, or applying other transformations.
+- All results go through in exactly the same way, with adjustments made in interpreting exactly what variables the principal components capture.
+
+# Standardisation example
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+We have the following covariance matrix:
+
+```{r}
+cov_mat <- matrix(
+  c(1, 4, 4, 100), nrow = 2
+)
+cov_mat
+```
+
+which produces the following eigendecomposition:
+
+```{r}
+eigen(cov_mat) |> lapply(function(x) signif(x, 2))
+```
+
+:::
+
+:::{.column width="50%"}
+
+The associated correlation matrix:
+
+```{r}
+diag_mat_sd_inv <- diag(diag(cov_mat), nrow = nrow(cov_mat)) |> sqrt() |> solve()
+rho_mat <- diag_mat_sd_inv %*% cov_mat %*% diag_mat_sd_inv
+rho_mat 
+```
+
+has the following eigendecomposition:
+
+```{r}
+eigen(rho_mat) |> lapply(function(x) signif(x, 2))
+```
+
+The eigenvectors are in very different directions.
+
+:::
+
+::::
+
+# Example
+
+:::: {.columns}
+
+::: {.column width="57%"}
+
+We read in data of measurements Painted Turtles [@jolicoeur_mosimann60]:
+
+```{r}
+#| eval: false
+#| echo: true
+if (!requireNamespace(
+  "remotes", quietly = TRUE
+  )) {
+  install.packages("remotes")
+}
+remotes::install_github(
+  "MiguelRodo/DataTidy23RodoHonsMult@2024"
+)  
+```
+
+:::
+
+::: {.column width="43%"}
+
+```{r}
+#| echo: true
+data(
+  "data_tidy_turtle",
+  package = "DataTidy23RodoHonsMult"
+)
+data_tidy_turtle
+```
+
+:::
+
+::::
+
+# Measurements highly correlated
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+```{r}
+#| include: false
+plot_tbl_turtle <- data_tidy_turtle |>
+  tidyr::pivot_longer(
+    length:width,
+    names_to = "x_var",
+    values_to = "x_val"
+  )
+p <- ggplot(
+  plot_tbl_turtle,
+  aes(x = x_val, y = height, col = gender)
+) +
+  geom_point(alpha = 0.75) +
+  scale_colour_manual(
+    values = c(male = "dodgerblue", female = "mediumseagreen")
+   ) +
+  facet_wrap(~x_var, scales = "free", ncol =1 ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  labs(
+    x = "Measurement",
+    y = "Height"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  ) +
+  theme(
+    strip.background = element_rect(fill = "white", colour = "gray25")
+  )
+path_p_turtle <- projr::projr_path_get("cache", "fig", "p-turtle.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_turtle,
+  units = "cm",
+  base_height = 7,
+  base_width = 5
+)
+```
+
+```{r}
+#| results: "asis"
+knitr::include_graphics(path_p_turtle)
+```
+
+:::
+
+:::{.column width="50%"}
+
+- Due to the correlation, we may likely summarise the data very well using principal components.
+- We'll use the `prcomp` function in R, and do it from first principles.
+
+:::
+
+::::
+
+# Using the `prcomp` function I {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+pr_obj <- prcomp(
+  ~ log(length) + log(width) + log(height),
+  data = data_tidy_turtle,
+  retx = TRUE
+)
+pr_obj
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The first principal component has a markedly higher standard deviation.
+- It is weighted roughly evenly across the variables, indicating it is a general "size" variable.
+
+:::
+
+::::
+
+# Using the `prcomp` function II {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+summary(pr_obj)
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The `summary` function provides the per-component standard deviation and variance, as well as the cumulative variance.
+
+:::
+
+::::
+
+# Using the `prcomp` function III {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+plot(pr_obj)
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The `plot` command provides the scree plot.
+- Clearly, unless we're specifically interested in non-size variables we should only retain the first principal component.
+
+:::
+
+::::
+
+# Using the `prcomp` function IV {.smaller}
+
+Here are the principal components:
+
+```{r}
+#| echo: true
+pr_obj$x |> head() |> signif(2)
+```
+
+# Interpretation guideliness {.smaller}
+
+```{r}
+#| echo: false
+example_mat <- matrix(
+  c(
+    0.8, 0.6, 0.01, 001,
+    0.01, 0.3, 0.3, -0.9055
+    ),
+  nrow = 2,
+  byrow = TRUE
+)
+rownames(example_mat) <- c("PC1", "PC2")
+colnames(example_mat) <- c("CO2", "NO", "O3", "Wind speed")
+example_mat
+```
+
+- **Summarize, Don't Repeat:** Avoid simply listing coefficients from tables. Instead, concisely summarize the key insights in a few sentences. 
+- **Ignore Trivial Coefficients:** Very small coefficients (e.g., 0.001) are usually negligible and can be omitted from your interpretation.
+- **Use Coefficients Judiciously:** Mention coefficients in parentheses when they strengthen your interpretation.
+- For example:
+  - "Component one is driven by O3 (0.08) and NO (0.54))."
+  - "Component two contrasts O3  and NO (both 0.3) with Wind speed (-0.9)."
+
+# References
+

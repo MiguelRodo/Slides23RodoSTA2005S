@@ -1,0 +1,143 @@
+---
+title: "Facts: Regression Week V - Prediction"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+---
+
+# Prediction Interval
+
+## Definition
+A **prediction interval** is a range within which a single new observation is expected to fall with a specified probability, given the current model and predictor values. Unlike confidence intervals, which estimate the mean response, prediction intervals account for both the uncertainty in estimating the model parameters and the inherent variability in individual observations.
+
+## Formula
+The prediction interval for a new response $Y_f$ at predictor values $X_f$ is given by:
+
+$$
+\hat{Y}_f \pm t_{\alpha/2, n - k} \cdot s \sqrt{1 + X_f' (X'X)^{-1} X_f}
+$$
+
+Where:
+- $\hat{Y}_f = X_f' \hat{\beta}$ is the predicted value.
+- $t_{\alpha/2, n - k}$ is the critical value from the $t$-distribution with $n - k$ degrees of freedom.
+- $s$ is the standard error of the estimate.
+- $X_f$ is the vector of predictor values for the new observation.
+- $X$ is the matrix of predictor values from the training data.
+- $k$ is the number of predictors.
+
+## How to Derive the Formula
+1. **Predicted Value**: Start with the linear regression model to obtain the predicted value $\hat{Y}_f = X_f' \hat{\beta}$.
+2. **Actual Value**: The actual value can be expressed as $Y_f = X_f' \beta + \epsilon_f$, where $\epsilon_f \sim N(0, \sigma^2)$.
+3. **Difference $Z$**: Define $Z = Y_f - \hat{Y}_f$, which has an expected value of 0.
+4. **Variance of $Z$**: Calculate $\text{Var}(Z) = \sigma^2 \left( 1 + X_f' (X'X)^{-1} X_f \right)$.
+5. **Standardization**: Standardize $Z$ to obtain a $t$-distribution.
+6. **Prediction Interval**: Solve for $Y_f$ to derive the interval formula.
+
+---
+
+# Differences between Confidence Interval and Prediction Interval
+
+## Sources of Variability
+- **Confidence Interval (CI)**: Accounts for uncertainty in estimating the regression coefficients $\beta$.
+- **Prediction Interval (PI)**: Includes both the uncertainty in estimating $\beta$ and the random variation in future observations.
+
+## Which is Wider
+- **Prediction Interval** is always wider than the **Confidence Interval** for the same predictor values and confidence level because it incorporates additional variability from individual observations.
+
+## Effect of Increasing Sample Size
+- **Confidence Interval**: As sample size increases, the width of the confidence interval decreases and approaches zero, reflecting increased precision in estimating the mean response.
+- **Prediction Interval**: The width of the prediction interval does not shrink to zero with increasing sample size. It stabilizes based on the error variance inherent in individual observations.
+
+---
+
+# Variable Selection
+
+## Motivation
+Variable selection aims to identify a subset of relevant predictors that contribute most to the model's predictive performance. Motivations include:
+- **Interpretability**: Simpler models are easier to understand and interpret.
+- **Practical Application**: Fewer variables can lead to easier data collection and implementation.
+- **Prediction Accuracy**: Balancing bias and variance to optimize predictive performance.
+
+## Why We Don't Do Exhaustive Search
+- **Combinatorial Explosion**: With $p$ predictors, there are $2^p$ possible models. For large $p$, evaluating all models becomes computationally infeasible.
+- **Example**: For $p = 100$, there are approximately $1.27 \times 10^{30}$ possible models.
+
+## Appropriate Selection Criteria
+- **Bayesian Information Criterion (BIC)**: $\text{BIC} = n \ln(\text{RSS}/n) + \ln(n)k$
+- **Akaike Information Criterion (AIC)**: $\text{AIC} = n \ln(\text{RSS}/n) + 2k$
+- **Adjusted $R^2$**: Adjusts the $R^2$ value based on the number of predictors.
+
+These criteria balance model fit with model complexity, penalizing the addition of unnecessary variables.
+
+## Which is Stricter: BIC vs. AIC
+- **BIC** is stricter than **AIC** for a given sample size. It imposes a larger penalty for adding variables, often resulting in models with fewer predictors.
+
+## Understanding Selection Methods
+- **Forward Selection**:
+  - **Starting Point**: Begins with the intercept-only model.
+  - **Process**: Iteratively adds the variable that offers the best improvement based on the selection criterion.
+  
+- **Backward Elimination**:
+  - **Starting Point**: Begins with the full model containing all predictors.
+  - **Process**: Iteratively removes the least significant variable until no further improvement is possible.
+  
+- **Stepwise Selection**:
+  - **Starting Point**: Can start with either the null or full model.
+  - **Process**: Combines forward and backward steps, allowing variables to be added or removed at each step to optimize the selection criterion.
+
+---
+
+# Evaluating Model Performance
+
+## Approach to Get Unbiased Estimates
+To obtain unbiased estimates of model performance, it is essential to evaluate the model on data **not used** during the training phase. This typically involves splitting the dataset into training and test sets.
+
+## Why Use Separate Test Data
+Testing the model on unseen data provides an unbiased estimate of the model's prediction error. It ensures that the performance metrics reflect the model's ability to generalize to new data rather than its performance on the data it was trained on. This approach primarily aims to obtain an accurate error estimate rather than directly avoiding overfitting.
+
+---
+
+# Q&A
+
+- What is a prediction interval?
+  - A range where a new observation is expected to fall with a certain probability.
+- What does a confidence interval estimate?
+  - The mean response at a given predictor value.
+- What are the sources of variability in a confidence interval?
+  - Uncertainty in estimating the regression coefficients.
+- What are the sources of variability in a prediction interval?
+  - Uncertainty in estimating the regression coefficients and random variation in future observations.
+- Which interval is wider, confidence or prediction?
+  - Prediction interval.
+- What happens to the confidence interval as sample size increases?
+  - It decreases in width and approaches zero.
+- What happens to the prediction interval as sample size increases?
+  - It stabilizes based on the error variance.
+- Why do we perform variable selection?
+  - For interpretability, practical application, and prediction accuracy.
+- Why don't we perform an exhaustive search for the best set of variables?
+  - Because of combinatorial explosion making it computationally infeasible.
+- What is the Bayesian Information Criterion?
+  - $\text{BIC} = n \ln(\text{RSS}/n) + \ln(n)k$
+- What is the Akaike Information Criterion?
+  - $\text{AIC} = n \ln(\text{RSS}/n) + 2k$
+- What does Adjusted $R^2$ adjust for?
+  - The number of predictors in the model.
+- Which criterion is stricter, BIC or AIC?
+  - BIC.
+- What is the starting point for forward selection?
+  - The intercept-only model.
+- What is the starting point for backward elimination?
+  - The full model with all predictors.
+- What does stepwise selection combine?
+  - Forward and backward steps.
+- Why use separate test data to evaluate model performance?
+  - To obtain an unbiased estimate of prediction error.
+- What does using the same data for training and testing lead to?
+  - Under-estimating the error.
+- What does a larger sample size do to the confidence interval?
+  - Decreases its width.
+- Does the prediction interval shrink to zero with larger sample sizes?
+  - No.

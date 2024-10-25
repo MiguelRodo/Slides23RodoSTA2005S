@@ -1,0 +1,889 @@
+---
+title: Principal component analysis
+author: Miguel Rodo
+bibliography: zotero.bib
+format:
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+nocite: |
+    @johnson_wichern07
+---
+
+```{r }
+#| include: false
+library(tibble)
+library(ggplot2)
+library(DataTidy23RodoHonsMult)
+for (x in list.files("R", full.names = TRUE)) {
+  source(x)
+}
+```
+
+# Context
+
+- Multivariate analysis helps us uncover patterns and relationships within datasets containing multiple variables.
+- **Example**: Meteorologists analyze temperature, humidity, wind speed, and more to understand weather systems.
+  - Possible questions:
+    - What sets of variable(s) are correlated?
+    - Can we predict the likelihood of rain based on these variables?
+    - What variables most distinguish between different weather patterns?
+
+# Basis of approach
+
+- **Linear combinations**:
+
+$$
+\symbf{x}_1\symbf{u}_1 + \symbf{x}_2\symbf{u}_2 + \ldots + \symbf{x}_p\symbf{u}_p
+$$
+
+- Why linear combinations?
+  - Simplicity >> strong theoretical results >> robustness, speed and interpretability
+
+# Types of multivariate analysis
+
+- $\symbf{X} \sim \symbf{X}$: PCA, factor analysis, correspondence analysis (count data)
+  - **Examples**: identify correlates sets of variables
+- $\symbf{Y} \sim \symbf{X}$: Multiple/multivariate regression, canonical correlation analysis, discrimination and classification
+
+# Principal components analysis
+
+- Principal components analysis (PCA) identifies the directions of greatest variation, allowing you to:
+  - Represent data more compactly, and
+  - Interpret relationships between variables.
+
+- PCA is a linear technique with an algebraic solution, so it is fast to fit.
+
+# Example applications
+
+- **Market analysis**: Identify correlated stocks to ensure a diversified portfolio
+- **Image compression**: Represent images with fewer pixels while preserving accuracy
+- **Bioinformatics**: Identify sets of co-expressed genes responsible for different functions in the body
+
+# Two-variable example
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- Suppose we have a dataset with two correlated variables, perhaps weight and height.
+- Then, the scatterplot of these may look something like this:
+
+```{r}
+set.seed(2106)
+plot_tbl <- tibble::tibble(
+  height = rnorm(100, 160, 10)
+) |>
+  dplyr::mutate(
+    weight = height / 2.5 + rnorm(100, 0, 3.5 * height / 160)
+  ) |>
+  dplyr::mutate(
+    across(everything(), function(x) (x - mean(x)) / sd(x))
+  ) |>
+  dplyr::arrange(height)
+hw_tbl <- plot_tbl
+p <- ggplot(
+  aes(x = height, y = weight),
+  data = plot_tbl
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(alpha = 0.85, col = "dodgerblue")
+path_p_height_weight <- projr::projr_path_get("cache", "fig", "p-height-weight.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_height_weight,
+  units = "cm",
+  base_height = 5,
+  base_width = 5
+)
+```
+
+\centering
+
+```{r}
+knitr::include_graphics(path_p_height_weight)
+```
+
+:::
+
+::: {.column width="50%"}
+
+- We could combine these two variables into a single variable, representing size: $a_1 \times \text{height} + a_2 \times \text{weight}$.
+
+:::
+
+::::
+
+# Two-variable example (cont.) {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- The new variable is then the *length and sign of the projection*.
+- For example, suppose we have the point $[1.2, 0.3]$:
+
+```{r}
+set.seed(2106)
+plot_tbl <- tibble::tibble(
+  height = rnorm(100, 160, 10)
+) |>
+  dplyr::mutate(
+    weight = height / 2.5 + rnorm(100, 0, 3.5 * height / 160)
+  ) |>
+  dplyr::mutate(
+    across(everything(), function(x) (x - mean(x)) / sd(x))
+  ) |>
+  dplyr::arrange(height)
+proj_list <- list(c(1 / sqrt(2), 1 / sqrt(2)), c(1, 0), c(0, 1))[1]
+plot_tbl_ind <- tibble::tibble(
+  height = 1.2,
+  weight = 0.3
+)
+plot_tbl_proj_ind <- proj_list |>
+  purrr::map_df(~ mutate_proj(plot_tbl_ind, .x))
+
+p <- ggplot(
+  data = plot_tbl
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(aes(x = height, y = weight), alpha = 0.1, col = "dodgerblue") +
+  geom_point(
+    data = plot_tbl_proj_ind,
+    aes(x = height, y = weight), col = "mediumseagreen"
+  ) +
+  geom_segment(
+    data = plot_tbl_proj_ind,
+    aes(x = height, y = weight, xend = proj_x, yend = proj_y, group = proj),
+    col = "gray25", arrow = arrow(length = unit(0.3, "cm")), linetype = "solid"
+  ) +
+  geom_abline(
+    data = plot_tbl_proj_ind |>
+      dplyr::mutate(slope = a2 / a1) |>
+      dplyr::filter(slope %in% c(0,1)),
+    aes(intercept = 0, slope = slope),
+    col = "purple"
+  ) +
+  coord_cartesian(xlim = c(0, 2.5), ylim = c(0, 2.5)) +
+  ggrepel::geom_text_repel(
+    data = plot_tbl_proj_ind |>
+      dplyr::mutate(a1 = a1 |> signif(2), a2 = a2 |> signif(2)),
+    aes(x = a1, y = a2, label = proj),
+    nudge_x = 0.1, nudge_y = 0.1
+  )
+path_p_height_weight_ind <- projr::projr_path_get("cache", "fig", "p-height-weight-ind.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_height_weight_ind,
+  units = "cm",
+  base_height = 5,
+  base_width = 5
+)
+```
+
+\centering
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_height_weight_ind)
+```
+
+:::
+
+::: {.column width="50%"}
+
+- If we set $\symbf{a} = [1/\sqrt{2}, 1/\sqrt{2}]$, then the new variable is $1/\sqrt{2} \times 1.2 + 1/\sqrt{2} \times 0.3$.
+- We go from the matrix of vairables
+
+```{r}
+tibble::tibble(height = 1.2, weight = 0.3) |> as.data.frame()
+```
+
+- to
+
+```{r}
+tibble::tibble(size = 1.2 / sqrt(2) + 0.3 / sqrt(2)) |> as.data.frame()
+```
+
+:::
+
+::::
+
+# How do we choose $a_1$ and $a_2$? {.smaller}
+
+- Consider projecting onto the lines $[0.5, 2]$, $[1, -1]$ and $[1, 1]$:
+
+```{r}
+proj_list <- list(c(0.5, 2), c(1, 1), c(1, -1))
+plot_tbl_proj <- purrr::map_df(proj_list, ~mutate_proj(plot_tbl, .x))
+
+p <- ggplot(
+  data = plot_tbl_proj
+) +
+  geom_vline(
+    xintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  geom_hline(
+    yintercept = 0, col = "gray50", linetype = "solid"
+  ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = "Height",
+    y = "Weight"
+  ) +
+  geom_point(aes(x = height, y = weight), alpha = 0.85, col = "dodgerblue") +
+  geom_segment(
+    data = plot_tbl_proj |>
+      dplyr::group_by(proj) |>
+      dplyr::slice(seq(1, 100, length.out = 5) |> round()) |>
+      dplyr::ungroup(),
+    aes(x = height, y = weight, xend = proj_x, yend = proj_y, group = proj),
+    col = "gray25", arrow = arrow(length = unit(0.3, "cm")), linetype = "solid"
+  ) +
+  geom_abline(
+    data = plot_tbl_proj |>
+      dplyr::group_by(proj) |>
+      dplyr::slice(1) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(slope = a2 / a1),
+    aes(intercept = 0, slope = slope),
+  ) +
+  facet_wrap(~proj, ncol = 3)
+path_p_proj <- projr::projr_path_get("cache", "fig", "p-proj.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_proj,
+  units = "cm",
+  base_height = 6,
+  base_width = 12
+)
+```
+
+\begin{figure}
+\centering
+\includegraphics[width=0.55\textwidth]{`r path_p_proj`}
+\end{figure}
+
+::::{.columns}
+
+::: {.column width="50%"}
+- Height and weight increase together, so $a_1$ and $a_2$ should both be positive.
+- Beyond that, we want to choose $a_1$ and $a_2$ so that the projection captures the most variation in the data.
+:::
+
+::: {.column width="50%"}
+- The variability of the (lengths of the) projections is 1.3 (0.5, 2), 0.3 (1, -1) and 1.7 (1, 1), respectively.
+- The projection onto $[1, 1]$ captures the most variation.
+:::
+
+::::
+
+# Further motivation for capturing variation
+
+- On its own grounds, imagine that you could retain only one of two variables: one has zero variance (all the observations are the same) and the other has some positive variance. Clearly, you would choose the latter.
+
+\pause
+
+- Later, we will see that capturing maximal variation:
+  - Minimises the distance from the original data to the projection.
+  - Allows us to reconstruct the original variables with minimal error.
+
+# Objective function: the first principal component
+
+- Assume that our data $\symbf{X} \in \mathcal{R}^p$ are distributed with mean $\symbf{\symbf{\mu}}$ and covariance matrix $\symbf{\Sigma}$.
+- We seek to find the linear combination of the variables that captures the most variation.
+- For the first principal component, we seek to find $\symbf{a}_1$ such that
+
+$$
+\text{Var}(\symbf{a}_1'\symbf{X}) = \symbf{a}_1^T\symbf{\Sigma}\symbf{a}_1
+$$
+
+- is maximized, subject to the constraint that $||\symbf{a}_1|| = 1$.
+  - This is necessary as otherwise we could meaninglessly increase the variation without bound by making $\symbf{a}_1$ longer.
+- Applied to the previous example, the first principal component would be a linear combination of height and weight that captures the most variation.
+
+# Objective function: the second principal component
+
+- The second principal component is the linear combination of the variables that captures the most variation, subject to the constraint that it is orthogonal to the first principal component.
+- In other words, for the second principal component we seek to find $\symbf{a}_2$ such that
+
+$$
+\text{Var}(\symbf{a}_2'\symbf{X}) = \symbf{a}_2^T\symbf{\Sigma}\symbf{a}_2
+$$
+
+- is maximized, subject to the constraints that $||\symbf{a}_2|| = 1$ and $\symbf{a}_2^T\symbf{a}_1 = 0$.
+
+
+# Objective function for all principal components
+
+- For the $k$-th principal component (for $k\leq p$), we seek to find $\symbf{a}_k$ such that
+
+$$
+\text{Var}(\symbf{a}_k'\symbf{X}) = \symbf{a}_k^T\symbf{\Sigma}\symbf{a}_k
+$$
+
+- is maximized, subject to the constraints that $||\symbf{a}_k|| = 1$ and $\symbf{a}_k^T\symbf{a}_j = 0$ for $j < k$.
+
+\pause
+
+- Up until this point, we've explored various options for $\symbf{a}_k$ without any method. We'll now discuss how to compute these principal components.
+- First, we'll discuss a more general result.
+
+# Weights for variance-maximising linear combinations {.smaller}
+
+Let $\symbf{X}:\symbf{p}\times 1$ be the random vector with variance-covariance matrix $\symbf{\Sigma}:p\times p$, which has the $i$-th largest eigenvalue as $\lambda_i$ and associated eigenvector $\symbf{e}_i$.
+
+Then the $i$-th principal component (defined as before) is given by 
+
+$$
+Y_i = \symbf{e}_i'\symbf{X},
+$$
+
+implying that
+
+\begin{align*}
+\mathrm{Var}[Y_i] &= \lambda_i \;\forall \; i \in \{1,2, \ldots, p\}, \; \mathrm{and} \\
+\mathrm{Cov}[Y_i, Y_j] &= 0 \; \mathrm{for} \; i\neq j.
+\end{align*}
+
+# A note on terminology
+
+- Principal components (the $\symbf{Y}_i$'s) may also be referred to as "scores".
+- The coefficient vectors $\symbf{a}_i$ may also be referred to as "loadings" (thinking algebraically) or as "principal axes"/"principal directions" (thinking geometrically).
+
+# Example {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+Suppose that we have the following variance-covariance matrix:
+
+```{r}
+#| echo: true
+vcov_mat <- matrix(
+  c(1, 0.9, 0.9, 0, 0, 0, 0,
+    0.9, 1, 0.9, 0, 0, 0, 0,
+    0.9, 0.9, 1, 0, 0, 0, 0,
+    0, 0, 0, 1, 0.9, 0.9, 0.9,
+    0, 0, 0, 0.9, 1, 0.9, 0.9,
+    0, 0, 0, 0.9, 0.9, 1, 0.9,
+    0, 0, 0, 0.9, 0.9, 0.9, 1),
+  byrow = TRUE,
+  nrow = 7
+)
+colnames(vcov_mat) <- paste0("V", 1:7)
+rownames(vcov_mat) <- paste0("V", 1:7)
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+vcov_mat
+```
+
+:::
+
+::::
+
+# Example (cont.) {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- We apply the eigen decomposition to the variance-covariance matrix:
+
+```{r}
+#| echo: true
+eig_obj <- eigen(vcov_mat)
+```
+
+- to obtain the following eigenvectors:
+
+```{r}
+#| echo: true
+eig_vec_mat <- eig_obj$vectors
+rownames(eig_vec_mat) <- paste0("V", 1:7)
+colnames(eig_vec_mat) <- paste0("PC", 1:7)
+```
+
+:::
+
+:::{.column width="50%"}
+
+```{r}
+eig_vec_mat |> signif(2)
+```
+
+:::
+
+::::
+
+# Example (cont.) {.smaller}
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+- By the variance formula, these linear combinations have the following variances:
+
+```{r}
+#| echo: true
+(eig_vec_mat |> t()) %*%
+  vcov_mat %*%
+  (eig_vec_mat) |>
+  diag() |>
+  signif(2)
+```
+
+:::
+
+:::{.column width="50%"}
+
+- These are the same as the eigenvalues:
+
+```{r}
+#| echo: true
+eig_obj$values |>
+  signif(2) |>
+  setNames(paste0("PC", 1:7))
+```
+
+- Clearly, due to the correlation structure, the orthogonality constraint implies that only two PCs have meaningful variance.
+
+:::
+
+::::
+
+# Total variance {.smaller}
+
+The sum of variances of the original variables is equal to the sum of the eigenvalues of $\symbf{\Sigma}$, which is also equal to the sum of variances of the principal components:
+
+$$
+\sum_{i=1}^{p} \sigma_{ii} = \sum_{i=1}^{p} \text{Var}(X_i) = \sum_{i=1}^{p} \lambda_i = \sum_{i=1}^{p} \text{Var}(Y_i).
+$$
+
+# Contribution per component
+
+We've seen before that
+
+$$
+\text{trace}(\symbf{\Sigma}) = \sum \lambda_i = \sum \text{Var}(Y_i).
+$$
+
+This implies that the proportion of the total variance due to the $k^{th}$ principal component is
+
+$$
+\frac{\lambda_k}{\sum \lambda_i },\quad k=1,...p,
+$$
+
+and (due to being uncorrelated) the proportion of variance accounted for by the first $r$ principal components is given by
+
+$$
+\frac{\sum_{i=1}^r \lambda_i }{\sum \lambda_i }.
+$$
+
+# The scree plot
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- The scree plot is a graphical representation of the proportion of variance accounted for by each principal component.
+- It plots $(i, \lambda_i/\sum_{j=1}^{p} \lambda_j)$ for $i = 1, \ldots, p$.
+- Typically, we look for the "elbow" in the plot, which indicates the number of principal components to retain.
+- Beyond this point, each additional principal component captures little additional variation.
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+plot_tbl <- tibble::tibble(
+  pc = 1:7,
+  prop_var = eig_obj$values / sum(eig_obj$values)
+)
+plot_tbl_point <- purrr::map_df(
+  seq(5.5, 5.502, length.out = 9), function(x) {
+    plot_tbl |>
+      dplyr::filter(pc == 2) |>
+      dplyr::mutate(size_point = x)
+  }
+)
+p <-  ggplot(
+  data = plot_tbl
+  ) +
+    geom_line(
+      aes(x = pc, y = prop_var),
+      stat = "identity",
+      colour = "dodgerblue"
+    ) +
+    geom_point(
+      data = plot_tbl_point |> dplyr::slice(5:9),
+      aes(x = pc, y = prop_var, size = size_point),
+      colour = "mediumseagreen",
+      alpha = 0.9,
+      shape = 1,
+      show.legend = FALSE
+    ) +
+    geom_point(
+      aes(x = pc, y = prop_var),
+      colour = "dodgerblue",
+      alpha = 0.9,
+      size = 1.5
+    ) +
+    labs(
+      x = "Principal component index",
+      y = "Proportion of variance"
+    ) +
+    cowplot::theme_cowplot() +
+    cowplot::background_grid(major = "xy") +
+    theme(
+      panel.background = element_rect(fill = "white"),
+      plot.background = element_rect(fill = "white")
+    ) +
+    scale_x_continuous(
+      breaks = 1:7
+    )
+path_p_scree <- projr::projr_path_get("cache", "fig", "p-scree.pdf")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_scree,
+  units = "cm",
+  base_height = 7,
+  base_width = 8 * (7/6)
+)
+```
+
+```{r}
+#| results: asis
+knitr::include_graphics(path_p_scree)
+```
+
+:::
+
+::::
+
+# Variance standardisation
+
+- Before applying PCA, one can standardise the variances to have unit variance.
+- This may be appropriate when:
+  - the variances have different units (e.g. weight in kg vs annual income in rands), or
+  - the variances have different scales (e.g. some genes are extremely rare whereas others are abundantly expressed), or
+  - we wish to eliminate any effect of differences in variance on downstream analyses, e.g. when applying penalised regression.
+- Similar comments go for logging the data, or applying other transformations.
+- All results go through in exactly the same way, with adjustments made in interpreting exactly what variables the principal components capture.
+
+# Standardisation example
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+We have the following covariance matrix:
+
+```{r}
+cov_mat <- matrix(
+  c(1, 4, 4, 100), nrow = 2
+)
+cov_mat
+```
+
+which produces the following eigendecomposition:
+
+```{r}
+eigen(cov_mat) |> lapply(function(x) signif(x, 2))
+```
+
+:::
+
+:::{.column width="50%"}
+
+The associated correlation matrix:
+
+```{r}
+diag_mat_sd_inv <- diag(diag(cov_mat), nrow = nrow(cov_mat)) |> sqrt() |> solve()
+rho_mat <- diag_mat_sd_inv %*% cov_mat %*% diag_mat_sd_inv
+rho_mat 
+```
+
+has the following eigendecomposition:
+
+```{r}
+eigen(rho_mat) |> lapply(function(x) signif(x, 2))
+```
+
+The eigenvectors are in very different directions.
+
+:::
+
+::::
+
+# Example
+
+:::: {.columns}
+
+::: {.column width="57%"}
+
+We read in data of measurements Painted Turtles [@jolicoeur_mosimann60]:
+
+```{r}
+#| eval: false
+#| echo: true
+if (!requireNamespace(
+  "remotes", quietly = TRUE
+  )) {
+  install.packages("remotes")
+}
+remotes::install_github(
+  "MiguelRodo/DataTidy23RodoHonsMult@2024"
+)  
+```
+
+:::
+
+::: {.column width="43%"}
+
+```{r}
+#| echo: true
+data(
+  "data_tidy_turtle",
+  package = "DataTidy23RodoHonsMult"
+)
+data_tidy_turtle
+```
+
+:::
+
+::::
+
+# Measurements highly correlated
+
+::::{.columns}
+
+:::{.column width="50%"}
+
+```{r}
+#| include: false
+plot_tbl_turtle <- data_tidy_turtle |>
+  tidyr::pivot_longer(
+    length:width,
+    names_to = "x_var",
+    values_to = "x_val"
+  )
+p <- ggplot(
+  plot_tbl_turtle,
+  aes(x = x_val, y = height, col = gender)
+) +
+  geom_point(alpha = 0.75) +
+  scale_colour_manual(
+    values = c(male = "dodgerblue", female = "mediumseagreen")
+   ) +
+  facet_wrap(~x_var, scales = "free", ncol =1 ) +
+  cowplot::theme_cowplot() +
+  cowplot::background_grid(major = "xy") +
+  theme( 
+    panel.background = element_rect(fill = "white"), 
+    plot.background = element_rect(fill = "white")
+  ) +
+  labs(
+    x = "Measurement",
+    y = "Height"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  ) +
+  theme(
+    strip.background = element_rect(fill = "white", colour = "gray25")
+  )
+path_p_turtle <- projr::projr_path_get("cache", "fig", "p-turtle.png")
+cowplot::save_plot(
+  plot = p,
+  filename = path_p_turtle,
+  units = "cm",
+  base_height = 7,
+  base_width = 5
+)
+```
+
+```{r}
+#| results: "asis"
+knitr::include_graphics(path_p_turtle)
+```
+
+:::
+
+:::{.column width="50%"}
+
+- Due to the correlation, we may likely summarise the data very well using principal components.
+- We'll use the `prcomp` function in R, and do it from first principles.
+
+:::
+
+::::
+
+# Using the `prcomp` function I {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+pr_obj <- prcomp(
+  ~ log(length) + log(width) + log(height),
+  data = data_tidy_turtle,
+  retx = TRUE
+)
+pr_obj
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The first principal component has a markedly higher standard deviation.
+- It is weighted roughly evenly across the variables, indicating it is a general "size" variable.
+
+:::
+
+::::
+
+# Using the `prcomp` function II {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+summary(pr_obj)
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The `summary` function provides the per-component standard deviation and variance, as well as the cumulative variance.
+
+:::
+
+::::
+
+# Using the `prcomp` function III {.smaller}
+
+::::{.columns}
+
+:::{.column width="70%"}
+
+```{r}
+#| echo: true
+plot(pr_obj)
+```
+
+:::
+
+:::{.column width="30%"}
+
+- The `plot` command provides the scree plot.
+- Clearly, unless we're specifically interested in non-size variables we should only retain the first principal component.
+
+:::
+
+::::
+
+# Using the `prcomp` function IV {.smaller}
+
+Here are the principal components:
+
+```{r}
+#| echo: true
+pr_obj$x |> head() |> signif(2)
+```
+
+# Interpretation guideliness {.smaller}
+
+```{r}
+#| echo: false
+example_mat <- matrix(
+  c(
+    0.8, 0.6, 0.01, 001,
+    0.01, 0.3, 0.3, -0.9055
+    ),
+  nrow = 2,
+  byrow = TRUE
+)
+rownames(example_mat) <- c("PC1", "PC2")
+colnames(example_mat) <- c("CO2", "NO", "O3", "Wind speed")
+example_mat
+```
+
+- **Summarize, Don't Repeat:** Avoid simply listing coefficients from tables. Instead, concisely summarize the key insights in a few sentences. 
+- **Ignore Trivial Coefficients:** Very small coefficients (e.g., 0.001) are usually negligible and can be omitted from your interpretation.
+- **Use Coefficients Judiciously:** Mention coefficients in parentheses when they strengthen your interpretation.
+- For example:
+  - "Component one is driven by O3 (0.08) and NO (0.54))."
+  - "Component two contrasts O3  and NO (both 0.3) with Wind speed (-0.9)."
+
+# References
+

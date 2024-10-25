@@ -1,0 +1,171 @@
+---
+title: "Facts: Bootstrapping"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+---
+
+# Bootstrapping
+
+## What is Bootstrapping?
+
+**Bootstrapping** is a resampling technique used to perform statistical inference by repeatedly sampling with replacement from the observed data. It allows for estimating the sampling distribution of a statistic without relying on parametric assumptions about the data distribution.
+
+## Concept of a Sampling Distribution
+
+A **sampling distribution** is the probability distribution of a given statistic based on a random sample. Understanding sampling distributions is essential for making inferences about population parameters from sample data.
+
+### Skewness of Sampling Distributions
+
+The **skewness** of a sampling distribution refers to its asymmetry. A skewed sampling distribution indicates that the statistic is more likely to deviate in one direction than the other, which can affect confidence interval calculations and hypothesis testing.
+
+### Influence of Data Distribution Assumptions
+
+Our assumptions about the underlying data distribution significantly influence the shape and properties of the sampling distribution.
+
+- **Normal Distribution Assumption**: If the data is normally distributed, the sampling distribution of the mean is also normal, regardless of sample size.
+  
+- **Non-Normal Distribution**: If the data distribution is non-normal, the sampling distribution of the mean tends to normality only as the sample size becomes large (Central Limit Theorem). For smaller sample sizes, the sampling distribution may retain the skewness of the original data.
+
+## Assumptions of Confidence Intervals
+
+### Confidence Interval Using the $z$-Distribution
+
+$$
+\hat{\theta} \pm z^{\alpha/2}\hat{se}(\hat{\theta})
+$$
+
+**Assumptions:**
+- The sampling distribution of $\hat{\theta}$ is normal.
+- The standard error $\hat{se}(\hat{\theta})$ is known or accurately estimated.
+- Suitable for large sample sizes or normally distributed data.
+
+### Confidence Interval Using the $t$-Distribution
+
+$$
+\hat{\theta} \pm t^{\alpha/2}_{n-k}\hat{se}(\hat{\theta})
+$$
+
+**Assumptions:**
+- The sampling distribution of $\hat{\theta}$ is approximately normal.
+- The standard error $\hat{se}(\hat{\theta})$ is estimated from the sample.
+- Applicable when the sample size is small and the population standard deviation is unknown.
+- Assumes the data is symmetrically distributed and that the sample mean and sample standard deviation are independent.
+
+## Bootstrap Sample
+
+A **bootstrap sample** is created by randomly drawing observations with replacement from the original sample. Each bootstrap sample is the same size as the original sample and may contain duplicate observations.
+
+## Bootstrap Confidence Intervals
+
+Bootstrap confidence intervals use resampling methods to estimate the distribution of a statistic and construct confidence intervals.
+There are several options, which vary in their assumptions and properties.
+
+### Types of Bootstrap Confidence Intervals
+
+- **Percentile Method**: Constructs the confidence interval using the percentiles of the bootstrap distribution of the statistic.
+  - Asymmetric?
+    - Yes.
+    - Source of asymmetry?
+      - The bootstrap distribution of the statistic may not be symmetric.
+  
+- **T-Bootstrap Method**: Replaces the unbiased estimator of $s^2$ with the boostrap estimate of the variance, from the standard $t$-distribution confidence interval.
+  - Formula:
+    - $\hat{\theta} \pm t^{\alpha/2}_{n - 1}\hat{se}_{\mathrm{boot}}(\hat{\theta})$
+  - Asymmetric?
+    - No
+  
+- **Bootstrap-T Method**: Replaces the quantiles of the $t$-distribution with the quantiles of the bootstrapped $t$-stat distribution.
+  - $t$-statistic:
+    - $\frac{\hat{\theta} - \theta}{\hat{se}(\hat{\theta})}$
+  - Bootstrapped $t$ distribution
+    - For each bootstrap sample, calculate the $t$-statistic.
+    - These represent the distribution of the $t$-statistic.
+    - Notation:
+      - $q_{\alpha/2}$: $\alpha/2$ quantile of the bootstrapped $t$-stat distribution.
+      - $q_{1-\alpha/2}$: $(1-\alpha/2)$ quantile of the bootstrapped $t$-stat distribution.
+  - Confidence interval formula:
+    - $\hat{\theta} - q_{1-\alpha/2}\hat{se}(\hat{\theta}), \hat{\theta} - q_{\alpha/2}\hat{se}(\hat{\theta})$
+  - Asymmetric?
+    - Yes.
+    - Source of asymmetry?
+      - The bootstrapped $t$-stat distribution may not be symmetric.
+
+### Properties of Bootstrap Confidence Intervals
+
+- **Asymmetry**: The percentile and bootstrap-t methods allow for asymmetric confidence intervals, which can better accommodate skewed sampling distributions.
+  
+- **Flexibility**: The percentile and bootstrap-t methods methods do not assume a normal sampling distribution, making them suitable for a variety of data distributions.
+
+# Q&A
+
+- What is bootstrapping?
+  - A resampling technique used to perform statistical inference by repeatedly sampling with replacement from the observed data.
+- What does bootstrapping allow us to do?
+  - Estimate the sampling distribution of a statistic without relying on parametric assumptions about the data distribution.
+- What is a sampling distribution?
+  - The probability distribution of a given statistic based on a random sample.
+- Why is understanding sampling distributions essential?
+  - For making inferences about population parameters from sample data.
+- What does skewness of a sampling distribution refer to?
+  - Its asymmetry.
+- What does a skewed sampling distribution indicate?
+  - The statistic is more likely to deviate in one direction than the other.
+- How does skewness affect statistical analysis?
+  - It can affect confidence interval calculations and hypothesis testing.
+- How do data distribution assumptions influence the sampling distribution?
+  - They significantly influence the shape and properties of the sampling distribution.
+- What is the assumption if data is normally distributed?
+  - The sampling distribution of the mean is also normal, regardless of sample size.
+- What happens to the sampling distribution of the mean if the data distribution is non-normal?
+  - It tends to normality only as the sample size becomes large.
+- What is a bootstrap sample?
+  - A draw with replacement from the original sample.
+- How is a bootstrap sample created?
+  - By randomly drawing observations with replacement from the original sample.
+- What are bootstrap confidence intervals?
+  - Confidence intervals that use resampling methods to estimate the distribution of a statistic.
+- What are the types of bootstrap confidence intervals:
+  - Percentile Method
+  - T-Bootstrap Method
+  - Bootstrap-T Method
+- What is the Percentile Method?
+  - Constructs the confidence interval using the percentiles of the bootstrap distribution of the statistic.
+- Is the Percentile Method asymmetric?
+  - Yes.
+- What is the source of asymmetry in the Percentile Method?
+  - The bootstrap distribution of the statistic may not be symmetric.
+- What is the T-Bootstrap Method?
+  - Replaces the unbiased estimator of $s^2$ with the bootstrap estimate of the variance, from the standard $t$-distribution confidence interval.
+- What is the formula for the T-Bootstrap Method?
+  - $\hat{\theta} \pm t^{\alpha/2}_{n - 1}\hat{se}_{\mathrm{boot}}(\hat{\theta})$
+- Is the T-Bootstrap Method asymmetric?
+  - No.
+- What is the Bootstrap-T Method?
+  - Replaces the quantiles of the $t$-distribution with the quantiles of the bootstrapped $t$-stat distribution.
+- What is the $t$-statistic in the Bootstrap-T Method?
+  - $\frac{\hat{\theta} - \theta}{\hat{se}(\hat{\theta})}$
+- What does the bootstrapped $t$-distribution represent?
+  - The distribution of the $t$-statistic calculated from each bootstrap sample.
+- What is the confidence interval formula for the Bootstrap-T Method?
+  - $\hat{\theta} - q_{1-\alpha/2}\hat{se}(\hat{\theta}), \hat{\theta} - q_{\alpha/2}\hat{se}(\hat{\theta})$
+- Is the Bootstrap-T Method asymmetric?
+  - Yes.
+- What is the source of asymmetry in the Bootstrap-T Method?
+  - The bootstrapped $t$-stat distribution may not be symmetric.
+- What is a property of bootstrap confidence intervals?
+  - They can be asymmetric.
+- What is another property of bootstrap confidence intervals?
+  - They offer flexibility by not assuming a normal sampling distribution.
+- Which bootstrap confidence interval methods allow for asymmetric confidence intervals?
+  - Percentile and Bootstrap-T methods.
+- Do bootstrap confidence intervals assume a normal sampling distribution?
+  - No, they do not rely on strong parametric assumptions.
+- Why might bootstrap confidence intervals be preferred over traditional $z$ and $t$ intervals?
+  - They offer more flexibility, especially in cases of non-normality and small sample sizes.
+- What is one key property of the Percentile and Bootstrap-T methods?
+  - They allow for asymmetric confidence intervals.
+- What does the flexibility of bootstrap confidence intervals refer to?
+  - Their ability to accommodate a variety of data distributions without assuming normality.

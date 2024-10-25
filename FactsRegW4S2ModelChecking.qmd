@@ -1,0 +1,501 @@
+---
+title: "Model Validation in Linear Regression"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+---
+
+# Introduction
+
+Model validation is a crucial step in linear regression analysis to ensure that the model accurately represents the data and satisfies the underlying assumptions. This document provides a comprehensive overview of model validation techniques, including the use of the coefficient of determination ($R^2$) and adjusted $R^2$, assumption checking methods, and diagnostic tools like studentized residuals, leverage, and Cook's distance.
+
+# Coefficient of Determination ($R^2$)
+
+## Definition
+
+The coefficient of determination, denoted as $R^2$, measures the proportion of the variance in the dependent variable ($Y$) that is predictable from the independent variables ($X$) in a linear regression model. It is calculated as:
+
+$$
+R^2 = \frac{\text{SSR}}{\text{SST}} = 1 - \frac{\text{SSE}}{\text{SST}},
+$$
+
+where:
+
+- $\text{SSR}$: Sum of Squares due to Regression (explained variation)
+- $\text{SSE}$: Sum of Squared Errors (unexplained variation)
+- $\text{SST}$: Total Sum of Squares (total variation)
+
+## Interpretation
+
+An $R^2$ value close to 1 indicates that a large proportion of the variance in $Y$ is explained by the model, suggesting a good fit. Conversely, an $R^2$ value near 0 implies that the model does not explain much of the variance.
+
+## Range
+
+$R^2$ ranges between 0 and 1:
+
+$$
+0 \leq R^2 \leq 1
+$$
+
+## Relationship to Number of Variables in Model
+
+Adding more independent variables to a model will generally increase $R^2$, even if those variables do not significantly contribute to the model. This is because $R^2$ does not account for the number of variables included.
+
+## Relationship to Correlation Between Fitted and Actual Values
+
+$R^2$ is the square of the correlation coefficient ($R$) between the observed values and the fitted values:
+
+$$
+R^2 = (\text{Correlation between } Y \text{ and } \hat{Y})^2
+$$
+
+## Drawbacks
+
+- **Biased**: As coefficients are estimated using the data, $R^2$ will tend to over-estimate the proportion of variation explained.
+- **Does Not Adjust for Complexity**: Does not penalize for adding irrelevant variables.
+
+## Advantages
+
+- **Simplicity**: Easy to compute and interpret.
+- **Standard Metric**: Widely used for assessing linear models.
+
+# Adjusted $R^2$
+
+## Definition
+
+Adjusted $R^2$ adjusts the $R^2$ value based on the number of predictors in the model, providing a more accurate measure when comparing models with different numbers of independent variables. It is calculated as:
+
+$$
+R_{\text{adj}}^2 = 1 - (1 - R^2) \left( \frac{n - 1}{n - k - 1} \right),
+$$
+
+where:
+
+- $n$: Number of observations
+- $k$: Number of independent variables
+
+## Motivation
+
+Adjusted $R^2$ compensates for the addition of variables that do not improve the model significantly, penalizing models with unnecessary complexity.
+
+## Advantages
+
+- **Can Decrease**: Unlike $R^2$, adjusted $R^2$ will not necessarily increase with the addition of more variables.
+  - **Model Comparison**: As a result of the above, it can be used to compare models with different numbers of predictors.
+- **Less upwardly biased**: Whilst $R^2$ tends to exaggerate the model's explanatory power, adjusted $R^2$ is less prone to this bias.
+
+## Disadvantages
+
+- **Less Intuitive**: Interpretation is slightly more complex than $R^2$.
+- **No formal motivation**: The formula is an ad-hoc adjustment, not derived from first principles.
+
+# Location in Model Output
+
+Both $R^2$ and adjusted $R^2$ typically appear in the summary output of regression models in statistical software packages. They are often found near the bottom of the output, providing quick metrics for model evaluation.
+
+# Assumption Checking
+
+After evaluating the model fit using $R^2$ and adjusted $R^2$, it's essential to verify that the underlying assumptions of linear regression are satisfied.
+
+## Key Assumptions in Linear Regression
+
+1. **Linearity**: The relationship between the independent and dependent variables is linear.
+2. **Independence**: Observations are independent of each other.
+3. **Homoscedasticity**: The residuals have constant variance.
+4. **Normality**: The residuals are normally distributed.
+5. **No Multicollinearity**: Independent variables are not highly correlated.
+
+## Methods of Assessment
+
+### Graphical Methods
+
+- **Residual Plots**: Scatter plots of residuals versus fitted values, predictors, row indices or some other useful variable.
+- **Histogram/Density Plots**: Visualize the distribution of residuals.
+- **Q-Q Plots**: Assess normality by plotting quantiles of residuals against theoretical quantiles.
+
+### Hypothesis Testing
+
+- **Shapiro-Wilk Test**: Tests for normality of residuals.
+- **Kolmogorov-Smirnov Test**: Another normality test, less sensitive to deviations in the tails.
+
+### Per-Observation Statistics
+
+- **Studentized Residuals**: Standardized residuals accounting for variance.
+- **Leverage Values**: Detects observations with extreme predictor values.
+- **Cook's Distance**: Identifies influential and/or outlying observations.
+
+## Advantages and Disadvantages
+
+- **Graphical Methods**: Intuitive but subjective.
+- **Hypothesis Testing**: Objective but may be sensitive to sample size. Does not quantify size of discrepancy.
+- **Per-Observation Statistics**: Pinpoint specific problematic observations but can be complex to interpret.
+
+# Detailed Assessment Methods
+
+## Histogram/Density of Residuals
+
+Used to assess the normality of residuals. A symmetric, bell-shaped histogram suggests normal distribution.
+
+## Residuals Scatterplot
+
+### Appropriate Choices of X-Axis Variable
+
+- **Fitted Values**: To assess homoscedasticity.
+- **Predictor Variables**: To check for linearity.
+- **Row Index** (or some other variable that may induce correlation, such as time): To detect autocorrelation.
+
+### Identifying Violations
+
+- **Non-Linearity**: Patterns or curves in the plot.
+- **Heteroscedasticity**: Fan or cone shapes indicating changing variance.
+- **Autocorrelation**: Clusters or patterns in the residuals.
+
+## Q-Q Plot
+
+### Identifying Normality Violations
+
+- **Deviations from the Line**: Points deviating significantly from the reference line suggest non-normality.
+
+### Nature of Violation
+
+- **Skewness**: Asymmetry in the plot.
+- **Kurtosis**: Heavy tails or peakedness.
+
+### Bounds of the Band
+
+The bands represent confidence intervals, indicating where most points should lie if the distribution is normal.
+
+### Importance of the Y=X Line
+
+The reference line (Y=X) represents the expected quantiles if the residuals are perfectly normal.
+
+## Hypothesis Testing Approaches
+
+### Names of Tests
+
+- **Shapiro-Wilk Test**
+- **Kolmogorov-Smirnov Test**
+
+### Null Hypothesis
+
+- **Shapiro-Wilk**: Residuals are normally distributed.
+- **Kolmogorov-Smirnov**: Residuals follow a specified distribution.
+
+### Sensitivity
+
+- **Shapiro-Wilk**: More sensitive
+- **Kolmogorov-Smirnov**: Less sensitive, especially to tail deviations.
+
+# Studentized Residuals
+
+## Why Studentize?
+
+To standardize residuals accounting for their varying variances, making them comparable across observations.
+
+## Internally Studentized Residual
+
+### Definition
+
+$$
+t_i = \frac{\hat{e}_i}{s \sqrt{1 - h_i}},
+$$
+
+where:
+
+- $\hat{e}_i$: Residual for observation $i$
+- $s$: Estimated standard error
+- $h_i$: Leverage of observation $i$
+
+### Disadvantage
+
+Uses the same model that included the observation, potentially underestimating the size of the residual.
+
+## Externally Studentized Residual
+
+### Definition
+
+$$
+t_i = \frac{y_i-\hat{y}_{(i)}}{\sqrt{s^2_{(i)}(1 + \symbf{x}_i'(\symbf{X}_{(i)}'\symbf{X}_{(i)})^{-1}\symbf{x}_i) }},
+$$
+
+where $\symbf{x}_i$ is the predictor vector for observation $i$, $\hat{y}_{(i)}$ is the predicted value and $s_{(i)}$ is the standard error, both calculated without observation $i$, and $\symbf{X}_{(i)}$ is the design matrix without the $i$th row.
+
+### Advantage
+
+Provides a more accurate assessment by excluding the observation from variance estimation.
+
+#### Disadvantage
+
+More computationally intensive than internally studentized residuals.
+
+#### Equivalent formula
+
+$$
+t_i= r_i \sqrt{\frac{n - k - 1}{n - k - r_i^2}},
+$$
+
+### Reason for Single Model Fit Definition
+
+- **Speed**: Computationally faster while still accurate.
+
+## Appropriate Cutoffs
+
+Observations with $|t_i| > 2$ are often considered outliers, aligning with the critical value from the standard normal distribution ($z_{0.025} \approx 1.96$) and $t$-distribution for large degrees of freedom.
+
+## Identifying Discrepant Observations
+
+- **Scatterplots**: Observations that fall far from others.
+- **Density Plots**: Deviations from normal distribution patterns.
+
+# Leverage
+
+High leverage points have predictor values far from the mean, potentially exerting undue influence on the model.
+
+## Definition
+
+$$
+h_i = \symbf{x}_i'(\symbf{X}'\symbf{X})^{-1}\symbf{x}_i,
+$$
+
+where:
+
+- $\symbf{x}_i$: Predictor vector for observation $i$
+- $\symbf{X}$: Design matrix
+
+Equivalently, it is the $i$-th diagonal element of the hat matrix ($H = \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$).
+
+## Interpretation
+
+The leverage of an observation quantifies how much influence that observation has on the fitted values. High leverage points can significantly affect the regression coefficients.
+
+## Total leverage
+
+It can be shown (see question bank) that the leverage values sum to the number of predictors ($k$):
+
+$$
+\sum_{i=1}^{n} h_i = k
+$$
+
+## Average leverage
+
+The average leverage is $\frac{k}{n}$, where $n$ is the number of observations.
+
+## Influence of Leverage
+
+For the $i$-th observation, the predicted value is:
+
+$$
+\hat{y}_i = h_i y_i + \sum_{j \neq i} H_{ij} y_j,
+$$
+
+where $H_{ij}$ is the $i,j$-th element of the hat matrix $H$.
+
+$h_i$ therefore determines the weight of the $i$-th observation in the prediction.
+
+## Identifying High-Leverage Points
+
+### Methods
+
+- **Threshold Based on Average Leverage**: Points where $h_i > c \times \frac{k}{n}$, with $c$ commonly set to 2 or 3.
+- **Comparative Analysis**: Points with leverage separated from others, as viewed graphically (plot against row index, residuals, etc.).
+
+# Cook's Distance
+
+## Definition
+
+Cook's distance combines the information from residuals and leverage to assess the influence of each observation on the fitted regression coefficients.
+
+$$
+D_i = \frac{ t_i^{2} h_i }{ k (1 - h_i) },
+$$
+
+where:
+
+- $k$: Number of predictors
+- $t_i$: Externally studentized residual
+- $h_i$: Leverage of observation $i$
+
+## Components Combined
+
+- **Leverage ($h_i$)**: Influence due to predictor values.
+- **Size of Residual ($t_i$)**: Influence due to the discrepancy between observed and fitted values.
+
+## Identifying Outlying Observations
+
+### Threshold
+
+- **Common Rule**: $D_i > \frac{4}{n - k - 1}$
+- **Relative Comparison**: Observations with Cook's distance much larger than others.
+
+### Interpretation
+
+Large Cook's distance values indicate observations that have some combination of high leverage and outlyingness.
+
+# Conclusion
+
+Model validation is essential to ensure the reliability and validity of linear regression models. By thoroughly checking model assumptions and identifying outliers or influential observations, we can improve model performance and make more accurate predictions.
+
+---
+
+# Q&A
+
+- What is $R^2$?
+  - A statistical measure representing the proportion of variance in the dependent variable explained by the independent variables.
+- How is $R^2$ calculated?
+  - $R^2 = \frac{\text{SSR}}{\text{SST}} = 1 - \frac{\text{SSE}}{\text{SST}}$
+- What does SSR stand for?
+  - Sum of Squares due to Regression
+- What does SSE stand for?
+  - Sum of Squared Errors
+- What does SST stand for?
+  - Total Sum of Squares
+- How do you interpret an $R^2$ value close to 1?
+  - Indicates a large proportion of variance in $Y$ is explained by the model.
+- How do you interpret an $R^2$ value near 0?
+  - Model does not explain much of the variance in $Y$.
+- What is the range of $R^2$?
+  - $0 \leq R^2 \leq 1$
+- How does the number of variables in the model affect $R^2$?
+  - Adding more variables generally increases $R^2$.
+- What is the relationship between $R^2$ and the correlation between fitted and actual values?
+  - $R^2$ is the square of the correlation coefficient.
+- What is a drawback of $R^2$?
+  - Overestimation due to not adjusting for the number of predictors.
+- What is another drawback of $R^2$?
+  - Does not penalize for adding irrelevant variables.
+- What is an advantage of $R^2$?
+  - Simplicity.
+- What is another advantage of $R^2$?
+  - Standard metric.
+- What is adjusted $R^2$?
+  - A modified version of $R^2$ that accounts for the number of predictors.
+- How is adjusted $R^2$ calculated?
+  - $R_{\text{adj}}^2 = 1 - (1 - R^2) \left( \frac{n - 1}{n - k - 1} \right)$
+- What does $n$ represent in adjusted $R^2$?
+  - Number of observations.
+- What does $k$ represent in adjusted $R^2$?
+  - Number of independent variables.
+- What is the motivation for using adjusted $R^2$?
+  - To compensate for adding variables that do not significantly improve the model.
+- What is an advantage of adjusted $R^2$:
+  - First?
+    - Less upwardly biased
+  - Second?
+    - Useful for model comparison
+- What is a disadvantage of adjusted $R^2$:
+  - First?
+    - Less intuitive
+  - Second?
+    - Can decrease with additional variables
+  - Third?
+    - No formal motivation
+- Where do $R^2$ and adjusted $R^2$ appear in model output?
+  - In the summary section of regression outputs in statistical software.
+- What is a key assumption in linear regression?
+  - Linearity.
+- What is another key assumption?
+  - Independence.
+- What is the third key assumption?
+  - Homoscedasticity.
+- What is the fourth key assumption?
+  - Normality.
+- What is the fifth key assumption?
+  - No multicollinearity.
+- How can assumptions be assessed?
+  - Graphical methods, hypothesis testing, and per-observation statistics.
+- What are the types of graphical methods?
+  - Residual plots, histogram/density plots, Q-Q plots.
+- What are the types of hypothesis testing methods?
+  - Shapiro-Wilk test and Kolmogorov-Smirnov test.
+- What are the types of per-observation statistics?
+  - Cook's distance, leverage values, studentized residuals.
+- What is an advantage of graphical methods?
+  - Intuitive.
+- What is a disadvantage of graphical methods?
+  - Subjective interpretation.
+- What is an advantage of hypothesis testing?
+  - Objective.
+- What is a disadvantage of hypothesis testing?
+  - Sensitive to sample size.
+- What is an advantage of per-observation statistics?
+  - Identify specific problematic observations.
+- What is a disadvantage of per-observation statistics?
+  - Can be complex to interpret.
+- What is used to assess the normality of residuals?
+  - Histogram/density plots and Q-Q plots.
+- What does a symmetric, bell-shaped histogram suggest?
+  - Normal distribution of residuals.
+- What can residuals scatterplot help detect?
+  - Non-linearity, heteroscedasticity, autocorrelation.
+- What are appropriate x-axis variables for residuals scatterplot?
+  - Fitted values, predictor variables, row index.
+- How do you identify non-linearity in residuals scatterplot?
+  - Patterns or curves.
+- How do you identify heteroscedasticity in residuals scatterplot?
+  - Fan or cone shapes.
+- How do you identify autocorrelation in residuals scatterplot?
+  - Clusters or patterns.
+- How can normality be assessed with Q-Q plot?
+  - By checking if points deviate from the reference line.
+- What does skewness in Q-Q plot look like?
+  - Points curve away from the line at ends.
+- What does kurtosis in Q-Q plot look like?
+  - Points deviate in the middle or tails.
+- What do the bounds of the band in Q-Q plot represent?
+  - Confidence intervals for normality.
+- Why is the Y=X line important in Q-Q plot?
+  - Represents expected quantiles if residuals are normal.
+- What are the names of normality tests?
+  - Shapiro-Wilk and Kolmogorov-Smirnov.
+- What is the null hypothesis of Shapiro-Wilk test?
+  - Residuals are normally distributed.
+- What is the null hypothesis of Kolmogorov-Smirnov test?
+  - Residuals follow a specified distribution.
+- Which test is more sensitive?
+  - Shapiro-Wilk.
+- Which test lacks power in identifying tail deviations?
+  - Kolmogorov-Smirnov.
+- Why do we studentize residuals?
+  - To standardize residuals accounting for their varying variances.
+- What is internally studentized residual?
+  - $t_i = \frac{\hat{e}_i}{s \sqrt{1 - h_i}}$
+- What is a disadvantage of internally studentized residuals?
+  - Underestimates the size of the residual.
+- What is externally studentized residual?
+  - $t_i = \frac{y_i - \hat{y}_{(i)}}{\sqrt{s^2_{(i)} \left(1 + \mathbf{x}_i' (\mathbf{X}_{(i)}' \mathbf{X}_{(i)})^{-1} \mathbf{x}_i \right)}}$
+- What is an advantage of externally studentized residuals?
+  - More accurate assessment by excluding the observation.
+- What is the equivalent formula for externally studentized residual?
+  - $t_i = r_i \sqrt{\frac{n - k -1}{n - k - r_i^2}}$
+- Why use the single model fit definition for externally studentized residual?
+  - Speed.
+- What is an appropriate cutoff for identifying outliers?
+  - $|t_i| > 2$
+- How do you identify discrepant observations?
+  - Scatterplots and density plots.
+- What is leverage?
+  - Measures how far an observation's predictor values are from others.
+- How is leverage calculated?
+  - $h_i = \mathbf{x}_i' (\mathbf{X}' \mathbf{X})^{-1} \mathbf{x}_i$
+- What is the sum of leverage values?
+  - $\sum_{i=1}^{n} h_i = k$
+- What is average leverage?
+  - $\frac{k}{n}$
+- How does leverage influence the model?
+  - Determines the weight of the observation in the prediction.
+- How do you identify high-leverage points?
+  - $h_i > c \times \frac{k}{n}$ or leverage significantly larger than others.
+- What is Cook's distance?
+  - A measure that combines leverage and size of residual to assess influence.
+- What does Cook's distance combine?
+  - Leverage and size of residual.
+- How is Cook's distance calculated?
+  - $D_i = \frac{ t_i^{2} h_i }{ k (1 - h_i) }$
+- What is a common threshold for Cook's distance?
+  - $D_i > \frac{4}{n - k - 1}$
+- How do you identify outlying observations using Cook's distance?
+  - Observations with Cook's distance far from others.
+- What is Modified Cook's statistic?
+  - Alternative versions of Cook's distance to address specific concerns.

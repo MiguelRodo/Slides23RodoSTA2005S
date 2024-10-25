@@ -1,0 +1,471 @@
+---
+title: "Key Points: Regression Week V - Matching the Model to the Data"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+---
+
+# Introduction
+
+- **Purpose of Model Transformations:**
+  - Adjust the regression model to better meet key assumptions.
+  - Address non-linearity, heteroscedasticity, skewness, and outliers in the data.
+
+# Suite of Tactics to Handle Non-Linearity
+
+1. **Transform the Dependent Variable ($Y$):**
+   - Linearize relationships.
+   - Stabilize variance.
+   - Reduce skewness.
+   - Handle outliers.
+
+2. **Transform the Independent Variables ($X_i$):**
+   - Address specific non-linear relationships without altering relationships with other variables or altering variance.
+
+3. **Introduce New Explanatory Variables:**
+   - Add polynomial terms or interaction terms to capture non-linear effects.
+
+# Transforming the Dependent Variable ($Y$)
+
+## Why Transform $Y$?
+
+- **Linearize Relationships:**
+  - Convert non-linear relationships to linear ones.
+
+- **Stabilize Variance:**
+  - Address heteroscedasticity by equalizing residual spread.
+
+- **Reduce Skewness:**
+  - Make residuals more normally distributed.
+
+- **Handle Outliers:**
+  - Mitigate the impact of extreme values on the model.
+
+## Effects of Transformation
+
+- Alters relationships with all explanatory variables.
+- May introduce or exacerbate non-constant variance.
+
+## Common Transformations
+
+1. **Logarithmic Transformation ($Y' = \log(Y)$):**
+   - Useful for exponential growth relationships.
+   - Stabilizes variance and linearizes multiplicative relationships.
+   - Undefined for $Y = 0$; use $\log(Y + 1)$ if necessary.
+
+2. **Square Root Transformation ($Y' = \sqrt{Y}$):**
+   - Suitable for count data and moderate heteroscedasticity.
+
+## Impact on Interpretation
+
+- **Coefficients:** Represent changes on the transformed scale.
+  - **Log Transformation:** $\exp(\beta_i)$ indicates multiplicative change in $Y$.
+  - **Square Root Transformation:** $\beta_i$ indicates change in $\sqrt{Y}$.
+- Interpretations on original scale:
+  - **Log Transformation:**
+    - Exponentiate coefficients, and increase is multiplicative.
+    - The interpretation is no longer in terms of the mean of $Y$.
+    - For example, $\exp(\beta_i)$ represents the multiplicative change in $Y$ for a one-unit increase in $X$.
+  - **Square root transformation:**
+    - No direct interpretation in terms of $Y$.
+
+# Transforming Individual Explanatory Variables ($X_i$)
+
+## Why Transform $X_i$?
+
+- Address non-linear relationships specific to one explanatory variable.
+- Preserve linear relationships with other variables.
+
+## Effects of Transforming $X_i$
+
+- Does not fix non-constant variance or outliers.
+- Corrects the specific non-linear relationship without altering relationships with other variables.
+
+## Common Transformations
+
+- **Log Transformation ($X' = \log(X)$):**
+  - Use when the effect of $X$ on $Y$ decreases as $X$ increases.
+
+- **Square Root Transformation ($X' = \sqrt{X}$):**
+  - Similar application as log transformation.
+
+- **Exponentiation ($X' = \exp(X)$):**
+  - Use when the effect of $X$ on $Y$ increases as $X$ increases.
+
+- **Squaring ($X' = X^2$):**
+  - Use to capture quadratic relationships.
+
+## Impact on Interpretation
+
+- Interpret coefficients in terms of the transformed $X$ variable.
+  - Example: With $X' = \log(X)$, $\beta_1$ represents the change in $Y$ for a one-unit increase in $\log(X)$.
+  - No direct interpretation in terms of the original $X$ variable - one would have to look at a plot of the relationship.
+
+# Introducing Interaction Terms
+
+## Purpose
+
+- Model scenarios where the effect of one explanatory variable on $Y$ depends on the level of another explanatory variable.
+
+## Interaction Between Continuous and Two-level Categorical Variables
+
+### Model formula
+$$
+Y = \beta_0 + \beta_X X + \beta_G I(\text{Group} = B) + \beta_{X:G} X \times I(\text{Group} = B) + \epsilon
+$$
+
+### Interpretation of coefficients
+
+#### Intercept of $Y$
+
+- **Group A (Reference Group):**
+  - $\beta_0$
+- **Group B:**
+  - $\beta_0 + \beta_G$
+- **Comparison between groups A and B:**
+  - The difference in intercept between the two groups is $\beta_G$ when $X = 0$.
+
+#### Slope of $Y$ with respect to $X$
+
+- **Group A (Reference Group):**
+  - $\beta_X$
+- **Group B:**
+  - $\beta_X + \beta_{X:G}$
+- **Comparison between groups A and B:**
+  - The difference in the slope of $Y$ with respect to $X$ between the two groups is $\beta_{X:G}$.
+
+#### Average $Y$ for a given $X$
+
+- **Group A (Reference Group):**
+  - $\mathrm{E}[Y] = \beta_0 + \beta_X X$
+- **Group B:**
+  - $\mathrm{E}[Y] = (\beta_0 + \beta_G) + (\beta_X + \beta_{X:G}) X$
+- **Comparison between groups A and B:**
+  - The difference in average $Y$ between the two groups is $\beta_G + X \beta_{X:G}$ for a given $X$.
+
+### Hypothesis testing
+
+#### Testing effect of group on slope
+
+- Question being addressed, in plain English:
+  - Does the effect of $X$ on $Y$ differ between the two groups?
+- **Null Hypothesis:** $H_0: \beta_{X:G} = 0 $$
+- **Alternative Hypothesis:** $H_1: \beta_{X:G} \neq 0$
+
+#### Testing effect of $X$ within a specific group
+
+- Question being addressed, in plain English:
+  - Does $X$ affect $Y$ for a specific group?
+- Reference group:
+  - **Null Hypothesis:** $H_0: \beta_X = 0$
+  - **Alternative Hypothesis:** $H_1: \beta_X \neq 0$
+- Non-reference group:
+  - **Null Hypothesis:** $H_0: \beta_X + \beta_{X:G} = 0$
+  - **Alternative Hypothesis:** $H_1: \beta_X + \beta_{X:G} \neq 0$
+
+#### Testing group effect
+
+- Question being addressed, in plain English:
+  - Does the group affect the response?
+  - We need to check whether the group affects the intercept and/or the slope.
+- **Null Hypothesis:** $H_0: \beta_G = \beta_{X:G} = 0$
+- **Alternative Hypothesis:** At least one of $\beta_G$ or $\beta_{X:G}$ is non-zero.
+
+  ## Interaction Between Continuous and $a$-level Categorical Variables
+
+### Model Formula
+
+$$
+Y = \beta_0 + \beta_X X + \beta_{G_2} I(\text{Group} = G_2) + \ldots + \beta_{G_a} I(\text{Group} = G_a) + \beta_{X:G_2} X \times I(\text{Group} = G_2) + \ldots + \beta_{X:G_a} X \times I(\text{Group} = G_a) + \epsilon
+$$
+
+### Interpretation of Coefficients
+
+#### Intercept of $Y$
+
+- **Group 1 (Reference Group):**
+  - $\beta_0$
+
+- **Group $i$ (where $i = 2, \ldots, a$):**
+  - $\beta_0 + \beta_{G_i}$
+
+- **Comparison between Groups 1 and $i$:**
+  - The difference in intercept between the two groups is $\beta_{G_i}$ when $X = 0$.
+
+#### Slope of $Y$ with respect to $X$
+
+- **Group 1 (Reference Group):**
+  - $\beta_X$
+
+- **Group $i$ (where $i = 2, \ldots, a$):**
+  - $\beta_X + \beta_{X:G_i}$
+
+- **Comparison between Groups 1 and $i$:**
+  - The difference in the slope of $Y$ with respect to $X$ between the two groups is $\beta_{X:G_i}$.
+
+#### Average $Y$ for a Given $X$
+
+- **Group 1 (Reference Group):**
+  - $$ \mathrm{E}[Y] = \beta_0 + \beta_X X $$
+
+- **Group $i$ (where $i = 2, \ldots, a$):**
+  - $$ \mathrm{E}[Y] = (\beta_0 + \beta_{G_i}) + (\beta_X + \beta_{X:G_i}) X $$
+
+- **Comparison between Groups 1 and $i$:**
+  - The difference in average $Y$ between the two groups is $\beta_{G_i} + X \times \beta_{X:G_i}$ for a given $X$.
+
+### Hypothesis Testing
+
+These first three tests are essentially the same as those for the two-group case, except that we now highlight that one group is a reference group.
+
+#### Testing effect of group on slope for individual group
+
+- **Question Being Addressed:**
+  - Do the effects of $X$ on $Y$ differ between the reference group and group $i$?
+- **Null Hypothesis:** $H_0: \beta_{X:G_i} = 0$
+- **Alternative Hypothesis:** $H_1: \beta_{X:G_i} \neq 0$
+
+#### Testing effect of $X$ for individual group
+
+- **Question Being Addressed:**
+  - Does $X$ affect $Y$ for a specific group $i$?
+  - **Reference Group:**
+    - **Null Hypothesis:** $H_0: \beta_X = 0$
+    - **Alternative Hypothesis:** $H_1: \beta_X \neq 0$
+  - **Group $i$ (where $i = 2, \ldots, a$):**
+    - **Null Hypothesis:** $H_0: \beta_X + \beta_{X:G_i} = 0$
+    - **Alternative Hypothesis:** $H_1: \beta_X + \beta_{X:G_i} \neq 0$
+
+#### Testing group effect for individual group
+
+- **Question Being Addressed:**
+  - Does group $i$ have a different average $Y$ than the reference group?
+- **Null Hypothesis:** $H_0: \beta_{G_i} = \beta_{X:G_i} = 0$
+- **Alternative Hypothesis:** At least one of $\beta_{G_i}$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$.
+
+The following tests check for effects across all groups.
+
+#### Testing effect of group on slope
+
+- **Question Being Addressed:**
+  - Does the effect of $X$ on $Y$ differ between any groups?
+  - **Null Hypothesis:** $H_0: \beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+  - **Alternative Hypothesis:** At least one $\beta_{X:G_i} \neq 0$ for $i = 2, \ldots, a$.
+
+#### Testing effect of $X$ across groups
+
+- **Question Being Addressed:**
+  - Does $X$ affect $Y$ for any group?
+  - **Null Hypothesis:** $H_0: \beta_X = \beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+  - **Alternative Hypothesis:** At least one $\beta_X$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$.
+  - Comment: Differs from the previous test as it includes the reference group.
+
+#### Testing group effect
+
+- **Question Being Addressed:**
+  - Do the group affect $Y$?
+  - **Null Hypothesis:** $H_0: \beta_{G_2} = \beta_{G_3} = \ldots = \beta_{G_a} = 0$ and $\beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+  - **Alternative Hypothesis:** At least one $\beta_{G_i}$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$.
+  - Comment: differs from the previous test as it also considers the intercepts.
+
+# Q&A
+
+- What is the purpose of model transformations?
+  - To adjust the regression model to better meet key assumptions
+- Why adjust the regression model?
+  - To better meet key assumptions
+- What key assumptions are addressed by model transformations?
+  - Non-linearity
+  - Heteroscedasticity
+  - Skewness
+  - Outliers
+- What is the first tactic to handle non-linearity?
+  - Transform the dependent variable ($Y$)
+- Why transform the dependent variable ($Y$)?
+  - To linearize relationships
+- What does transforming $Y$ stabilize?
+  - Variance
+- What does transforming $Y$ reduce?
+  - Skewness
+- What does transforming $Y$ handle?
+  - Outliers
+- What is the second tactic to handle non-linearity?
+  - Transform the independent variables ($X_i$)
+- Why transform independent variables ($X_i$)?
+  - To address specific non-linear relationships
+- What does transforming $X_i$ preserve?
+  - Linear relationships with other variables
+- What is the third tactic to handle non-linearity?
+  - Introduce new explanatory variables
+- What types of new explanatory variables can be introduced?
+  - Polynomial terms
+  - Interaction terms
+- Why introduce polynomial terms or interaction terms?
+  - To capture non-linear effects
+- What is a common transformation for the dependent variable ($Y$)?
+  - Logarithmic transformation ($Y' = \log(Y)$)
+- When is logarithmic transformation useful?
+  - For exponential growth relationships
+- What does logarithmic transformation stabilize?
+  - Variance
+- What does logarithmic transformation linearize?
+  - Multiplicative relationships
+- What is a limitation of logarithmic transformation?
+  - Undefined for $Y = 0$
+- How can logarithmic transformation be adjusted if $Y = 0$?
+  - Use $\log(Y + 1)$
+- What is another common transformation for $Y$?
+  - Square root transformation ($Y' = \sqrt{Y}$)
+- When is square root transformation suitable?
+  - For count data
+  - For moderate heteroscedasticity
+- What do coefficients represent after transforming $Y$?
+  - Changes on the transformed scale
+- What does $\exp(\beta_i)$ indicate in log transformation?
+  - A multiplicative change in $Y$
+- What does $\beta_i$ indicate in square root transformation?
+  - Change in $\sqrt{Y}$
+- How is the log transformation interpreted on the original scale?
+  - Exponentiate coefficients; the increase is multiplicative
+- What does $\exp(\beta_i)$ represent in log transformation?
+  - Multiplicative change in $Y$ for a one-unit increase in $X$
+- Is there a direct interpretation for square root transformation in terms of $Y$?
+  - No
+- What is the purpose of transforming individual explanatory variables ($X_i$)?
+  - To address non-linear relationships specific to one explanatory variable
+- What does transforming $X_i$ not fix?
+  - Non-constant variance
+  - Outliers
+- What is a common transformation for $X_i$?
+  - Log transformation ($X' = \log(X)$)
+- When to use log transformation on $X_i$?
+  - When the effect of $X$ on $Y$ decreases as $X$ increases
+- What is another transformation for $X_i$?
+  - Square root transformation ($X' = \sqrt(X)$)
+- When to use square root transformation on $X_i$?
+  - Similar application as log transformation
+- What is exponentiation of $X_i$?
+  - $X' = \exp(X)$
+- When to exponentiate $X_i$?
+  - When the effect of $X$ on $Y$ increases as $X$ increases
+- What is squaring of $X_i$?
+  - $X' = X^2$
+- When to square $X_i$?
+  - To capture quadratic relationships
+- How are coefficients interpreted after transforming $X_i$?
+  - In terms of the transformed $X$ variable
+- What does $\beta_1$ represent with $X' = \log(X)$?
+  - Change in $Y$ for a one-unit increase in $\log(X)$
+- Is there a direct interpretation for transformed $X_i$ in original scale?
+  - No
+- What is the purpose of introducing interaction terms?
+  - To model scenarios where the effect of one explanatory variable on $Y$ depends on another explanatory variable
+- What types of interaction terms are discussed?
+  - Interaction between continuous and two-level categorical variables
+  - Interaction between continuous and $a$-level categorical variables
+- What is the model formula for interaction between continuous and two-level categorical variables?
+  - $Y = \beta_0 + \beta_X X + \beta_G I(\text{Group} = B) + \beta_{X:G} X \times I(\text{Group} = B) + \epsilon$
+- What is the intercept for Group A?
+  - $\beta_0$
+- What is the intercept for Group B?
+  - $\beta_0 + \beta_G$
+- What is the difference in intercept between groups A and B?
+  - $\beta_G$
+- What is the slope of $Y$ with respect to $X$ for Group A?
+  - $\beta_X$
+- What is the slope of $Y$ with respect to $X$ for Group B?
+  - $\beta_X + \beta_{X:G}$
+- What is the difference in slope between groups A and B?
+  - $\beta_{X:G}$
+- What is the average $Y$ for Group A?
+  - $\mathrm{E}[Y] = \beta_0 + \beta_X X$
+- What is the average $Y$ for Group B?
+  - $\mathrm{E}[Y] = (\beta_0 + \beta_G) + (\beta_X + \beta_{X:G}) X$
+- What is the difference in average $Y$ between groups A and B for a given $X$?
+  - $\beta_G + X \beta_{X:G}$
+- What is the first hypothesis test for interaction terms?
+  - Does the effect of $X$ on $Y$ differ between the two groups?
+- What is the null hypothesis for effect of group on slope?
+  - $H_0: \beta_{X:G} = 0$
+- What is the alternative hypothesis for effect of group on slope?
+  - $H_1: \beta_{X:G} \neq 0$
+- What is the second hypothesis test for interaction terms?
+  - Does $X$ affect $Y$ for a specific group?
+- What is the null hypothesis for $X$ effect in reference group?
+  - $H_0: \beta_X = 0$
+- What is the alternative hypothesis for $X$ effect in reference group?
+  - $H_1: \beta_X \neq 0$
+- What is the null hypothesis for $X$ effect in non-reference group?
+  - $H_0: \beta_X + \beta_{X:G} = 0$
+- What is the alternative hypothesis for $X$ effect in non-reference group?
+  - $H_1: \beta_X + \beta_{X:G} \neq 0$
+- What is the third hypothesis test for interaction terms?
+  - Does the group affect the response?
+- What is the null hypothesis for group effect?
+  - $H_0: \beta_G = \beta_{X:G} = 0$
+- What is the alternative hypothesis for group effect?
+  - At least one of $\beta_G$ or $\beta_{X:G}$ is non-zero
+- What is the model formula for interaction between continuous and $a$-level categorical variables?
+  - $$
+    Y = \beta_0 + \beta_X X + \beta_{G_2} I(\text{Group} = G_2) + \ldots + \beta_{G_a} I(\text{Group} = G_a) + \beta_{X:G_2} X \times I(\text{Group} = G_2) + \ldots + \beta_{X:G_a} X \times I(\text{Group} = G_a) + \epsilon
+    $$
+- What is the intercept for Group 1?
+  - $\beta_0$
+- What is the intercept for Group $i$?
+  - $\beta_0 + \beta_{G_i}$
+- What is the difference in intercept between Group 1 and Group $i$?
+  - $\beta_{G_i}$
+- What is the slope of $Y$ with respect to $X$ for Group 1?
+  - $\beta_X$
+- What is the slope of $Y$ with respect to $X$ for Group $i$?
+  - $\beta_X + \beta_{X:G_i}$
+- What is the difference in slope between Group 1 and Group $i$?
+  - $\beta_{X:G_i}$
+- What is the average $Y$ for Group 1?
+  - $\mathrm{E}[Y] = \beta_0 + \beta_X X$
+- What is the average $Y$ for Group $i$?
+  - $\mathrm{E}[Y] = (\beta_0 + \beta_{G_i}) + (\beta_X + \beta_{X:G_i}) X$
+- What is the difference in average $Y$ between Group 1 and Group $i$ for a given $X$?
+  - $\beta_{G_i} + X \times \beta_{X:G_i}$
+- What is the first hypothesis test for multiple interaction terms?
+  - Do the effects of $X$ on $Y$ differ between the reference group and group $i$?
+- What is the null hypothesis for group $i$ slope effect?
+  - $H_0: \beta_{X:G_i} = 0$
+- What is the alternative hypothesis for group $i$ slope effect?
+  - $H_1: \beta_{X:G_i} \neq 0$
+- What is the second hypothesis test for multiple interaction terms?
+  - Does $X$ affect $Y$ for a specific group $i$?
+- What is the null hypothesis for $X$ effect in reference group?
+  - $H_0: \beta_X = 0$
+- What is the alternative hypothesis for $X$ effect in reference group?
+  - $H_1: \beta_X \neq 0$
+- What is the null hypothesis for $X$ effect in group $i$?
+  - $H_0: \beta_X + \beta_{X:G_i} = 0$
+- What is the alternative hypothesis for $X$ effect in group $i$?
+  - $H_1: \beta_X + \beta_{X:G_i} \neq 0$
+- What is the third hypothesis test for multiple interaction terms?
+  - Does group $i$ have a different average $Y$ than the reference group?
+- What is the null hypothesis for group $i$ effect?
+  - $H_0: \beta_{G_i} = \beta_{X:G_i} = 0$
+- What is the alternative hypothesis for group $i$ effect?
+  - At least one of $\beta_{G_i}$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$
+- What is the fourth hypothesis test for multiple interaction terms?
+  - Does the effect of $X$ on $Y$ differ between any groups?
+- What is the null hypothesis for effect of group on slope across all groups?
+  - $H_0: \beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+- What is the alternative hypothesis for effect of group on slope across all groups?
+  - At least one $\beta_{X:G_i} \neq 0$ for $i = 2, \ldots, a$
+- What is the fifth hypothesis test for multiple interaction terms?
+  - Does $X$ affect $Y$ for any group?
+- What is the null hypothesis for $X$ effect across all groups?
+  - $H_0: \beta_X = \beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+- What is the alternative hypothesis for $X$ effect across all groups?
+  - At least one $\beta_X$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$
+- What is the sixth hypothesis test for multiple interaction terms?
+  - Do the groups affect $Y$?
+- What is the null hypothesis for group effect across all groups?
+  - $H_0: \beta_{G_2} = \beta_{G_3} = \ldots = \beta_{G_a} = 0$ and $\beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
+- What is the alternative hypothesis for group effect across all groups?
+  - At least one $\beta_{G_i}$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$

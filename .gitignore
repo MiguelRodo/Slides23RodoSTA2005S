@@ -31,3 +31,6 @@ SCRATCH-3.qmd
 SCRATCH.R
 SCRATCH_files/**
 
+*_files/**/*
+Slides*html
+Facts*html

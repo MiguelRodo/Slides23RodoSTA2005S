@@ -1,0 +1,411 @@
+---
+title: "Bootstrapping"
+author: "Miguel Rodo"
+institute: "Department of Statistical Sciences - University of Cape Town"
+bibliography: zotero.bib
+nocite: |
+  @hesterberg14
+format: 
+  beamer:
+    embed-resources: true
+    aspectratio: 169
+    urlcolor: cyan
+    linkcolor: blue
+    filecolor: magenta
+    include-in-header:
+      file: preamble.tex
+execute:
+  echo: true
+---
+
+
+```{r}
+#| include: false
+library(tibble)
+library(ggplot2)
+theme_set(
+  cowplot::theme_cowplot() + 
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white"),
+    )
+  )
+```
+
+# Introduction
+
+Suppose that we have skewed data
+
+```{r}
+x_vec <- seq(0.0001, 10, length.out = 1e3)
+skew_tbl <- tibble(
+  x = x_vec,
+  y = dexp(x_vec, rate = 0.1)^1.5
+)
+```
+
+```{r}
+#| include: false
+p <- ggplot(skew_tbl) +
+  geom_line(aes(x = x, y = y), color = "dodgerblue", size = 1) +
+  labs(x = "Value", y = "Frequency") +
+  cowplot::background_grid(major = "xy", minor = "none")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-init_example.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 10, height = 7, dpi = 150,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.4\textwidth]{`r path_fig`}
+\end{centering}
+
+# The distribution of the mean will tend to be skewed as well, especially at lower sample sizes
+
+```{r}
+set.seed(4)
+mean_tbl <- purrr::map_df(
+  c(5, 10, 20, 40, 100, 1e3), function(x) {
+    set.seed(3)
+    mean_vec <- replicate(1e3, {
+      x_vec <- rexp(x, rate = 0.1)^1.5
+      mean(x_vec)
+    })
+    tibble(
+      sample_size = x,
+      mean = mean_vec
+    )
+  }
+)
+```
+
+# The distribution of the mean will tend to be skewed as well, especially at lower sample sizes
+
+```{r}
+#| include: false
+mean_tbl_norm <- purrr::map_df(
+  c(5, 10, 20, 40, 100, 1e3), function(x) {
+    set.seed(3)
+    mean_vec <- mean_tbl |>
+      dplyr::filter(sample_size == x) |>
+      dplyr::pull(mean)
+    mean_norm <- mean(mean_vec)
+    sd_norm <- sd(mean_vec)
+    x_vec <- seq(min(mean_vec), max(mean_vec), length.out = 1e3)
+    y_vec <- dnorm(x_vec, mean = mean_norm, sd = sd_norm)
+    tibble(
+      sample_size = x,
+      x = x_vec,
+      y = y_vec
+    )
+  }
+)
+p <- ggplot(
+  mean_tbl, aes(x = mean, fill = factor(sample_size))
+) +
+  geom_line(
+    data = mean_tbl_norm,
+    aes(x = x, y = y, group = sample_size),
+    color = "black", size = 1,
+    inherit.aes = FALSE
+  ) +
+  geom_density(alpha = 0.7) +
+  labs(x = "Mean", y = "Density") +
+  scale_fill_viridis_d(option = "plasma", name = "Sample Size") +
+  facet_wrap(~ sample_size, scales = "free") +
+  cowplot::background_grid(major = "xy", minor = "none") +
+  theme(legend.position = "none") +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(title = "Distribution of the Mean by Sample Size")
+
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-mean_example.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 16, height = 14,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.575\textwidth]{`r path_fig`}
+\end{centering}
+
+# Problematic for confidence intervals - all problems fixed?
+
+Suppose that we wish to estimate a confidence interval for the mean of some distritution.
+Then, assuming that the data is normally distributed, we can use the following formula:
+
+$$
+\bar{x} \pm z_{\alpha/2} \hat{se}(\bar{x})
+$$
+
+where:
+
+- $\bar{x}$ is the sample mean,
+- $s$ is the sample standard deviation,
+- $n$ is the sample size, and
+- $z_{\alpha/2}$ is the critical value for the desired confidence level.
+
+\pause
+
+- Problem? $s$ is estimated
+
+# We can improve this using the $t$-distribution
+
+$$
+\bar{x} \pm t_{\alpha/2, n-1} \hat{se}(\bar{x})
+$$
+
+where $t_{\alpha/2, n-1}$ is the critical value for the $t$-distribution with $n-1$ degrees of freedom.
+
+- Further problems?
+  - Assumes a symmetric sampling distribution
+  - Assumes that $s$ and $\bar{x}$ are independent
+
+# Bootstrapping
+
+- **Definition**
+  - A resampling technique used to perform inference sampling a dataset with replacement.
+
+# Sampling with replacement
+
+```{r}
+orig_vec <- rnorm(1:3) |> signif(2)
+boot_tbl <- tibble::tibble(
+  Original = orig_vec,
+  `Sample 1` = sample(orig_vec, replace = TRUE),
+  `Sample 2` = sample(orig_vec, replace = TRUE),
+  `Sample 3` = sample(orig_vec, replace = TRUE)
+)
+boot_tbl
+```
+
+- Mean for each boostrap sample: `r sapply(boot_tbl[, -1], mean) |> signif(2)`
+
+# "Ideal" way to estimate a sampling distribution
+
+- Repeatedly resample from the actual data generating process!
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{_data_raw/img/ideal_world.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Practical way to estimate a sampling distribution
+
+- Repeatedly resample from the *sample*
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{_data_raw/img/bootstrap_world.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Bootstrap alternatives to $t$ confidence intervals I: The percentile method
+
+1. Generate $B$ bootstrap samples.
+2. Calculate the sample mean for each sample.
+3. Set the (1-$\alpha$) confidence interval as the $\alpha/2$ and $1-\alpha/2$ percentiles of the bootstrap means.
+
+# Implementation in R
+
+- First, create our bootstrap sample:
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_vec_perc <- replicate(2e3, {
+  sample(sample_vec, replace = TRUE) |> mean()
+})
+```
+
+- Then, calculate our bounds:
+
+```{r}
+quantile(mean_vec_perc, c(0.025, 0.975)) |> signif(2)
+```
+
+```{r}
+#| include: false
+ci_vec_perc <- quantile(mean_vec_perc, c(0.025, 0.975))
+```
+
+# Bootstrap alternatives to $t$ confidence intervals I: Estimate se using the bootstrap
+
+This has the following formula:
+
+$$
+\bar{x} \pm t_{\alpha/2, n-1} \hat{se^{\ast}}(\bar{x})
+$$
+  
+  where $\hat{se^{\ast}}(\bar{x})$ is the standard deviation of the bootstrap means:
+
+$$
+\hat{se^{\ast}}(\bar{x}) = \sqrt{\frac{1}{B-1} \sum_{b=1}^{B} (\bar{x}^{(b)} - \bar{x})^2}
+$$
+
+# Bootstrap alternatives to $t$ confidence intervals II: Estimate se using the bootstrap
+
+1. Generate $B$ bootstrap samples.
+2. Calculate the sample mean for each sample.
+3. Calculate the standard deviation of the bootstrap means.
+4. Set the (1-$\alpha$) confidence interval as $\bar{x} \pm z_{\alpha/2} \hat{se}^{\ast}(\bar{x})$
+
+# Implementation in R
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+mean_vec_perc <- replicate(2e3, {
+  sample(sample_vec, replace = TRUE) |> mean()
+})
+se_boot <- sd(mean_vec_perc)
+ci_vec_se_boot <- mean_actual +
+  c(-1, 1) * se_boot * 
+  qt(0.975, df = length(mean_vec_perc) - 1)
+ci_vec_se_boot |> signif(2)
+```
+
+# Problem?
+
+- The t-stat is not $t$-distributed!
+- By $t$-test, we mean:
+
+$$
+\frac{\hat{\theta} - \theta}{\hat{se}(\hat{\theta})}
+$$
+
+- Why not?
+  - Observations not normally distributed
+  - Sample mean and sample standard deviation are not independent
+
+# Sample standard deviation and mean correlated
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+summ_stat_list <- replicate(2e3, {
+  boot_sample <- sample(sample_vec, replace = TRUE)
+  c("mean" = mean(boot_sample), "sd" = sd(boot_sample))
+})
+```
+
+```{r}
+#| include: false
+plot_tbl <- tibble(
+  mean = summ_stat_list[1, ],
+  sd = summ_stat_list[2, ]
+)
+p <- ggplot(
+  plot_tbl, aes(x = mean, y = sd)
+) +
+  geom_point(alpha = 0.25, colour = "dodgerblue") +
+  labs(x = "Mean", y = "Standard Deviation") +
+  cowplot::background_grid(major = "xy", minor = "none")
+path_fig <- projr::projr_path_get(
+  "cache", "fig", "w6", "p-mean_sd_corr.pdf"
+)
+ggsave(
+  path_fig, plot = p, width = 10, height = 7,
+  units = "cm"
+)
+```
+
+\centering
+\begin{centering}
+\includegraphics[width=0.5\textwidth]{`r path_fig`}
+\end{centering}
+
+# Bootstrap alternatives to $t$ confidence intervals III: bootstrap the t-statistic
+
+1. Generate $B$ bootstrap samples.
+2. For each bootstrap sample, calculate the t-statistic.
+3. Calcalate the $\alpha/2$ and $1-\alpha/2$ percentiles of the t-statistics.
+3. Set the (1-$\alpha$) confidence interval as 
+
+$$
+\hat{\theta} - q_{1-\alpha/2}\hat{se}(\hat{\theta}), \hat{\theta} - q_{\alpha/2}\hat{se}(\hat{\theta})
+$$
+
+# Implementation in R {.smaller}
+
+```{r}
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+sd_actual <- sd(sample_vec) / sqrt(length(sample_vec) - 1)
+t_stat_vec <- replicate(2e3, {
+  boot_sample <- sample(sample_vec, replace = TRUE)
+  mean_boot <- mean(boot_sample)
+  se_boot <- sd(boot_sample) / sqrt(length(boot_sample) - 1)
+  (mean_boot - mean_actual) / se_boot
+})
+quant_vec_t <- quantile(t_stat_vec, c(0.025, 0.975))
+lb <- mean_actual - quant_vec_t[2] * sd_actual
+ub <- mean_actual - quant_vec_t[1] * sd_actual
+c(lb, ub) |> signif(2)
+```
+
+```{r}
+#| include: false
+ci_vec_boot_t <- c(lb, ub)
+```
+
+# Comparison of confidence intervals
+
+```{r}
+#| include: false
+set.seed(3)
+sample_vec <- rexp(10, rate = 0.1)^1.5
+mean_actual <- mean(sample_vec)
+sd_actual <- sd(sample_vec) / sqrt(length(sample_vec) - 1)
+ci_vec_t <- mean_actual +
+  c(-1, 1) * qt(0.975, df = length(sample_vec) - 1) * sd_actual
+```
+
+```{r}
+#| echo: false
+tibble(
+  Method = c("T", "Percentile", "Bootstrap SE", "Bootstrap t"),
+  `Lower bound` = c(ci_vec_t[1], ci_vec_perc[1], ci_vec_se_boot[1], ci_vec_boot_t[1]),
+  `Upper bound` = c(ci_vec_t[2], ci_vec_perc[2], ci_vec_se_boot[2], ci_vec_boot_t[2])
+)
+```
+
+# One-side non-coverage for normally distributed data
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{_data_raw/img/normal_sim.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# One-side non-coverage for exponentially-distributed data
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{_data_raw/img/exp_sim.png}
+\caption{Hesterberg (2014)}
+\end{figure}
+
+# Take-home messages
+
+- Bootstrapping is a resampling technique for improved inference.
+- The choice of confidence interval method dramatically affects coverage probabilities:
+  - Small sample sizes: the percentile and bootstrap-se methods are too narrow. The percentile method performs atrociously at small sample sizes.
+  - Skew data: the $t$- and bootstrap-se methods are symmetric, and the percentile method is insufficiently skew.
+  - The bootstrap-$t$ method has good small sample performance and is more robust to skewness.
+- Estimating confidence intervals for skew data is hard, and takes more samples than typically thought.
+
+# References
