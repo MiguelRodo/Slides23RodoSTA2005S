@@ -99,6 +99,8 @@ There are several options, which vary in their assumptions and properties.
   
 - **Flexibility**: The percentile and bootstrap-t methods methods do not assume a normal sampling distribution, making them suitable for a variety of data distributions.
 
+---
+
 # Q&A
 
 - What is bootstrapping?

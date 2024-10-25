@@ -38,7 +38,7 @@ format:
   - Address heteroscedasticity by equalizing residual spread.
 
 - **Reduce Skewness:**
-  - Make residuals more normally distributed.
+  - Make residuals more symmetrically distributed.
 
 - **Handle Outliers:**
   - Mitigate the impact of extreme values on the model.
@@ -269,6 +269,8 @@ The following tests check for effects across all groups.
   - **Null Hypothesis:** $H_0: \beta_{G_2} = \beta_{G_3} = \ldots = \beta_{G_a} = 0$ and $\beta_{X:G_2} = \beta_{X:G_3} = \ldots = \beta_{X:G_a} = 0$
   - **Alternative Hypothesis:** At least one $\beta_{G_i}$ or $\beta_{X:G_i}$ is non-zero for $i = 2, \ldots, a$.
   - Comment: differs from the previous test as it also considers the intercepts.
+
+---
 
 # Q&A
 
