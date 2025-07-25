@@ -7,7 +7,7 @@ _projr-local.yml
 _environment.local
 
 # Start of projr section: do not edit by hand (until `# End of projr section`)
-_data_raw/**
+_raw_data/**
 _tmp/**
 _output/**
 docs/**

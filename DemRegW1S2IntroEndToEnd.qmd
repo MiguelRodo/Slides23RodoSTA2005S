@@ -34,13 +34,13 @@ Code is also "folded" away, so you can click on the triangle to the left of the 
 #### Files
 
 To run this, you will have to download `w1s2.zip` from `Amathuba` (`Module 1 - Regression` >> `Introduction` >> `Slides`), unzip it, and copy the contents to the your working diretory.
-It contains two files, within the `_data_raw` folder.
+It contains two files, within the `_raw_data` folder.
 - `Advertising.csv`
-- `reg_img_exp.png`. This file (and not `Advertising.csv`) must be in the `img` sub-folder of `_data_raw`, i.e. at `_data_raw/img/reg_img_exp.png`.
+- `reg_img_exp.png`. This file (and not `Advertising.csv`) must be in the `img` sub-folder of `_raw_data`, i.e. at `_raw_data/img/reg_img_exp.png`.
 
 So, in your working directory you must have these files at these paths:
-- `_data_raw/Advertising.csv` (`Advertising.csv`)
-- `_data_raw/img/reg_img_exp.png` (`reg_img_exp.png`)
+- `_raw_data/Advertising.csv` (`Advertising.csv`)
+- `_raw_data/img/reg_img_exp.png` (`reg_img_exp.png`)
 
 #### `R` packages
 
@@ -116,7 +116,7 @@ First we read our data in:
 
 ```{r}
 # Read in the raw data from the Advertising.csv file
-data_raw_ad <- read.csv("_data_raw/Advertising.csv", header = TRUE)
+data_raw_ad <- read.csv("_raw_data/Advertising.csv", header = TRUE)
 
 # Convert the raw data to a tibble for easier manipulation
 data_raw_ad <- as_tibble(data_raw_ad)
@@ -128,7 +128,7 @@ In the real world, it's important to examine the data first as the analytical te
 
 - Since we're interested in performing linear regression, we would like to assess upfront the following:
   - Distribution of the response variable (hopefully normal)
-  - Relationship between repsonse and dependent variables (hopefully linear)
+  - Relationship between response and dependent variables (hopefully linear)
   - Correlation between explanatory variables (hopefully minor)
 
 - Once we've fitted the model, we can also be more sure that we haven't made a mistake somewhere by the results matching what we see in preliminary data exploration.
@@ -279,7 +279,7 @@ The plot below displays some of the key quantities associated with the data and 
 ```{r}
 #| results: asis
 #| echo: false
-path_img <- "_data_raw/img/reg_img_exp.png"
+path_img <- "_raw_data/img/reg_img_exp.png"
 if (file.exists(path_img)) {
   knitr::include_graphics(path_img)
 }

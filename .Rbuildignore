@@ -7,8 +7,8 @@
 
 ^CITATION\.cff$
 # Start of projr section: do not edit by hand (until `# End of projr section`)
-^_data_raw/
-^_data_raw$
+^_raw_data/
+^_raw_data$
 ^_tmp/
 ^_tmp$
 ^_output/

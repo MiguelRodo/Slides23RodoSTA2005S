@@ -1,20 +1,18 @@
 directories:
-  data-raw:
-    path: _data_raw
+  raw-data:
+    path: _raw_data
   cache:
     path: _tmp
   output:
     path: _output
   docs:
     path: docs
-NA: ~
 build:
   git: yes
   github:
-    input:
-      content: data-raw
-    output:
+    archive:
       content:
-      - output
+      - raw-data
       - docs
+      - output
 

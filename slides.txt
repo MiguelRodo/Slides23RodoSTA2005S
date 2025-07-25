@@ -32,7 +32,7 @@ format:
 
 \centering
 
-![](_data_raw/img/distributions.pdf){width=90%}
+![](_raw_data/img/distributions.pdf){width=90%}
 
 
 # Relevance to later sections
@@ -603,7 +603,7 @@ knitr::include_graphics(path_p)
 :::{.column width=50%}
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{_data_raw/img/reg_img.png}
+\includegraphics[width=\textwidth]{_raw_data/img/reg_img.png}
 \end{figure}
 :::
 
@@ -636,7 +636,7 @@ knitr::include_graphics(path_p)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth]{_data_raw/img/toolbox-wide-edit-removebg.png}
+\includegraphics[width=0.6\textwidth]{_raw_data/img/toolbox-wide-edit-removebg.png}
 \end{figure}
 
 <!--
@@ -830,7 +830,7 @@ knitr::include_graphics(path_p_grid)
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{_data_raw/img/iceberg.png}
+\includegraphics[width=\textwidth]{_raw_data/img/iceberg.png}
 \end{figure}
 
 :::
@@ -839,7 +839,7 @@ knitr::include_graphics(path_p_grid)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.95\textwidth]{_data_raw/img/lm_output.png}
+\includegraphics[width=0.95\textwidth]{_raw_data/img/lm_output.png}
 \end{figure}
 
 :::
@@ -931,7 +931,7 @@ format:
 library(tibble)
 library(dplyr)
 
-data_raw_ad <- read.csv("_data_raw/Advertising.csv", header = TRUE)
+data_raw_ad <- read.csv("_raw_data/Advertising.csv", header = TRUE)
 
 # Convert the raw data to a tibble for easier manipulation
 data_raw_ad <- as_tibble(data_raw_ad)
@@ -949,7 +949,7 @@ summary(fit_tv)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth]{_data_raw/img/lm_output.png}
+\includegraphics[width=0.6\textwidth]{_raw_data/img/lm_output.png}
 \end{figure}
 
 
@@ -1008,7 +1008,7 @@ where $E(X)= \mu$ and $\textrm{Var}(X)=\sigma^2$ for $x\in\mathbb{R}$.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{_data_raw/img/rnorm_0_1.pdf}
+    \includegraphics[width=\linewidth]{_raw_data/img/rnorm_0_1.pdf}
     \caption{$X \sim \mathcal{N}(0,1)$}
     \label{fig:sims_rnorm}
 \end{figure}
@@ -1754,7 +1754,7 @@ summary(fit_ad)
 # Advertising dataset: Inference from fit {.smaller}
 
 \begin{center}
-\includegraphics[width=0.95\textwidth]{_data_raw/img/summary.png}
+\includegraphics[width=0.95\textwidth]{_raw_data/img/summary.png}
 \end{center}
 
 
@@ -1828,7 +1828,7 @@ c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
 # Reporting hypothesis test results {.smaller}
 
 \begin{center}
-\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\includegraphics[width=0.66\textwidth]{_raw_data/img/summary-shortened.png}
 \end{center}
 
 - Each one unit increase in TV spend increased average revenue by $2.01$ units ($p < 0.001$; 95% CI: $1.95$ to $2.07$), holding radio spend constant.
@@ -1839,7 +1839,7 @@ c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
 # Reporting hypothesis test results {.smaller}
 
 \begin{center}
-\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\includegraphics[width=0.66\textwidth]{_raw_data/img/summary-shortened.png}
 \end{center}
 
 - No effect of radio spend on average revenue was detected (p = 0.79; 95% CI: $1.95$ to $2.07$), when controlling for TV spend.
@@ -2590,7 +2590,7 @@ summary(lm(bp ~ group, data = trt_tbl))
 ```
 
 \begin{center}
-\includegraphics[width=0.6\textwidth]{_data_raw/img/f_stat.png}
+\includegraphics[width=0.6\textwidth]{_raw_data/img/f_stat.png}
 \end{center}
 
 # Extensions of ANOVA
@@ -4234,7 +4234,7 @@ forward_model <- stepAIC(null_model, scope = list(lower = null_model, upper = fu
 # Model fitting process
 
 \begin{center}
-\includegraphics[width=\linewidth]{_data_raw/img/forward_selection.png}
+\includegraphics[width=\linewidth]{_raw_data/img/forward_selection.png}
 \end{center}
 
 # Forward Selection: Results
@@ -4810,7 +4810,7 @@ boot_tbl
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{_data_raw/img/ideal_world.png}
+\includegraphics[width=0.7\textwidth]{_raw_data/img/ideal_world.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -4820,7 +4820,7 @@ boot_tbl
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{_data_raw/img/bootstrap_world.png}
+\includegraphics[width=0.7\textwidth]{_raw_data/img/bootstrap_world.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -5000,7 +5000,7 @@ tibble(
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{_data_raw/img/normal_sim.png}
+\includegraphics[width=0.55\textwidth]{_raw_data/img/normal_sim.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -5008,7 +5008,7 @@ tibble(
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{_data_raw/img/exp_sim.png}
+\includegraphics[width=0.55\textwidth]{_raw_data/img/exp_sim.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 

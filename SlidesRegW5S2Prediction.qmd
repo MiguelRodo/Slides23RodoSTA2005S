@@ -331,7 +331,7 @@ forward_model <- stepAIC(null_model, scope = list(lower = null_model, upper = fu
 # Model fitting process
 
 \begin{center}
-\includegraphics[width=\linewidth]{_data_raw/img/forward_selection.png}
+\includegraphics[width=\linewidth]{_raw_data/img/forward_selection.png}
 \end{center}
 
 # Forward Selection: Results

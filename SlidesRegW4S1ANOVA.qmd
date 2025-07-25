@@ -511,7 +511,7 @@ summary(lm(bp ~ group, data = trt_tbl))
 ```
 
 \begin{center}
-\includegraphics[width=0.6\textwidth]{_data_raw/img/f_stat.png}
+\includegraphics[width=0.6\textwidth]{_raw_data/img/f_stat.png}
 \end{center}
 
 # Extensions of ANOVA

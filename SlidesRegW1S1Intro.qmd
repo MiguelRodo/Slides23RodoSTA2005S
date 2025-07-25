@@ -263,7 +263,7 @@ knitr::include_graphics(path_p)
 :::{.column width=50%}
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{_data_raw/img/reg_img.png}
+\includegraphics[width=\textwidth]{_raw_data/img/reg_img.png}
 \end{figure}
 :::
 
@@ -296,7 +296,7 @@ knitr::include_graphics(path_p)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth]{_data_raw/img/toolbox-wide-edit-removebg.png}
+\includegraphics[width=0.6\textwidth]{_raw_data/img/toolbox-wide-edit-removebg.png}
 \end{figure}
 
 <!--
@@ -490,7 +490,7 @@ knitr::include_graphics(path_p_grid)
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{_data_raw/img/iceberg.png}
+\includegraphics[width=\textwidth]{_raw_data/img/iceberg.png}
 \end{figure}
 
 :::
@@ -499,7 +499,7 @@ knitr::include_graphics(path_p_grid)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.95\textwidth]{_data_raw/img/lm_output.png}
+\includegraphics[width=0.95\textwidth]{_raw_data/img/lm_output.png}
 \end{figure}
 
 :::

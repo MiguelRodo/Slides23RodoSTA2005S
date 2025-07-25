@@ -87,7 +87,7 @@ summary(fit_ad)
 # Advertising dataset: Inference from fit {.smaller}
 
 \begin{center}
-\includegraphics[width=0.95\textwidth]{_data_raw/img/summary.png}
+\includegraphics[width=0.95\textwidth]{_raw_data/img/summary.png}
 \end{center}
 
 
@@ -161,7 +161,7 @@ c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
 # Reporting hypothesis test results {.smaller}
 
 \begin{center}
-\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\includegraphics[width=0.66\textwidth]{_raw_data/img/summary-shortened.png}
 \end{center}
 
 - Each one unit increase in TV spend increased average revenue by $2.01$ units ($p < 0.001$; 95% CI: $1.95$ to $2.07$), holding radio spend constant.
@@ -172,7 +172,7 @@ c("t-statistic" = t_stat, "p-value" = p_value) |> signif(3)
 # Reporting hypothesis test results {.smaller}
 
 \begin{center}
-\includegraphics[width=0.66\textwidth]{_data_raw/img/summary-shortened.png}
+\includegraphics[width=0.66\textwidth]{_raw_data/img/summary-shortened.png}
 \end{center}
 
 - No effect of radio spend on average revenue was detected (p = 0.79; 95% CI: $1.95$ to $2.07$), when controlling for TV spend.

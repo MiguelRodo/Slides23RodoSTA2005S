@@ -197,7 +197,7 @@ boot_tbl
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{_data_raw/img/ideal_world.png}
+\includegraphics[width=0.7\textwidth]{_raw_data/img/ideal_world.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -207,7 +207,7 @@ boot_tbl
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{_data_raw/img/bootstrap_world.png}
+\includegraphics[width=0.7\textwidth]{_raw_data/img/bootstrap_world.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -387,7 +387,7 @@ tibble(
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{_data_raw/img/normal_sim.png}
+\includegraphics[width=0.55\textwidth]{_raw_data/img/normal_sim.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 
@@ -395,7 +395,7 @@ tibble(
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.55\textwidth]{_data_raw/img/exp_sim.png}
+\includegraphics[width=0.55\textwidth]{_raw_data/img/exp_sim.png}
 \caption{Hesterberg (2014)}
 \end{figure}
 

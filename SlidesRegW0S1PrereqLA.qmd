@@ -32,7 +32,7 @@ format:
 
 \centering
 
-![](_data_raw/img/distributions.pdf){width=90%}
+![](_raw_data/img/distributions.pdf){width=90%}
 
 
 # Relevance to later sections
