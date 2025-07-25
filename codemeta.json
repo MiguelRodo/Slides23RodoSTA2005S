@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/MiguelRodo/Slides23RodoSTA2005S",
   "issueTracker": "https://github.com/MiguelRodo/Slides23RodoSTA2005S/issues",
   "license": "{{ License }}",
-  "version": "0.0.0.1",
+  "version": "0.10.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
+  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
   "author": [
     {
       "@type": "Person",
@@ -34,7 +34,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "1.623KB",
+  "fileSize": "2296.819KB",
   "citation": [
     {
       "@type": "CreativeWork",

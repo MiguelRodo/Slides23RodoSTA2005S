@@ -8,4 +8,4 @@ bibentry(bibtype = "Misc",
                          email = "miguel.rodo@uct.ac.za"),
          url = "https://github.com/MiguelRodo/Slides23RodoSTA2005S/#readme",
          abstract = "Slides for STA2005S",
-         version = "0.0.0-1")
+         version = "0.10.0")

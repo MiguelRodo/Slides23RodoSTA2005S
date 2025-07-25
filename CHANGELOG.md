@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- *Minor* (v0.10.0): Miguel Julio Rodo (2025-07-25 10:04:44)
+  - Build completely for the first time in 2025
+
 - *Minor* (v0.9.0): Miguel Julio Rodo (22:59:01)
   - Add Facts docs
 

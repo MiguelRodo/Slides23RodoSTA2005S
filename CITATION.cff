@@ -7,7 +7,7 @@ cff-version: 1.2.0
 message: 'To cite package "Slides23RodoSTA2005S" in publications use:'
 type: software
 title: 'Slides23RodoSTA2005S: Slides for STA2005S'
-version: 0.0.0-1
+version: 0.10.0
 abstract: Slides for STA2005S
 authors:
 - family-names: Rodo
