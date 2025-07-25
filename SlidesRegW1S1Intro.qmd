@@ -3,7 +3,7 @@ title: "Regression Week I: Introduction and foundations to GLMs"
 subtitle: "Slide deck I: Course introduction and motivation"
 author: Miguel Rodo
 institute: University of Cape Town
-date: 22 July 2024
+date: 23 July 2025
 format:
   beamer:
     embed-resources: true
