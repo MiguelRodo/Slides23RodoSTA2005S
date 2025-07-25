@@ -38,7 +38,7 @@
   "Packages": {
     "DataTidy23RodoHonsMult": {
       "Package": "DataTidy23RodoHonsMult",
-      "Version": "0.0.0-1",
+      "Version": "0.11.1",
       "Source": "GitHub",
       "Title": "Tidy data for demonstration and assessment for UCT statistics honours multivariate course",
       "Authors@R": "person(\"Miguel\", \"Rodo\", , \"miguel.rodo@uct.ac.za\", role = c(\"aut\", \"cre\"))",
@@ -49,14 +49,14 @@
       "BugReports": "https://github.com/MiguelRodo/DataTidy23RodoHonsMult/issues",
       "Encoding": "UTF-8",
       "Roxygen": "list(markdown = TRUE)",
-      "RoxygenNote": "7.3.1",
+      "RoxygenNote": "7.3.2",
       "Author": "Miguel Rodo [aut, cre]",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "MiguelRodo",
       "RemoteRepo": "DataTidy23RodoHonsMult",
-      "RemoteRef": "main",
-      "RemoteSha": "0d7d7283370457cf4ff0a29b21db28e8c29ffa1c"
+      "RemoteRef": "2025",
+      "RemoteSha": "ce2fcb77be44e56955235d9f686541773607f5be"
     },
     "MASS": {
       "Package": "MASS",
