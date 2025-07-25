@@ -26,7 +26,8 @@
 ^FactsRegW5S2Prediction\.qmd$
 ^FactsRegW6S1Boot\.qmd$
 ^FactsRegW6S2PCA\.qmd$
-^QARegSlidesW0S1PrereqLA\.qmd$
+^NotesRegW1S0Prereq\.qmd$
+^QARegNotesW1S0Prereq\.qmd$
 ^QARegSlidesW1S1Intro\.qmd$
 ^QARegSlidesW1S3IntroMVN\.qmd$
 ^QARegW2S1GLM\.qmd$
@@ -38,7 +39,6 @@
 ^QARegW5S1Transformations\.qmd$
 ^QARegW5S2Prediction\.qmd$
 ^README\.Rmd$
-^SlidesRegW0S1PrereqLA\.qmd$
 ^SlidesRegW1S1Intro\.qmd$
 ^SlidesRegW1S2Intro\.qmd$
 ^SlidesRegW1S3Intro\.qmd$
@@ -93,10 +93,14 @@
 ^FactsRegW6S2PCA_files$
 ^FactsRegW6S2PCA\.html/
 ^FactsRegW6S2PCA\.html$
-^QARegSlidesW0S1PrereqLA_files/
-^QARegSlidesW0S1PrereqLA_files$
-^QARegSlidesW0S1PrereqLA\.html/
-^QARegSlidesW0S1PrereqLA\.html$
+^NotesRegW1S0Prereq_files/
+^NotesRegW1S0Prereq_files$
+^NotesRegW1S0Prereq\.html/
+^NotesRegW1S0Prereq\.html$
+^QARegNotesW1S0Prereq_files/
+^QARegNotesW1S0Prereq_files$
+^QARegNotesW1S0Prereq\.html/
+^QARegNotesW1S0Prereq\.html$
 ^QARegSlidesW1S1Intro_files/
 ^QARegSlidesW1S1Intro_files$
 ^QARegSlidesW1S1Intro\.html/
@@ -137,10 +141,6 @@
 ^QARegW5S2Prediction_files$
 ^QARegW5S2Prediction\.html/
 ^QARegW5S2Prediction\.html$
-^SlidesRegW0S1PrereqLA_files/
-^SlidesRegW0S1PrereqLA_files$
-^SlidesRegW0S1PrereqLA\.html/
-^SlidesRegW0S1PrereqLA\.html$
 ^SlidesRegW1S1Intro\.pdf/
 ^SlidesRegW1S1Intro\.pdf$
 ^SlidesRegW1S2Intro\.pdf/

@@ -30,8 +30,10 @@ FactsRegW6S1Boot_files/**
 FactsRegW6S1Boot.html/**
 FactsRegW6S2PCA_files/**
 FactsRegW6S2PCA.html/**
-QARegSlidesW0S1PrereqLA_files/**
-QARegSlidesW0S1PrereqLA.html/**
+NotesRegW1S0Prereq_files/**
+NotesRegW1S0Prereq.html/**
+QARegNotesW1S0Prereq_files/**
+QARegNotesW1S0Prereq.html/**
 QARegSlidesW1S1Intro_files/**
 QARegSlidesW1S1Intro.html/**
 QARegSlidesW1S3IntroMVN_files/**
@@ -52,8 +54,6 @@ QARegW5S1Transformations_files/**
 QARegW5S1Transformations.html/**
 QARegW5S2Prediction_files/**
 QARegW5S2Prediction.html/**
-SlidesRegW0S1PrereqLA_files/**
-SlidesRegW0S1PrereqLA.html/**
 SlidesRegW1S1Intro.pdf/**
 SlidesRegW1S2Intro.pdf/**
 SlidesRegW1S3Intro.pdf/**

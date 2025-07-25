@@ -1,6 +1,6 @@
 ---
 title: Q&A
-subtitle: "Slide deck 1: Linear algebra and statistical prerequisites"
+subtitle: "Notes: Statistical distributions and linear algebra"
 format:
   html:
     embed-resources: true
