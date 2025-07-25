@@ -52,6 +52,7 @@
 ^SlidesRegW6S1Boot\.qmd$
 ^SlidesRegW6S2PCA\.qmd$
 ^_dependencies\.R$
+^BUILDLOG\.md$
 ^CHANGELOG\.md$
 ^codemeta\.json$
 ^manifest\.csv$
@@ -136,8 +137,10 @@
 ^QARegW5S2Prediction_files$
 ^QARegW5S2Prediction\.html/
 ^QARegW5S2Prediction\.html$
-^SlidesRegW0S1PrereqLA\.pdf/
-^SlidesRegW0S1PrereqLA\.pdf$
+^SlidesRegW0S1PrereqLA_files/
+^SlidesRegW0S1PrereqLA_files$
+^SlidesRegW0S1PrereqLA\.html/
+^SlidesRegW0S1PrereqLA\.html$
 ^SlidesRegW1S1Intro\.pdf/
 ^SlidesRegW1S1Intro\.pdf$
 ^SlidesRegW1S2Intro\.pdf/

@@ -11,24 +11,22 @@ format:
 - Why do related univariate distributions arise frequently in the context of linear regression?
   - Since the response is normally distributed (and univariate)
 - How is a standard normal random variable denoted?
-  - $X$
+  - $Z$ (usually)
   - How do we write its distribution?
     - $N(0, 1)$
-  - Suppose a normal random variable has meann $\mu$ and variance $\sigma^2$. How do we denote its distribution?
+  - Suppose a normal random variable has mean $\mu$ and variance $\sigma^2$. How do we denote its distribution?
     - $N(\mu, \sigma^2)$
   - How to create a $N(\mu, \sigma^2)$ random variable from a $N(0, 1)$ random variable?
     - Multiply by $\sigma$ and add $\mu$
     - Formula?
-      - $\mu + \sigma X$
+      - $\mu + \sigma Z$
   - How do we create a $N(0, 1)$ random variable from a $N(\mu, \sigma^2)$ random variable?
     - Subtract $\mu$ and divide by $\sigma$
     - Formula?
       - $\frac{(X - \mu)}{\sigma}$
-    - What is usually the notation for such a variable?
-      - $Z$
 - What is the sum of squares of $n$ standard normal random variables distributed as?
-  - $\chi^2_n$
-  - What is the notation for a $\chi^2_n$ random variable?
+  - $\chi^2$ with $n$ degrees of freedom
+  - How do we denote this?
     - $\chi^2_n$
 - $\chi^2_n$ random variable:
   - What variables do we need to create it?
@@ -98,6 +96,10 @@ format:
   - $\mathrm{tr}(\symbf{ABC})= \mathrm{tr}(\symbf{CAB})= \mathrm{tr}(\symbf{BCA})$
 - What is the maximum possible rank of a rectangular matrix?
   - Its shorter dimension
+- Which matrices share the same rank as $\symbf{A}$?
+  - $\symbf{A}$′, $\symbf{A}\symbf{A}'$, and $\symbf{A}'\symbf{A}$
+- What is the rank condition for invertibility?
+  - Rank must equal the number of rows and columns of the matrix
 - What is an eigenvector $\symbf{x}$ of a matrix $\symbf{A}$?
   - A unit-length vector such that $\symbf{A}\symbf{x}=\lambda\symbf{x}$
 - What can any symmetric matrix $\symbf{S}$ be factorisation as?
@@ -112,7 +114,10 @@ format:
     - What is a name commonly given to the factorisation $\symbf{S}= \symbf{P}\symbf{\Lambda}\symbf{P}'$?
       - Spectral decomposition
 - What characterizes a positive definite matrix?
-  - All eigenvalues are positive
+  - First?
+      - All eigenvalues are positive
+  - Second?
+    - Symmetric
 - What is the condition for a matrix $\symbf{A}$ to be idempotent?
   - $\symbf{A}^2=\symbf{A}\symbf{A}=\symbf{A}$
 - What are the eigenvalues of an idempotent matrix?

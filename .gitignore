@@ -11,6 +11,7 @@ _raw_data/**
 _tmp/**
 _output/**
 docs/**
+BUILDLOG.md
 DemRegW1S2IntroEndToEnd_files/**
 DemRegW1S2IntroEndToEnd.html/**
 DemRegW1S2IntroScenario_files/**
@@ -51,7 +52,8 @@ QARegW5S1Transformations_files/**
 QARegW5S1Transformations.html/**
 QARegW5S2Prediction_files/**
 QARegW5S2Prediction.html/**
-SlidesRegW0S1PrereqLA.pdf/**
+SlidesRegW0S1PrereqLA_files/**
+SlidesRegW0S1PrereqLA.html/**
 SlidesRegW1S1Intro.pdf/**
 SlidesRegW1S2Intro.pdf/**
 SlidesRegW1S3Intro.pdf/**
