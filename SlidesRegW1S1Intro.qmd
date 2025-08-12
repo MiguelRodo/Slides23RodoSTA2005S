@@ -3,7 +3,7 @@ title: "Regression Week I: Introduction and foundations to GLMs"
 subtitle: "Slide deck I: Course introduction and motivation"
 author: Miguel Rodo
 institute: University of Cape Town
-date: 23 July 2025
+date: today
 format:
   beamer:
     embed-resources: true
@@ -50,12 +50,10 @@ library(ggplot2)
 #| results: asis
 #| label: tab-schedule
 schedule_tbl <- tibble::tibble(
-  Weeks = c("1", "2-6", "Vac", "7-11", "12"),
-  `Start date` = c("22 Jul", "29 Jul", "30 Jul", "9 Sep", "14 Oct"),
-  `End date` = c("26 Jul", "30 Aug", "8 Sep", "11 Oct", "18 Oct"),
-  Section = c("Regression", "Experimental design", "")[
-    c(1, 2, 3, 1, 2)
-  ]
+  Weeks = c("1-6", "Vac", "7-12"),
+  `Start date` = c("28 Jul", "8 Sep", "15 Sep"),
+  `End date` = c("7 Sep", "14 Sep", "17 Oct"),
+  Section = c("Regression",  "", "Experimental design")
 )
 ```
 
@@ -89,7 +87,7 @@ plot_tbl_txt <- tibble::tibble(
 plot_tbl_date <- tibble::tibble(
   x = 2:3,
   y = c(17, 17),
-  txt = c("10 October", "30 September")
+  txt = c("2 September", "29 August")
 )
 
 cat_lab_vec <- c("Assignment", "Test", "Exam") |> rev()
@@ -144,16 +142,31 @@ cowplot::ggsave2(
 knitr::include_graphics(path_p)
 ```
 
+# Relationship between assignment and test marks
+
+```{r}
+#| include: false
+#| echo: false
+path_p <- projr::projr_path_get("raw-data","img", "corr_reg.png")
+```
+
+\begin{figure}
+
+\centering
+\includegraphics[width=0.6\textwidth]{`r path_p`}
+
+\end{figure}
+
 
 # Learning resources: content
 
 - Regression notes:
-  - Location: `Module 1: Regression/More regression resources/Notes/NotesReg.pdf`
-  - Printed copies available at stats reception later this week
+  - Location: `Module 1: Regression/Notes/NotesReg.pdf`
+  - Printed copies available at stats reception
 - Slides:
   - Location: in `Slides` folder under each week's tab
 - Lecture recordings:
-  - Automatically uploaded to `Lecture Videos/Lecture Videos 2024` tab
+  - Automatically uploaded to `Lecture Videos/2025 Lecture Videos` tab
 
 # Learning resources: testing I
 
@@ -165,27 +178,24 @@ knitr::include_graphics(path_p)
   - Comprehensive set of short questions on each slide deck's content
   - A review of all the facts, essentially
   - Will be in the `Slides` folder for each week's content
-    - For example, `QARegSlidesW0S1PrereqLA.pdf` is in `Introduction/Slides` folder alongside `SlidesRegW0S1PrereqLA.pdf`
+    - For example, `QARegNotesW1S0Prereq.pdf` is in `Introduction/Slides` folder alongside `NotesRegW1S0Prereq.html`
   - *Note*: these are not exam-style questions, but rather a way to a) remember the content, and b) check your understanding
 
-
 :::
-
 
 \pause
 
 :::{.column width=50%}
 
-
 - Tutorials
-  - On Amathuba (`Module 1: Regression/More regression resources/Tutorials`)
+  - On Amathuba (`Module 1: Regression/Practice material/Tutorials`)
 
 \pause
 
 - Question bank:
   - Appropriate questions over and above the tutorials
   - Aim to progress from simpler to harder questions within each section
-  - On Amathuba (`Module 1: Regression/More regression resources/Question bank`)
+  - On Amathuba (`Module 1: Regression/Practice material/Question bank`)
   - Will be updated throughout the term
 
 :::
@@ -199,19 +209,28 @@ knitr::include_graphics(path_p)
 - Do tutorials (and attend them)
 - Do question bank questions
 
+# Advice from past tutors
+
+- Learning to code up analyses is perhaps the most useful part of the course.
+- Don't underestimate the course - passing STA2004F is great, but this is a lot of content. Marks are often terrible. 
+- Be wary of the assignments - they count as much as the tests, and take a long time. 
+- The exam counts 70%, so don't presume that assignments and tests will carry you through. Focus on understanding the content.
+- Questions to rehearse proofs are free marks. 
+- Experimental design in term four tends to be more difficult, so bank regression marks.  
+
 # Introduction to `R`
 
 - Online lecture:
-  - Day: Wednesday 24 July
+  - Day: Tuesday, 29 July
   - Time: 2pm
-  - Link: [MS Teams](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NjhjYTBlYjgtNDk3Ni00MGUxLWEyYmQtZGM4YTM5NjljNjUy%40thread.v2/0?context=%7b%22Tid%22%3a%2292454335-564e-4ccf-b0b0-24445b8c03f7%22%2c%22Oid%22%3a%22f479858a-bdb3-4e57-9ee4-f624b487e11f%22%7d)
+  - Link: [MS Teams](https://teams.microsoft.com/l/meetup-join/19%3aEKHxusbmBOjlrYMG0p3XKfzkKofUC-I-AtfcqCzGY0w1%40thread.tacv2/1753534512225?context=%7b%22Tid%22%3a%2292454335-564e-4ccf-b0b0-24445b8c03f7%22%2c%22Oid%22%3a%22c2d8a7b6-6c2b-4c5c-880f-fa02dfe60643%22%7d)
 
 \pause
 
 - Practicals:
-  - Days: Thursday and Friday, 25 and 26 July
-  - Times: 2-3pm and 3-4pm
-  - Category: `Week 1 Computer Lab Session - Intro to R`
+  - Days: Wednesday, Thursday and Friday (30, 31 July and 1 August)
+  - Times: 2-4pm
+  - Category: `R Intro Workshop`
 
 # Practicals
 
@@ -227,7 +246,7 @@ knitr::include_graphics(path_p)
 - Signup:
   - `Amathuba` >> `Course info` >> `Groups`
   - Categories;
-    - Practical: `Computer Lab Session` and `STA2005SLabSession 5`
+    - Practical: `Computer Lab Session` or `Lab Session`
     - Tutorial: `STA2005S Tutorials`
 
 # Office hours
@@ -243,7 +262,6 @@ knitr::include_graphics(path_p)
 - Email:
   - Address: `miguel.rodo@uct.ac.za`
   - Purpose: any admin-related issues
-
 
 # What is regression? {.smaller}
 
@@ -506,20 +524,39 @@ knitr::include_graphics(path_p_grid)
 
 ::::
 
-# Linear algebra and statistical theory prerequisites
+# Regression section outline
 
-- Under `Module 1: Regression/Introduction/Prerequisites`:
-  - `NotesRegW0StatDbn.pdf`
-    - Facts about normal, $t$ and $F$ distributions
-  - `SlidesRegW0S1PrereqLA.pdf`
-    - Essential linear algebra 
-  - `QARegSlidesW0S1PrereqLA.pdf`
-    - Questions and answers on the linear algebra content
-  - Pre-recorded lecture video
-    - Will upload one in the next day or two
-  - `DemRegW0LinearAlgebra.html`
-    - Implementing linear algebra in `R`
-  - `TutReg1IntroMVNQuestions.pdf`
+- **Week one**: statistical and mathematical prerequisites (statistical distributions and linear algebra), and useful proofs regarding the multivariate normal distribution
+- **Week two**: General linear model introduction (formulation, estimation and parameter distributions)
+- **Week three**: General linear model inference (confidence intervals and hypothesis testing)
+- **Week four**: ANOVA and model checking
+- **Week five**: Variable transformations, variable selection and Gauss-Markov theorem
+- **Week six**: PCA and bootstrapping
+
+# Prerequisites: Linear algebra and statistical theory I
+
+::::{.columns}
+
+:::{.column width=50%}
+
+**Content**, under `Module 1: Regression/Introduction/Prerequisites`:
+
+- Linear algebra:
+  - Slides: `SlidesRegW1S0PrereqLA.pdf`
+  - Video: `VideoRegW1S0PrereqLA.mp4`
+  - Basics in `R`: `DemRegW1S0LinearAlgebra.pdf`
+- Linear algebra + statistical distributions:
+  - Linear algebra content from slides above, plus information on statistical distributions: `NotesRegW1S0Prereq.html`
+  - Q&A on notes: `QARegNotesW1S0PrereqLA.pdf`
+:::
+
+:::{.column width=50%}
+
+**Practice material**, under `Module 1: Regression/Practice material`:
+
+  - `Tutorial/TutReg1IntroMVNQuestions.pdf`
     - The first few questions in this tutorial are about linear algebra
-  
 
+:::  
+
+::::

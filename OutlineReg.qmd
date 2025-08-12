@@ -1,0 +1,257 @@
+---
+title: "Content and competencies"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+---
+
+# Introduction
+
+This document outlines the course content and competencies, organised by week.
+Each week focuses on specific topics and includes:
+
+All relevant content and where to find it (in the listed documents).
+
+The lecture notes (NotesReg.pdf) are not listed but remain a key source of content.
+
+The competencies you should be able to demonstrate after engaging with the material.
+
+All proofs and derivations are grouped at the beginning for easy reference. Where a proof appears in multiple places, only the version I consider most useful is listed.
+
+I have aimed to include all relevant material, but if you notice omissions, please let me know. This is not an exhaustive or definitive list, though it is as complete as possible. Its purpose is to guide you towards the content and competencies I consider essential for your success in the course.
+
+# Proofs and derivations
+
+I list here where you can find a proof for the following results.
+
+- 1. Introduction/Slides
+	- SlidesRegW1S3IntroMVN.pdf
+		- Linear combination of MVN random vector (page 9)
+		- Partition of MVN random vector is MVN (page 16)
+		- Idempotent quadratic product of standard MVN is $\chi^2$ (page 19)
+-  2. General Liner Model/Slides
+	- SlidesRegW2L1GLM.pdf
+		- OLS estimator for simple linear regression (page 7)
+		- MLE for $\mathbf{\beta}$  for multiple linear regression (page 13)
+		- Distribution of $\hat{\mathbf{\beta}}$ (page 19)
+			- Video: `Theorem 7 - Distribution of MLE of beta.mp4`
+		- MLE for $\sigma^2$ (page 25)
+	- SlidesRegW2L1GLMProofsAdditional.pdf
+		- Bias of $\hat{\sigma}^2_{MLE}$ (page 2)
+				- Video: `Theorem 8 - Bias of MLE of sigma squared.mp4`, followed by `Theorem 8 - Bias of MLE of sigma squared - last line.mp4`
+		- Unbiased estimator for $\sigma^2$, namely $s^2$ (page 3)
+			- Video: `Lack of bias of s squared (result immediately following theorem 8.mp4`
+		- Distribution of $\frac{n-k}{\sigma^2}s^2\sim\chi^2_{n-k}$ (page 3)
+			- Video: Pending
+- 3. Confidence Intervals and Hypothesis Testing/Slides
+	- SlidesRegW3L1AdditionalProofs.pdf
+		- Independence of BY and Y'AY
+			- Videos: `Theorem 6 - Independence of BY and Y'AY - Part 1.mp4` and `Theorem 6 - Independence of BY and Y'AY - Part 2.mp4`
+		- Independence of $s^2$ and $\hat{\mathbf{\beta}}$
+			- *Important*: Will need to know result, but *do not* need to know proof (i.e. the proof itself will not be examined).
+	- SlidesRegW3L1Confint.pdf
+		- Derivation of distribution of $t$-stat test statistic involving $\mathbf{l}'\hat{\mathbf{\beta}}$
+			- Complete derivation for $l=\mathbf{x}_{[i]}$ (page 6-7)
+			- Briefer version for general $\mathbf{l}$ (page 11)
+		- Derivation of distribution $F$-stat test statistic involving $\mathbf{L}\hat{\mathbf{\beta}}$
+			- Brief derivation for $\mathbf{L}=\mathbf{I}_k$ (page 16)
+			- Brief derivation for general $\mathbf{L}$ (page 17)
+			- Examples of numerators for subsets of regression coefficients (page 18)
+		- Confidence intervals for:
+			- Individual regression coefficients (page 13)
+			- Complete derivation for $\mathbf{x}'_{[i]}\mathbf{\beta}$ (page 9)
+			- General $\mathbf{l}'\mathbf{\beta}$ (page 11)
+		- Distribution of $\mathbf{Y}'\mathbf{\Sigma}^{-1}\mathbf{Y}$
+			- Statement on page 15, proof an exercise in first tutorial 
+	- SlidesRegW3L1ConfintV2.pdf
+		- Derivation for distribution of test statistic involving $\mathbf{l}'\hat{\mathbf{\beta}}$ (pages 17-18)
+			- Applied to case of individual regression coefficient (page 21)
+			- Applied to case of predicted value (page 21)
+		- Derivation of confidence interval for $\mathbf{l}'\mathbf{\beta}$
+	- SlidesRegW3S2HypTestV2.pdf
+		- Derivation of hypothesis test involving $\mathbf{l}'\mathbf{\beta}$ (pages 9-10)
+			- Applied to individual regression coefficients (page 10)
+			- Applied to difference between two regression coefficients (pages 15)
+		- Derivation of hypothesis test involving $\mathbf{L}\mathbf{\beta}$ (pages 19-21)
+			- Applied to pair of regression coefficients (page 22)
+
+# Week One
+
+## Description
+
+In week one, we lay the theoretical foundations for deriving estimators and their distributions for unknown parameters ($\mathbf{\beta}$ and $\sigma^2$) in the general linear model.
+
+## Content and source
+
+### Statistical distributions
+
+- Moving between distributions related to the normal
+- *Content source*: 
+	- `1. Introduction/Prerequisites`:
+		- NotesRegW1S0Prereq.pdf
+
+### Linear algebra
+
+- Matrix multiplication
+- Block matrix multiplication
+- Orthogonality
+- Orthonormality
+- Trace
+- Rank
+- Eigenvectors and eigenvalues
+- Special matrices
+	- Symmetric
+	- Positive definite
+- Idempotency
+- *Content source*:
+	- `1. Introduction/Prerequisites`:
+			- NotesRegW1S0Prereq.pdf
+			- SlidesRegW1S0PrereqLA.pdf (content entirely contained in NotesRegW1S0Prereq.pdf, however)
+
+### Multivariate normal distribution
+
+- Univariate PDF
+- Multivariate PDF
+- MGF of an MVN random vector
+- Distribution of linear transformation of an MVN random vector
+	- Proof
+	- Downstream results:
+		- MVN partitions are MVN
+			- Proof
+- Distribution of quadratic form involving MVN random vector
+	- With respect to its inverse covariance matrix
+	- With respect to a (symmetric) idempotent matrix
+- *Content source*:
+	- `1. Introduction/Slides`:
+		- SlidesRegW1S3IntroMVN.pdf
+
+## Competencies and practice material
+
+- Apply results from statistical distribution, linear algebra theory and MVN theory
+	- Both in:
+		- Repeating provided proofs and derivations
+			- *Practice material*: Rehearse proofs
+		- Performing new derivations
+			- *Practice material*:
+				- Question Bank (mostly basics):
+					- `Prerequisites/`
+						- `Linear algebra/`
+				- TutRegW2Questions.pdf:
+					- All questions
+- Repeating provided MVN proofs
+	- *Practice material*: Rehearse proofs
+
+# Week Two
+
+## Description
+
+The general linear model is formally introduced. We derive estimators and their distributions for unknown quantities, namely the regression coefficients ($\mathbf{\beta}$) and the error variance ($\sigma^2$).
+
+## Content and source
+
+### General linear model
+
+- Model statement
+	- Knowns and unknowns
+	- Source of variation
+	- Structure of components
+	- Assumptions
+- Simple linear regression
+	- Model statement
+	- OLS estimator
+		- Proof
+- Multiple linear regression
+	- Model statement
+	- MLE for $\mathbf{\beta}$
+		- Proof
+		- Assumptions
+- Distribution of $\mathbf{\hat{\beta}}$
+	- Distribution of linear combinations of $\hat{\mathbf{\beta}}$
+- Estimator for $\sigma^2$
+	- MLE
+		- Proof
+	- Mean
+		- Proof
+	- Unbiased estimator
+		- Proof
+		- Distribution
+			- Proof
+- *Content source*: 
+	- `2. General linear model/Slides`:
+		- SlidesRegW2L1GLM.pdf
+    - SlidesRegW2L1GLMProofsAdditional.pdf
+
+## Competencies and practice material
+
+- General linear model:
+	- Identify known and unknown parameters
+		- *Practice material*: none 
+	- Express model in scalar, vector and matrix notation
+		- *Practice material*: none
+	- Design matrix:
+		- Construct appropriate design matrix, given model statement:
+			- Intercept column
+			- Numeric explanatory variables
+			- *Practice material*:
+				- PracRegW2Questions, Question 11
+		- Understand intercept column
+	- Identify sources of variation:
+		- *Practice material*: 
+			- TutRegW3GLMQuestions, Questions 3, 4 & 5
+	- Understand assumptions:
+		- State assumptions:
+			- *Practice material*:
+				- TutRegW3GLMQuestions.pdf, Question six
+		- Be able to identify scenarios violating assumptions
+			- *Practice material*:
+				- TutRegW3GLMQuestions.pdf, Question two
+	- Distinguish between simple and multiple regression
+		- *Practice material*: none
+- Estimating regression coefficients, $\mathbf{\beta}$
+	- Know formula for MLE, and be able to calculate it
+		- *Practice material*:
+			- PracRegW2Questions, Question 12
+	- Know conditions under which it can be calculated:
+		- *Practice material*: none
+- Distribution of $\hat{\mathbf{\beta}}$:
+  - Be able to calculate it from model components
+    - Practice material:
+      - PracRegW3.pdf, Part A
+  - Be able to calculate linear components of $\hat{\mathbf{\beta}}$:
+    - Practice material:
+      - TutRegW3, Question 5
+	- Impact of explanatory variable "variability" and mutual correlation on associated regression parameters' standard error
+		- *Practice material*:
+			- TutRegW3GLMQuestions.pdf, Question 4
+	- Be able to calculate distribution of linear combinations of $\hat{\mathbf{\beta}}$:
+		- Single linear combinations, i.e. $\mathbf{l}'\mathbf{\beta}$ for $\mathbf{l}:k\times 1$
+			- *Practice material*:
+				- TutRegW3GLMQuestions.pdf, Question five
+      - Multiple linear combinations, i.e. $\mathbf{L}\mathbf{\beta}$ for $\mathbf{L}:q\times k$
+        - *Practice material*: none
+- Interpreting regression coefficients
+	- Employ precise statistical interpretation of individual regression coefficient
+	- *Practice material*: none
+- Fitted values and residuals:
+	- Know formulae, and be able to calculate them
+		- *Practice material*: none
+	- Distinguish between residuals and errors
+		- *Practice material*: none
+- Estimating error variance
+	- Be able to calculate MLE
+		- *Practice material:* none
+	- Be able to calculate MLE bias
+    - *Practice material*: `TutRegW3GLMQuestions.pdf`, Question 7
+	- Be able to calculate unbiased estimator
+    - *Practice material*: `TutRegW3GLMQuestions.pdf`, Question 7
+
+# Week Three
+
+## Content and source
+
+### Confidence intervals
+
+## Competencies and practice material
+

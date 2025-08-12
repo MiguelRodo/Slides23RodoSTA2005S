@@ -27,6 +27,7 @@
 ^FactsRegW6S1Boot\.qmd$
 ^FactsRegW6S2PCA\.qmd$
 ^NotesRegW1S0Prereq\.qmd$
+^OutlineReg\.qmd$
 ^QARegNotesW1S0Prereq\.qmd$
 ^QARegSlidesW1S1Intro\.qmd$
 ^QARegSlidesW1S3IntroMVN\.qmd$
@@ -40,7 +41,6 @@
 ^QARegW5S2Prediction\.qmd$
 ^README\.Rmd$
 ^SlidesRegW1S1Intro\.qmd$
-^SlidesRegW1S2Intro\.qmd$
 ^SlidesRegW1S3Intro\.qmd$
 ^SlidesRegW3S1AdditionalProofs\.qmd$
 ^SlidesRegW3S1ConfInt\.qmd$
@@ -56,6 +56,7 @@
 ^CHANGELOG\.md$
 ^codemeta\.json$
 ^manifest\.csv$
+^Rplots\.pdf$
 ^slides\.txt$
 ^DemRegW1S2IntroEndToEnd_files/
 ^DemRegW1S2IntroEndToEnd_files$
@@ -97,6 +98,10 @@
 ^NotesRegW1S0Prereq_files$
 ^NotesRegW1S0Prereq\.html/
 ^NotesRegW1S0Prereq\.html$
+^OutlineReg_files/
+^OutlineReg_files$
+^OutlineReg\.html/
+^OutlineReg\.html$
 ^QARegNotesW1S0Prereq_files/
 ^QARegNotesW1S0Prereq_files$
 ^QARegNotesW1S0Prereq\.html/
@@ -143,8 +148,6 @@
 ^QARegW5S2Prediction\.html$
 ^SlidesRegW1S1Intro\.pdf/
 ^SlidesRegW1S1Intro\.pdf$
-^SlidesRegW1S2Intro\.pdf/
-^SlidesRegW1S2Intro\.pdf$
 ^SlidesRegW1S3Intro\.pdf/
 ^SlidesRegW1S3Intro\.pdf$
 ^SlidesRegW3S1AdditionalProofs\.pdf/

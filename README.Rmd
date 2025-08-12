@@ -29,6 +29,13 @@ You can install the development version of {{ Package }} like so:
 ```
 The purpose of Slides23RodoSTA2005S is to create slides for STA2005S
 
+## Learning outcomes
+
+By the end of week one, you should be able to:
+
+1. Demonstrate comfort with prerequisite normal distribution theory, matrix methods and linear algebra.
+2. Run an `R` script.
+3. State and apply several key theorems related to the multivariate normal distribution.
 
 ## Citation
 

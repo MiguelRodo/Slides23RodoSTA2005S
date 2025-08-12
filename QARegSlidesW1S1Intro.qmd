@@ -6,8 +6,6 @@ format:
     embed-resources: true
 ---
 
-*Note: the headings map to slide headings in the slide deck `SlidesRegW1S1Intro.pdf`.*
-
 ### What is regression?
 
 - In terms of notation, what is the symbol for the:
@@ -59,6 +57,8 @@ format:
     - Precise quantification of relationship
   - Second?
     - Able to predict
+  - Third?
+    - Separates size of effect from variability
 - Advantage of correlation:
   - First?
     - Unitless
