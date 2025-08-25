@@ -1,0 +1,83 @@
+---
+title: "ChatGPT and the regression assignment"
+format: pdf
+---
+
+## TL;DR
+
+ChatGPT is a great tool, but if you let it do all the work, you won’t learn to code - and you’ll struggle later in interviews, debugging, or working on real projects. For this assignment:
+
+- Good use → quick lookups, syntax help, error explanations, or reviewing your own working code.
+- Okay but less helpful → copying small snippets you fully understand without rewriting it.
+- Bad for learning → one-shot solutions or blind copy-paste (and obviously liable to getting zero if caught, in theory).
+
+Final advice - struggle a bit first, understand what you write, and submit only what you write.
+
+Incidentally, ChatGPT is great at writing `TL;DR` sections.
+
+## Using ChatGPT for this assignment - my view
+
+For what it's worth, here is my own, hopefully realistic view on using ChatGPT for this assignment.
+
+I don’t have a moral objection to using ChatGPT - it’s an incredible tool, and in real work you’d be silly not to use it when it’s the best option.
+
+But coding and analysis are skills you need to be able to *do yourself* in certain situations, and if you only ever let ChatGPT do them for you, you’ll find yourself stuck when:
+
+* You need to pass a coding interview.
+* You’re reviewing others’ code (or ChatGPT’s output) for correctness.
+* You’re debugging when ChatGPT’s answer doesn’t work.
+* You’re modifying a large or messy codebase.
+* You need something non-standard or highly dependent on understanding business context.
+* You have to verify that code is correct and fit for purpose.
+* You’re writing up analysis without it looking like a ChatGPT prompt dump.
+* Working on codebases where ChatGPT is not available (e.g. banned due to licensing or data privacy concerns)
+* High-value or ambiguous tasks where you need to be able to explain your code and decisions (see [GitHub's advice](https://docs.github.com/en/copilot/tutorials/coding-agent/get-the-best-results#choosing-the-right-type-of-tasks-to-give-to-copilot))
+
+Note that I never mentioned the prac test, because it's just an artificial hurdle.
+
+For this assignment, your goals are:
+
+1. **Get good marks.**
+2. **Learn to write R code yourself.**
+
+If you just prompt ChatGPT for the whole memo or for one-shot code, you’ll likely achieve #1 but sacrifice #2.
+That’s fine for *this* deadline (unless you are caught, of course), but then you will have to learn later.
+
+### Use cases
+
+Moving on, here’s how I think you can use ChatGPT effectively whilst promoting learning in this assignment:
+
+**Good use cases** (like a faster Google):
+
+* Looking up function names or syntax you’ve forgotten (e.g. the arguments for `hist()`).
+* Getting reminders of base R plotting functions.
+* Asking for explanations of error messages you don’t understand.
+
+Another good use case, but one only to do once your code is fully working:
+
+* Getting ChatGPT to review your *own* working code and suggest improvements - you’ll pick up useful tricks.
+
+**Acceptable but less helpful** (use sparingly):
+
+* Copying *small* snippets if you fully understand them. Preferably rewrite what you find, rather than copy-pasting.
+
+**Unhelpful for learning**:
+
+* Asking for and submitting a one-shot solution or memo.
+* Blindly copying and pasting blocks of code you haven’t read or tested.
+
+### General advice for this assignment
+
+* **Struggle a bit first.**
+  Don’t spend two hours stuck, but do try to work through problems before asking for help from ChatGPT.
+  Read the help files, inspect error messages, and test variations.
+  Do this enough, and your debugging skills will eventually become dramatically better.
+  It's really just practice, coding is not rocket science.
+
+* **Be honest.**
+  Submit your own work, even if it’s messy - the goal is to build a foundation you can improve next year.
+
+**Bottom line:**
+
+Learn to code by writing code, so that you can be a competent coder in the future.
+Don't let ChatGPT short-circuit your learning by letting it do all the work for you, unless you feel you can prompt your way through real work later.

@@ -22,6 +22,20 @@ All proofs and derivations are grouped at the beginning for easy reference. Wher
 
 I have aimed to include all relevant material, but if you notice omissions, please let me know. This is not an exhaustive or definitive list, though it is as complete as possible. Its purpose is to guide you towards the content and competencies I consider essential for your success in the course.
 
+## Weekly overview
+
+* **Week One — Foundations**
+  Focus on mathematical and statistical tools needed for regression: linear algebra, normal and multivariate normal distributions, and their properties. These are the building blocks for later proofs and derivations. By the end, you should be comfortable manipulating matrices, applying results about the MVN, and rehearsing core proofs.
+
+* **Week Two — The General Linear Model**
+  Formal introduction of the general linear model (GLM). We derive estimators for regression coefficients and error variance, examine their properties, and interpret the role of assumptions. By the end, you should be able to express the GLM in different forms, derive and compute estimators, and explain their distributions.
+
+* **Week Three — Inference (Confidence Intervals and Hypothesis Testing)**
+  Develop statistical inference for regression parameters. We cover confidence intervals and hypothesis tests for single and multiple linear combinations of coefficients, and interpret their meaning in applied contexts. By the end, you should be able to calculate, interpret, and compare intervals and tests, and connect them to effect size and uncertainty.
+
+* **Week Four — ANOVA and Model Checking**
+  Extend the GLM to categorical variables and analysis of variance, and learn how to assess model fit. We explore design matrices, F-tests, regression output, residual diagnostics, leverage, and influence. By the end, you should be able to construct and interpret categorical regression models, perform ANOVA tests, and evaluate whether model assumptions are reasonable.
+
 # Proofs and derivations
 
 I list here where you can find a proof for the following results.
@@ -31,7 +45,7 @@ I list here where you can find a proof for the following results.
 		- Linear combination of MVN random vector (page 9)
 		- Partition of MVN random vector is MVN (page 16)
 		- Idempotent quadratic product of standard MVN is $\chi^2$ (page 19)
--  2. General Liner Model/Slides
+-  2. General Linear Model/Slides
 	- SlidesRegW2L1GLM.pdf
 		- OLS estimator for simple linear regression (page 7)
 		- MLE for $\mathbf{\beta}$  for multiple linear regression (page 13)
@@ -76,13 +90,12 @@ I list here where you can find a proof for the following results.
 			- Applied to difference between two regression coefficients (pages 15)
 		- Derivation of hypothesis test involving $\mathbf{L}\mathbf{\beta}$ (pages 19-21)
 			- Applied to pair of regression coefficients (page 22)
+- ANOVA, Model Checking/Slides
+  - SlidesRegW4L2ModelChecking.pdf
+	  - Variance of residuals (page 16)
+		- Average leverage (page 29)
 
 # Week One
-
-## Description
-
-In week one, we lay the theoretical foundations for deriving estimators and their distributions for unknown parameters ($\mathbf{\beta}$ and $\sigma^2$) in the general linear model.
-
 ## Content and source
 
 ### Statistical distributions
@@ -145,10 +158,6 @@ In week one, we lay the theoretical foundations for deriving estimators and thei
 
 # Week Two
 
-## Description
-
-The general linear model is formally introduced. We derive estimators and their distributions for unknown quantities, namely the regression coefficients ($\mathbf{\beta}$) and the error variance ($\sigma^2$).
-
 ## Content and source
 
 ### General linear model
@@ -167,7 +176,7 @@ The general linear model is formally introduced. We derive estimators and their 
 	- MLE for $\mathbf{\beta}$
 		- Proof
 		- Assumptions
-- Distribution of $\mathbf{\hat{\beta}}$
+- Distribution of $\hat{\mathbf{\beta}}$
 	- Distribution of linear combinations of $\hat{\mathbf{\beta}}$
 - Estimator for $\sigma^2$
 	- MLE
@@ -187,15 +196,18 @@ The general linear model is formally introduced. We derive estimators and their 
 
 - General linear model:
 	- Identify known and unknown parameters
-		- *Practice material*: none 
+		- *Practice material*:
+		  - `Question Bank/Week Two/Model formulation` 
 	- Express model in scalar, vector and matrix notation
-		- *Practice material*: none
+		- *Practice material*:
+		  - `Question Bank/Week Two/Model formulation` 
 	- Design matrix:
 		- Construct appropriate design matrix, given model statement:
 			- Intercept column
 			- Numeric explanatory variables
 			- *Practice material*:
-				- PracRegW2Questions, Question 11
+				- `PracRegW2Questions`, Question 11
+				- `Question Bank/Week Two/Model formulation`
 		- Understand intercept column
 	- Identify sources of variation:
 		- *Practice material*: 
@@ -219,7 +231,7 @@ The general linear model is formally introduced. We derive estimators and their 
   - Be able to calculate it from model components
     - Practice material:
       - PracRegW3.pdf, Part A
-  - Be able to calculate linear components of $\hat{\mathbf{\beta}}$:
+  - Be able to calculate linear combinations of $\hat{\mathbf{\beta}}$:
     - Practice material:
       - TutRegW3, Question 5
 	- Impact of explanatory variable "variability" and mutual correlation on associated regression parameters' standard error
@@ -233,10 +245,11 @@ The general linear model is formally introduced. We derive estimators and their 
         - *Practice material*: none
 - Interpreting regression coefficients
 	- Employ precise statistical interpretation of individual regression coefficient
-	- *Practice material*: none
+	- *Practice material*:
+		- `TutRegW4Questions.pdf`, question a)i)
 - Fitted values and residuals:
 	- Know formulae, and be able to calculate them
-		- *Practice material*: none
+		- *Practice material*: `Question Bank/Week Two/Model formulation` 
 	- Distinguish between residuals and errors
 		- *Practice material*: none
 - Estimating error variance
@@ -251,7 +264,180 @@ The general linear model is formally introduced. We derive estimators and their 
 
 ## Content and source
 
-### Confidence intervals
+- Single linear combinations of $\mathbf{\beta}$, i.e. $\mathbf{\ell}'\mathbf{\beta}$ for $\mathbf{\ell}:k\times 1$
+	- Distribution of $\mathbf{\ell}'\hat{\mathbf{\beta}}$
+		- Proof
+	- Confidence intervals
+		- Formula
+		- Derivation
+		- Calculation
+		- Interpretation
+		- Cases:
+		  - Individual regression coefficients
+			- Fitted value (conditional mean)
+			- Arbitrary linear combination, e.g. difference between two regression coefficients
+	- Hypothesis tests
+	  - Formula
+		- Derivation
+		- Calculation
+		- Interpretation
+		- Cases:
+		  - Individual regression coefficients
+			- Arbitrary linear combination, e.g. difference between two regression coefficients
+- Multiple linear combinations of $\mathbf{\beta}$, i.e. $\mathbf{L}\mathbf{\beta}$ for $\mathbf{L}:q\times k$
+	- Distribution of $\mathbf{L}\hat{\mathbf{\beta}}$
+		- Proof
+	- Confidence intervals
+	  - Not covered
+	- Hypothesis tests
+	  - Formula
+		- Derivation
+		- Calculation
+		- Interpretation
+		- Cases:
+		  - Individual regression coefficients
+			- All regression coefficients
+			- All regression coefficients, including intercept
+			- Arbitrary subset of regression coefficients, e.g. pair of regression coefficients
+- Interpretation of confidence intervals and hypothesis tests
+	- Cases:
+		- Small p-value:
+			- Narrow CI around small effect size
+			- Wide CI around large effect size
+		- Large p-value:
+			- Narrow CI around no effect
+			- Wide CI around no effect
+- *Content source*:
+	- `3. Confidence Intervals and Hypothesis Testing/Slides`:
+		- SlidesRegW3L1ConfintV2.pdf
+		- SlidesRegW3S2HypTestV2.pdf
 
 ## Competencies and practice material
 
+- Confidence intervals:
+	- Individual regression coefficients:
+		- `Question Bank/Week three/Confidence Intervals and Hypothesis Testing`, Question 1
+			- Questions a,b are straightforward calculations
+			- The remaining questions are more challenging
+	- Linear combinations of regression coefficients:
+		- `Question Bank/Week three/Confidence Intervals and Hypothesis Testing`, Question 2
+		  - Question c
+	- Understanding coverage
+		- `Question Bank/Week three/Confidence Intervals and Hypothesis Testing`, Question 4
+- Hypothesis testing:
+  - Individual regression coefficients:
+		- `TutRegW4Questions.pdf`, question a)ii)
+	- Linear combinations of regression coefficients:
+		- `Question Bank/Week three/Confidence Intervals and Hypothesis Testing`, Question 2
+- Interpreting confidence intervals and hypothesis tests
+  - `Question Bank/Week three/Confidence Intervals and Hypothesis Testing`, Question 3, 6
+
+- Note: past tests will likely include several questions on calculating confidence intervals and hypothesis tests.
+
+# Week Four
+
+## ANOVA
+
+### Content and source
+
+- F-stat formulae:
+  - MSA/MSE formula (the first one)
+	- Standard regression F test formula
+	- Full versus reduced model F test formula
+- Categorical variables
+  - Model formulation
+	- Design matrix construction
+	  - Dummy variables
+			- Problem with creating dummy variables for all categories
+			- Reference level
+	- Interpretation of regression coefficients
+	- Confidence intervals
+	- Hypothesis tests
+- `summary(lm(...))` output
+	- Null hypothesis tested in F-statistic at bottom
+- *Content source:*
+  - `4. ANOVA, Model Checking/Slides`:
+		- SlidesRegW4L1ANOVA.pdf
+
+### Competencies and practice material
+
+- Identify model structure
+  - Practice material:
+	  - `TutRegW5Questions.pdf`, `Interpreting the model`, a
+- Construct design matrix
+  - Practice material:
+	  - `TutRegW5Questions.pdf`, `Constructing the design matrix`, c
+- Identify reference levels
+  - Practice material:
+	  - `TutRegW5Questions.pdf`, `Interpreting the model`, b
+		- `Question Bank/Week Four/ANOVA/Categorical Variables/Questions Regarding a Particular Model`:
+		  - `Initial understanding`: straightforward
+			- `Alternative coding`: more challenging
+			- `Miscellaneous`: understanding effect of encoding on correlation between parameters
+- Interpret regression coefficients
+  - Practice material:
+	  - `TutRegW5Questions.pdf`, `Interpreting the model`, d, e
+- Construct and interpret hypothesis tests
+	- Practice material:
+	  - `TutRegW5Questions.pdf`, `Hypothesis tests`, f-i, l1-6
+- Not added here, but the week 5 practical includes practice material on ANOVA.
+
+## Model validation
+
+### Content and source
+
+- $R^2$:
+  - Formula, in terms of sums of squares
+	- Interpretation
+	- Relationship to correlation between observed and fitted values
+	- Where to find it, in `summary(lm(...))` output
+- Adjusted $R^2$:
+  - Formula, in terms of sums of squares
+	- Motivation
+	- Where to find it, in `summary(lm(...))` output
+- Residual distribution plots:
+  - Residuals versus fitted values plot
+	  - Key assumption violations to look for
+	- Normal Q-Q plot
+	  - Key assumption violations to look for
+	- Histogram
+	  - Key assumption violations to look for
+- Formal tests for normality of residuals
+  - Shapiro-Wilk test
+	- Kolmogorov-Smirnov test
+	- Which is more powerful
+	- Advantages and disadvantages of formal tests versus graphical methods
+- Outliers versus leverage
+	- Distinction between these two concepts
+- Residuals
+  - Distribution, especially covariance
+- Studentised residuals
+  - Formulae
+	  - Internal: $\hat{e}_i/(s\sqrt{1-h_{ii}})$
+		- External: $\hat{e}_i/(s_{(i)}\sqrt{1-h_{ii}})$
+  - Distinction between internally and externally studentised residuals
+	  - Motivation for external studentisation
+	- Reasonable thresholds
+	- Purpose of studentisation
+	- Purpose of examining studentised residuals
+- Leverage
+  - Definition
+	- Relationship to fitted values
+	- Average leverage
+	- Reasonable threshold
+- Cook's statistic
+  - Purpose
+	- Do not need to memorise formula
+- *Content source*:
+  - `4. ANOVA, Model Checking/Slides`:
+		- SlidesRegW4L2ModelChecking.pdf
+
+### Competencies and practice material
+
+- For each statistic and plot listed above:
+	- Know formula (where applicable)
+	- Be able to identify assumption violations
+	- Practice material:
+	  - `TutRegW5Questions.pdf`, `Model validation`, all questions
+		- `Question Bank/Week Four/Model Checking/` has a number of questions on leverage
+- Not added here, but the week 5 practical includes practice material on model validation.

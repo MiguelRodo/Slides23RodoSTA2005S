@@ -43,10 +43,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # ANOVA: Analysis of Variance
 
-- ANOVA is a statistical technique used to compare the means of two or more groups.
+- ANOVA is a statistical technique initially primarily used to compare the means of two or more groups.
 - **Historical Context:**
   - Developed by Ronald Fisher in the early 20th century.
-  - Served as a foundational method before the development of general linear models.
+  - Served as a foundational method before the full development of inference for   general linear models.
 - **Directly Considers Sums of Squares:**
   - ANOVA focuses on partitioning total variability into components.
   - Emphasizes understanding the sources of variation in data.
@@ -248,6 +248,29 @@ We now calculate the p-value:
 1 - pf(f_stat, a - 1, n - a)
 ```
 
+# Using the `anova` function
+
+- The `oneway.test` function in R can be used to perform one-way ANOVA directly:
+
+```{r}
+oneway.test(bp ~ group, data = trt_tbl, var.equal = TRUE)
+```
+
+- ANOVA is so closely connected to linear models, however, that almost all functions performing it will either require a model object or fit a model "under the hood":
+
+```{r}
+fit <- lm(bp ~ group, data = trt_tbl)
+anova(fit)
+```
+
+# Correspondence with regression
+
+- In fact, standard output from `summary(lm(...))` includes an ANOVA test for the nullity of all non-intercept coefficients:
+
+```{r}
+summary(fit)
+```
+
 # ANOVA as a subset of linear regression
 
 ::::{.callout-tip appearance="minimal"}
@@ -256,7 +279,6 @@ GLM ["(generalised linear model)"]. All ANOVA problems can be solved through reg
 true: Not all regression problems can be solved using traditional ANOVA."
 [@tabachnick07]
 ::::
-
 
 - ANOVA is a special case of linear regression:
   - When all predictors are categorical variables represented by dummy variables, the linear regression model becomes equivalent to an ANOVA model.
@@ -425,26 +447,6 @@ f_stat <- (t(L %*% coef_mat) %*% solve(L %*% C %*% t(L)) %*% (L %*% coef_mat)) /
 1 - pf(f_stat, nrow(L), nrow(model.matrix(fit)) - ncol(model.matrix(fit)))
 ```
 
-# Multi-way ANOVA and regression
-
-- Two-way ANOVA and beyond:
-  - Includes two (two-way) or more (multiple) categorical variables.
-  - May include interaction terms (i.e. the effect of one variable depends on the level of another variable).
-- We have not covered interaction terms yet (next week), but we note that regression can handle multi-way ANOVA.
-
-# Multi-way ANOVA and regression
-
-- However, the relationship between ANOVA and regression becomes more complicated at this point:
-  - *Order of entry of variables*:
-    - In regression, the effect of each variable is calculated after all other variables have been accounted for.
-    - In ANOVA, this is flexible.
-  - *Interaction terms*:
-    - In ANOVA, interaction terms can be handled in different ways, e.g. type I, II, or III sum of squares.
-    - In regression, we typically take the approach of type III sum of squares.
-- You can take approaches to regression that correspond directly to the ANOVA approaches, but these are more than simply fitting one model.
-  - For example, to mimick sequential ANOVA, you could fit a series of models, each with one more variable than the last.
-  - To mimick type II ANOVA testing, you would test main effects using a model without interaction terms.
-
 # Reduced and full models
 
 - The $F$-test for a subset of coefficients being zero can be calculated in an alternative fashion using two model fits.
@@ -491,6 +493,12 @@ f_stat <- ((sse_r - sse_ur) / (k_ur - k_r)) / (sse_ur / (n - k_ur))
 1 - pf(f_stat, k_ur - k_r, nrow(trt_tbl) - k_ur)
 ```
 
+# Using the `anova` function to compare two models
+
+```{r}
+anova(fit_reduced, fit_full)
+```
+
 # F-statistic in the output of `summary(lm(...))`
 
 - The $F$-statistic in the output of `summary(lm(...))` tests the null hypothesis that all non-intercept coefficients are zero.
@@ -514,19 +522,188 @@ summary(lm(bp ~ group, data = trt_tbl))
 \includegraphics[width=0.6\textwidth]{_raw_data/img/f_stat.png}
 \end{center}
 
-# Extensions of ANOVA
+# Two-way ANOVA
 
-- **ANCOVA (Analysis of Covariance):**
-  - Combines ANOVA and regression by including both categorical and continuous predictors.
-  - *Regression Equivalent:* Regression models with both categorical and continuous variables.
+- Two-way ANOVA is an extension of one-way ANOVA that allows for two categorical explanatory variables.
+- Here is the model statement for two-way ANOVA:
 
-- **Repeated Measures ANOVA:**
-  - Used when the same subjects are measured multiple times.
-  - *Regression Equivalent:* Mixed-effects models.
+$$
+Y_{ijk} = \mu + \alpha_i + \beta_j + e_{ijk}
+$$
 
-- **MANOVA (Multivariate ANOVA):**
-  - Extends ANOVA when there are multiple dependent variables.
-  - *Regression Equivalent:* Multivariate regression models.
+- where:
+  - $\mu$ is the overall mean.
+  - $\alpha_i$ is the effect of the $i$-th level of the first categorical variable.
+  - $\beta_j$ is the effect of the $j$-th level of the second categorical variable.
+  - $e_{ijk}$ is the random error term for the $k$-th observation from the $i$-th level of the first variable and the $j$-th level of the second variable.
+
+# Simulating our advertising data again
+
+```{r}
+# Advertising data
+set.seed(201)
+n_ad <- 100L
+spend_vec_radio <- runif(n_ad, 0, 3)
+spend_vec_tv <- 1.2 * spend_vec_radio + runif(n_ad, 0, 3)
+revenue_vec <- 2 * spend_vec_tv + rnorm(n_ad, mean = 10, sd = 2)
+
+ad_tbl <- tibble(
+  spend_radio = spend_vec_radio,
+  spend_tv = spend_vec_tv,
+  revenue = revenue_vec
+)
+```
+
+# Extracting p-values from simple and multiple linear regression models
+
+```{r}
+fit_simple_tv <- lm(revenue ~ spend_tv, data = ad_tbl)
+fit_simple_radio <- lm(revenue ~ spend_radio, data = ad_tbl)
+fit_multiple <- lm(revenue ~ spend_tv + spend_radio, data = ad_tbl)
+```
+
+```{r}
+#| include: false
+p_val_tbl_lm <- tibble(
+  Model = c("Simple TV", "Simple Radio", "Multiple"),
+  `P-value (TV)` = c(
+    summary(fit_simple_tv)$coefficients[2, 4],
+    NA,
+    summary(fit_multiple)$coefficients[2, 4]
+  ),
+  `P-value (Radio)` = c(
+    NA,
+    summary(fit_simple_radio)$coefficients[2, 4],
+    summary(fit_multiple)$coefficients[3, 4]
+  )
+)
+```
+
+```{r}
+#| echo: false
+p_val_tbl_lm
+```
+
+# Fitting a two-way ANOVA model
+
+- The order of the explanatory variables matters for the "default" ANOVA test.
+
+- First we fit a two-way ANOVA model with TV spend first:
+
+```{r}
+fit_tv_first <- lm(revenue ~ spend_tv + spend_radio, data = ad_tbl)
+anova(fit_tv_first)
+```
+
+# Fitting a two-way ANOVA model
+
+- Now we fit a two-way ANOVA model with radio spend first:
+
+```{r}
+fit_radio_first <- lm(revenue ~ spend_radio + spend_tv, data = ad_tbl)
+anova(fit_radio_first)
+```
+
+# Final comparison of p-values
+
+```{r}
+#| echo: false
+anova_radio_first <- anova(fit_radio_first)
+p_anova_radio_first <- anova_radio_first$`Pr(>F)`[1:2]
+anova_tv_first <- anova(fit_tv_first)
+p_anova_tv_first <- anova_tv_first$`Pr(>F)`[1:2]
+p_val_tbl_anova <- tibble(
+  Model = c("ANOVA (TV first)", "ANOVA (Radio first)"),
+  `P-value (TV)` = c(
+    p_anova_tv_first[1],
+    p_anova_radio_first[2]
+  ),
+  `P-value (Radio)` = c(
+    p_anova_tv_first[2],
+    p_anova_radio_first[1]
+  )
+)
+p_val_tbl_I <- p_val_tbl_lm |>
+  dplyr::bind_rows(p_val_tbl_anova)
+p_val_tbl_I
+```
+
+- The key point is that multiple linear regression and ANOVA yield the same p-value for the *last* explanatory variable included in the ANOVA model.
+
+# Type I vs Type II ANOVA
+
+- The previous ANOVA example was an example of **Type I ANOVA**.
+  - This is also known as "sequential" ANOVA.
+  - In type I ANOVA, the effects of the variables are estimated in the order they are included in the model.
+- In type II ANOVA, the effects of the variables are estimated in a similar fashion to regression:
+  - The effects of the first variable are estimated after the effects of the second variable.
+  - This means that the order of the variables does not matter.
+
+# Applying Type II ANOVA: TV first
+
+```{r}
+car::Anova(fit_tv_first, type = "II")
+```
+
+# Applying Type II ANOVA: Radio first
+
+```{r}
+car::Anova(fit_radio_first, type = "II")
+```
+
+# Multiple linear regression summary
+
+```{r}
+summary(fit_tv_first)$coefficients |> signif(3)
+```
+
+# Regression treats every variable as if it were the last one
+
+- This in fact gives rise to the interpretation of regression coefficients as "holding all other variables constant".
+- They're not so much "constant" as "we have already accounted for them".
+- The justification comes from us getting the same regression coefficients between the following two scenarios:
+  - Multiple linear regression with all variables included.
+  - Simple linear regression for each variable *after* removing any association between each variable and the other variables in the model.
+
+# Equivalent algorithm for regression
+
+- In more detail, for e.g. $X_1$ we:
+  - Fit `lm(X_1 ~ X_2 + X_3 + \ldots + X_k)`.
+  - Extract the residuals, $\hat{\mathbf{e}}^{(1)}=\mathbf{X}_1 - \hat{\mathbf{X}}_1$.
+  - Model $\mathbf{Y} = \mathbf{1}\beta_0 + \hat{\mathbf{e}}^{(1)}$.
+  - The resulting coefficient is the same as the coefficient for $X_1$ in the multiple linear regression model (i.e. `lm(Y ~ X_1 + X_2 + \ldots + X_k)`).
+
+# Demonstration
+
+First, let's fit a multiple linear regression model:
+
+```{r}
+lm(revenue ~ spend_tv + spend_radio, data = ad_tbl) |>
+  summary() |>
+  broom::tidy()
+```
+
+# Demonstration cont.
+
+Now, let's fit a simple linear regression model for `spend_radio` after removing the association with `spend_tv`:
+  
+```{r}
+fit_radio <- lm(spend_radio ~ spend_tv, data = ad_tbl)
+residuals_radio <- resid(fit_radio)
+lm(revenue ~ residuals_radio, data = ad_tbl) |>
+  summary() |> coefficients() |> signif(3)
+```
+
+# Demonstration cont.
+
+Finally, let's fit a simple linear regression model for `spend_tv` after removing the association with `spend_radio`:
+
+```{r}
+fit_tv <- lm(spend_tv ~ spend_radio, data = ad_tbl)
+residuals_tv <- resid(fit_tv)
+lm(revenue ~ residuals_tv, data = ad_tbl) |>
+  summary() |> coefficients() |> signif(3)
+```
 
 # Take-aways
 

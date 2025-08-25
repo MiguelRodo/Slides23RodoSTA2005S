@@ -16,8 +16,10 @@
 ^docs/
 ^docs$
 ^_projr\.yml$
+^CommentChatGPT\.qmd$
 ^DemRegW1S2IntroEndToEnd\.qmd$
 ^DemRegW1S2IntroScenario\.qmd$
+^DemW4S1ANOVA\.qmd$
 ^DocsRegW2S1GLMMultiple\.qmd$
 ^ExtraRegW3S1IndependenceUnderAffineTransformation\.qmd$
 ^ExtraRegW3S1IndependenceUnderAffineTransformationQA\.qmd$
@@ -51,6 +53,7 @@
 ^SlidesRegW5S3GM\.qmd$
 ^SlidesRegW6S1Boot\.qmd$
 ^SlidesRegW6S2PCA\.qmd$
+^SlidesRegW1S1Intro\.tex$
 ^_dependencies\.R$
 ^BUILDLOG\.md$
 ^CHANGELOG\.md$
@@ -58,6 +61,10 @@
 ^manifest\.csv$
 ^Rplots\.pdf$
 ^slides\.txt$
+^SlidesRegW1S1Intro\.aux$
+^SlidesRegW1S1Intro\.log$
+^CommentChatGPT\.pdf/
+^CommentChatGPT\.pdf$
 ^DemRegW1S2IntroEndToEnd_files/
 ^DemRegW1S2IntroEndToEnd_files$
 ^DemRegW1S2IntroEndToEnd\.html/
@@ -66,6 +73,10 @@
 ^DemRegW1S2IntroScenario_files$
 ^DemRegW1S2IntroScenario\.html/
 ^DemRegW1S2IntroScenario\.html$
+^DemW4S1ANOVA_files/
+^DemW4S1ANOVA_files$
+^DemW4S1ANOVA\.html/
+^DemW4S1ANOVA\.html$
 ^DocsRegW2S1GLMMultiple\.pdf/
 ^DocsRegW2S1GLMMultiple\.pdf$
 ^ExtraRegW3S1IndependenceUnderAffineTransformation\.pdf/

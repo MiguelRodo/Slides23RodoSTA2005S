@@ -1,0 +1,391 @@
+---
+title: "Demonstratios of particular regression and ANOVA concepts"
+subtitle: "From simple vs multiple regression to Type I/II/III ANOVA tests and handling interactions"
+format:
+  html:
+    embed-resources: true
+    code-fold: false
+    toc: true
+    toc-depth: 3
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| include: false
+set.seed(201)
+
+# Core libraries
+library(tibble)
+library(ggplot2)
+library(cowplot)
+library(car)       # for Type II / III
+library(dplyr)
+library(broom)
+
+# Theme
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white")
+    )
+}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Where are we?
+
+* Described the general linear model and derived estimators and their distributions:
+
+  * $\hat{\mathbf{\beta}} = (\symbf{X}^\top \symbf{X})^{-1}\symbf{X}^\top \symbf{Y}$ with
+    $\hat{\mathbf{\beta}} \sim \mathcal N\left(\mathbf{\beta},\sigma^2(\symbf{X}^\top\symbf{X})^{-1}\right)$.
+  * Unbiased variance estimator:
+    $s^2=\hat{\sigma}^2_{\text{unbiased}} = \dfrac{1}{n-k}\sum_{i=1}^n (y_i-\hat y_i)^2$
+    with $\dfrac{(n-k)s^2}{\sigma^2} \sim \chi^2_{n-k}$.
+
+# Where are we going?
+
+- Comparing estimators between simple and multiple regression, showing their numerical differences and explaining why they differ.
+- Comparing different ANOVA types (Type I, Type II, Type III) and their relations with regression.
+- Providing a final recommendation for handling testing for effects in the presence of interactions in multiple regression.
+
+# Set-up code 
+
+```{r}
+#| eval: false
+library(tibble)
+library(ggplot2)
+library(cowplot)
+library(car)       # for Type II / III
+library(dplyr)
+library(broom)
+theme_cowplot_bg <- function(font_size = 14) {
+  cowplot::theme_cowplot(font_size = font_size) +
+    theme(
+      plot.background = element_rect(fill = "white"),
+      panel.background = element_rect(fill = "white")
+    )
+}
+```
+
+# Example 1 — Simulated advertising data (n = 100)
+
+We simulate **radio** and **TV** spend and a revenue outcome. TV spend is partly driven by radio (collinearity), and revenue depends strongly on TV.
+
+```{r}
+# Advertising data
+set.seed(201)
+n_ad <- 100L
+spend_vec_radio <- runif(n_ad, 0, 3)
+spend_vec_tv <- 1.2 * spend_vec_radio + runif(n_ad, 0, 3)
+revenue_vec <- 2 * spend_vec_tv + rnorm(n_ad, mean = 10, sd = 2)
+
+ad_tbl <- tibble(
+  spend_radio = spend_vec_radio,
+  spend_tv = spend_vec_tv,
+  revenue = revenue_vec
+)
+
+head(ad_tbl, 6)
+```
+
+## Simple regressions: revenue vs each predictor
+
+### Correspondence between ANOVA and regression
+
+First, we fit two simple linear regression models:
+
+```{r}
+m_tv_simple   <- lm(revenue ~ spend_tv,   data = ad_tbl)
+m_radio_simple<- lm(revenue ~ spend_radio,data = ad_tbl)
+```
+
+Here we display the fitted values along with their confidence bands:
+
+```{r}
+# Plots
+p_tv <- ggplot(ad_tbl, aes(spend_tv, revenue)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "TV spend", y = "Revenue") +
+  theme_cowplot_bg()
+
+p_radio <- ggplot(ad_tbl, aes(spend_radio, revenue)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "Radio spend", y = "Revenue") +
+  theme_cowplot_bg()
+
+plot_grid(p_tv, p_radio, ncol = 2)
+```
+
+## Multiple regression: revenue \~ tv + radio (order does **not** change the fit)
+
+```{r}
+m_both_tvfirst   <- lm(revenue ~ spend_tv + spend_radio, data = ad_tbl)
+m_both_radiofirst<- lm(revenue ~ spend_radio + spend_tv, data = ad_tbl)
+
+# Coefficients identical (fits are the same)
+coef(m_both_tvfirst)
+coef(m_both_radiofirst)
+all.equal(fitted(m_both_tvfirst), fitted(m_both_radiofirst))
+```
+
+### Why?
+
+Regress each predictor on the other, take residuals, then regress revenue residuals on predictor residuals — this reproduces the **partial** effects in the multiple regression.
+
+```{r}
+# Regress radio on TV; TV on radio
+r_radio_given_tv <- resid(lm(spend_radio ~ spend_tv, data = ad_tbl))
+r_tv_given_radio <- resid(lm(spend_tv ~ spend_radio, data = ad_tbl))
+
+# Residualise revenue on the "other" predictor
+r_y_given_tv    <- resid(lm(revenue ~ spend_tv,    data = ad_tbl))
+r_y_given_radio <- resid(lm(revenue ~ spend_radio, data = ad_tbl))
+
+# Residual-on-residual slopes
+fwl_radio <- lm(r_y_given_tv    ~ r_radio_given_tv)
+fwl_tv    <- lm(r_y_given_radio ~ r_tv_given_radio)
+
+coef(fwl_radio) |> signif(2)  # intercept ~ 0; slope = partial effect of radio
+coef(fwl_tv) |> signif(2)    # intercept ~ 0; slope = partial effect of TV
+
+# Compare to the multiple regression slopes:
+coef(m_both_tvfirst) |> signif(2)
+```
+
+We need not residualise the response variable (essentially because whatever the TV would have predicted, the residuals of radio could not predict):
+
+```{r}
+coef(lm(revenue ~ r_radio_given_tv, data = ad_tbl)) |>
+  signif(2)  # radio partial slope
+coef(lm(revenue ~ r_tv_given_radio, data = ad_tbl)) |>
+  signif(2)  # TV
+```
+
+This goes towards explaining why the standard errors increase for correlated predictors.
+In multiple regression, each explanatory variable is in a sense not modelled as is, but rather only whatever could not be explained by the other variables.
+When the other variables predict it well, there is little left over, which means that the explanatory variable has little variability left.
+For orthogonal predictors (which we now have), we have that $\mathrm{Var}(\hat{\beta_i}) = \frac{\sigma^2}{n\mathrm{Var}(X_i)}$, which increases with decreasing variability of $X_i$.
+
+<!--
+
+### QR decomposition view (orthogonal projections)
+
+QR (with `qr()`) shows that OLS computes $\hat\beta$ using orthogonalised columns of $X$; hence permutation of columns does not change the fitted values.
+
+```{r}
+#| eval: false
+X <- model.matrix(m_both_tvfirst)   # [Intercept, spend_tv, spend_radio]
+y <- ad_tbl$revenue
+
+qrX <- qr(X)
+Q <- qr.Q(qrX)       # orthonormal basis
+R <- qr.R(qrX)       # upper triangular
+
+beta_qr <- backsolve(R, t(Q) %*% y)
+cbind(beta_via_qr = as.vector(beta_qr),
+      beta_lm     = coef(m_both_tvfirst))
+max_abs_diff <- max(abs(beta_qr - coef(m_both_tvfirst)))
+max_abs_diff
+```
+
+!-->
+
+## ANOVA for simple linear regression
+
+For a single predictor, `anova(lm(y ~ x))` matches the $F$-test on the slope (which has the same p-value as the $t$-test on the slope, but the square of the $t$-statistic).
+
+```{r}
+anova(lm(revenue ~ spend_tv, data = ad_tbl))   # TV
+anova(lm(revenue ~ spend_radio, data = ad_tbl)) # Radio
+```
+
+```{r}
+summary(m_tv_simple)
+summary(m_radio_simple)
+```
+
+## Type I (sequential) sums of squares **depend on order**
+
+The default `anova()` on a multiple regression is **Type I** (sequential). With correlated predictors, the first-entered variable can appear much more (or less) significant.
+
+```{r}
+anova(m_both_tvfirst)    # TV entered first
+anova(m_both_radiofirst) # Radio entered first
+
+# Note the second line’s SS and p-value change with order.
+```
+
+Importantly, the variable that entered last has exactly the same test results (p-value) as that from the multiple linear regression including both variables:
+
+```{r}
+lm(revenue ~ spend_radio + spend_tv, data = ad_tbl) |>
+  summary()
+```
+
+So, regression always treats each variable as if they entered last.
+
+---
+
+# Example 2 — Full vs reduced model for a multi-level factor (global F test)
+
+We now **do not** reuse the advertising data. Simulate a 3-level factor `region` with different means; show that:
+
+1. `anova(full, reduced)` dropping the **entire** factor is a partial $F$ test.
+
+2. The same result arises from the hand-coded quadratic form
+
+$$
+F=\frac{(L\hat\beta)^\top\left\{L\widehat{\text{Cov}}(\hat\beta)L^\top\right\}^{-1}(L\hat\beta)}{q}
+$$
+
+with $q=\text{rank}(L)$.
+
+```{r}
+set.seed(42)
+n_region <- 300L
+region <- factor(sample(c("North","Central","South"), size = n_region, replace = TRUE))
+# True means by region; add noise
+mu <- c(North = 12, Central = 10, South = 14)
+y_region <- mu[region] + rnorm(n_region, sd = 2.5)
+
+reg_tbl <- tibble(y = as.numeric(y_region), region)
+
+# Full: with region; Reduced: intercept only
+m_full    <- lm(y ~ region, data = reg_tbl)
+m_reduced <- lm(y ~ 1,      data = reg_tbl)
+
+anova(m_reduced, m_full)  # partial F for the factor as a whole
+summary(m_full)
+```
+
+### Hand-coded $F$ — match the partial F above
+
+```{r}
+# Model matrix and estimated coefficients / covariance
+X_full <- model.matrix(m_full)                   # columns: (Intercept), regionNorth, regionSouth
+beta_hat <- coef(m_full)
+sigma2_hat <- sum(resid(m_full)^2) / df.residual(m_full)
+XtX_inv <- solve(t(X_full) %*% X_full)
+Cov_beta <- sigma2_hat * XtX_inv
+
+# Build L to jointly test all region dummies = 0 (i.e., drop entire factor)
+cols <- colnames(X_full)
+idx <- which(cols %in% c("regionNorth","regionSouth"))
+L <- diag(length(beta_hat))[idx, , drop = FALSE]  # selects those coefficients
+
+q <- qr(L)$rank
+num <- t(L %*% beta_hat) %*% solve(L %*% Cov_beta %*% t(L)) %*% (L %*% beta_hat)
+F_hand <- as.numeric(num / q)
+
+# Compare to partial F from anova
+F_aov <- anova(m_reduced, m_full)$`F`[2]
+data.frame(F_hand = F_hand, F_from_anova = F_aov)
+```
+
+---
+
+# Example 3 — Interaction model: drug × sex (n = 50)
+
+We encode `sex` as 0 = female, 1 = male; `drug` as 0/1. We simulate a **real interaction** so simple Type III vs Type II decisions matter.
+
+```{r}
+set.seed(777)
+n_int <- 100L
+sex  <- rbinom(n_int, 1, 0.5)             # 0=female, 1=male
+drug <- rbinom(n_int, 1, 0.5)
+
+# True model: baseline 10, drug effect +2 in females, ~0 in males (interaction -2),
+# sex main effect +1; noise sd=2
+y <- 10 + 1*sex + 2*drug + (-2)*(sex*drug) + rnorm(n_int, sd = 2)
+
+int_tbl <- tibble(y, sex = factor(sex, levels = c(0,1), labels = c("Female","Male")),
+                  drug = factor(drug, levels = c(0,1), labels = c("No","Yes")),
+                  sex_num = as.numeric(sex == "Male"),
+                  drug_num = as.numeric(drug == "Yes"))
+
+# Fit with interaction
+m_int_full <- lm(y ~ sex * drug, data = int_tbl)
+summary(m_int_full)
+```
+
+```{r}
+# Visualise interaction
+ggplot(int_tbl, aes(drug, y, colour = sex, group = sex)) +
+  stat_summary(fun = mean, geom = "point", position = position_dodge(width = 0.2)) +
+  stat_summary(fun = mean, geom = "line", position = position_dodge(width = 0.2)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               position = position_dodge(width = 0.2)) +
+  labs(title = "Drug × Sex interaction (means ± SE)",
+       x = "Drug", y = "Outcome") +
+  theme_cowplot_bg()
+```
+
+## Type II vs Type III (using `car::Anova`)
+
+* **Type II** (hierarchical): tests each **main effect** *after* the other main effect, **but without** the interaction. Sensible if the interaction is absent (or negligible), and respects hierarchy.
+* **Type III**: tests each term **with** all other terms in the model (including the interaction). For a binary `sex` coded with `Female = 0`, the Type III **drug** test is effectively “drug effect at **Female**”.
+
+```{r}
+Anova(m_int_full, type = 2)  # Type II
+Anova(m_int_full, type = 3)  # Type III
+```
+
+### Testing the interaction **first**
+
+A principled approach is to test the interaction via a partial $F$: compare the full model to a **main-effects-only** model.
+
+```{r}
+m_int_main <- lm(y ~ sex + drug, data = int_tbl)
+anova(m_int_main, m_int_full)  # test of the interaction term
+```
+
+* If the interaction is **not** significant, one workflow is to drop it and use **Type II** to test main effects.
+  *Caveat*: this is **data-driven model selection**, which can inflate power and does **not** preserve exact Type I error.
+* Alternatively, **keep** the interaction and use **Type III** to ask context-specific questions (e.g., “effect for females”, if they are coded 0). This can be less powerful if weak, same-direction effects exist in both groups, because we do not pool.
+
+### Simultaneous “any drug effect” test (main effect **and** interaction)
+
+We can test **both** the drug main effect and its interaction jointly with an $F$ test:
+
+$$
+H_0: \beta_{\text{drug}} = 0 \ \text{and}\  \beta_{\text{sex:drug}} = 0.
+$$
+
+This asks whether the drug affects **either** sex.
+
+```{r}
+# Build L that extracts the drug main effect and drug:sex interaction(s)
+X_int   <- model.matrix(m_int_full)
+b_int   <- coef(m_int_full)
+s2_int  <- sum(resid(m_int_full)^2) / df.residual(m_int_full)
+Vb_int  <- s2_int * solve(t(X_int) %*% X_int)
+
+# Identify columns
+colnames(X_int)
+# Terms are typically: (Intercept), sexMale, drugYes, sexMale:drugYes
+L_any_drug <- rbind(
+  "drugYes"           = as.numeric(names(b_int) == "drugYes"),
+  "sexMale:drugYes"   = as.numeric(names(b_int) == "sexMale:drugYes")
+)
+
+q <- qr(L_any_drug)$rank
+F_num <- t(L_any_drug %*% b_int) %*% solve(L_any_drug %*% Vb_int %*% t(L_any_drug)) %*% (L_any_drug %*% b_int)
+F_any_drug <- as.numeric(F_num / q)
+p_any_drug <- pf(F_any_drug, df1 = q, df2 = df.residual(m_int_full), lower.tail = FALSE)
+
+data.frame(F_any_drug = F_any_drug, df1 = q, df2 = df.residual(m_int_full), p_value = p_any_drug)
+```
+
+Equivalently, one can use the `anova` function with the full and reduced model (not including any terms involving drug):
+
+```{r}
+m_no_drug <- lm(y ~ sex)
+anova(m_no_drug, m_int_full)
+```
+
